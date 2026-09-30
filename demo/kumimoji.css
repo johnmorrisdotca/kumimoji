@@ -1,0 +1,7 @@
+/* What is Kumimoji's own on its demo page. The family's look is family.css, which this never repeats. */
+:root { --intro-room: 10.5rem; --intro-room-wide: 5.5rem; }
+.setup { margin: 0 0 16px; }
+.setup .fam-seg button { padding: 0 14px; }
+#table { min-height: 420px; }
+.credits { margin: 28px 0 0; }
+.more li > button code { overflow-wrap: anywhere; }

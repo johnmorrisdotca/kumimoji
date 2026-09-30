@@ -1,36 +1,91 @@
 {
   "name": "@johnmorrisdotca/kumimoji",
-  "version": "1.0.1",
-  "description": "Kumimoji 組み文字: the race to build a crossword from a bag of letter tiles, in English or Japanese, alone or at a table of two to eight. Seeded deals, word checking, wild tiles, trades, a computer player, a plain-DOM table and React views.",
-  "license": "MIT",
-  "author": "John Morris <john@johnmorris.ca>",
+  "version": "1.1.0",
+  "description": "Crossword tile race: a word game engine where each player builds a crossword from a bag of letter tiles, in English or Japanese kana, alone against the clock or at a table of two to eight. Seeded deals, word checking, wild tiles, a computer player, and a playable table for React, Vue, Svelte, Angular or plain HTML. Zero dependencies.",
+  "keywords": [
+    "word-game",
+    "word-puzzle",
+    "crossword",
+    "crossword-game",
+    "crossword-builder",
+    "tile-game",
+    "letter-tiles",
+    "tiles",
+    "word-tiles",
+    "anagram",
+    "anagrams",
+    "word-race",
+    "spelling",
+    "vocabulary",
+    "dictionary",
+    "word-list",
+    "word-check",
+    "word-validation",
+    "english",
+    "japanese",
+    "kana",
+    "hiragana",
+    "nihongo",
+    "language-learning",
+    "scowl",
+    "jmdict",
+    "wild-tiles",
+    "blank-tiles",
+    "game",
+    "game-engine",
+    "rules-engine",
+    "game-logic",
+    "puzzle",
+    "puzzle-generator",
+    "seeded",
+    "deterministic",
+    "prng",
+    "ai",
+    "computer-player",
+    "bot",
+    "multiplayer",
+    "pass-and-play",
+    "hotseat",
+    "party-game",
+    "save-game",
+    "json",
+    "export",
+    "import",
+    "browser-game",
+    "html5-game",
+    "typescript",
+    "javascript",
+    "esm",
+    "react",
+    "react-component",
+    "vue",
+    "svelte",
+    "angular",
+    "vanilla-js",
+    "dom",
+    "i18n",
+    "theming",
+    "dark-mode",
+    "zero-dependencies"
+  ],
   "homepage": "https://johnmorrisdotca.github.io/kumimoji/",
+  "bugs": {
+    "url": "https://github.com/johnmorrisdotca/kumimoji/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/johnmorrisdotca/kumimoji.git"
   },
-  "bugs": {
-    "url": "https://github.com/johnmorrisdotca/kumimoji/issues"
+  "license": "MIT",
+  "author": {
+    "name": "John Morris",
+    "email": "john@johnmorris.ca",
+    "url": "https://johnmorris.ca"
   },
   "type": "module",
-  "sideEffects": [
-    "./dist/words.js",
-    "./dist/tileWordsModule.js"
-  ],
-  "engines": {
-    "node": ">=20"
-  },
-  "keywords": [
-    "word-game",
-    "crossword",
-    "tiles",
-    "anagram",
-    "japanese",
-    "kana",
-    "game-engine",
-    "seeded",
-    "react"
-  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -57,17 +112,37 @@
     "CHANGELOG.md",
     "CONTRIBUTING.md"
   ],
+  "sideEffects": [
+    "./dist/words.js",
+    "./dist/tileWordsModule.js"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "vitest run",
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "check": "pnpm run lint && pnpm run typecheck && pnpm test",
-    "site": "pnpm run build && node scripts/site.mjs",
-    "prepublishOnly": "pnpm run check && pnpm run build"
+    "test": "vitest run",
+    "test:table": "pnpm site && playwright test",
+    "test:package": "pnpm build && node scripts/check-package.mjs",
+    "test:frameworks": "pnpm build && node scripts/check-frameworks.mjs",
+    "check": "pnpm lint && pnpm typecheck && pnpm test",
+    "site": "pnpm build && node scripts/site.mjs",
+    "docs:make": "node scripts/docs.mjs",
+    "prepublishOnly": "pnpm check && pnpm build"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
+    "@playwright/test": "^1.63.0",
     "@types/node": "^24.0.0",
     "@types/react": "^19.0.0",
     "eslint": "^9.0.0",
@@ -78,13 +153,8 @@
     "typescript-eslint": "^8.0.0",
     "vitest": "^5.0.0"
   },
-  "peerDependencies": {
-    "react": ">=18"
-  },
-  "peerDependenciesMeta": {
-    "react": {
-      "optional": true
-    }
+  "publishConfig": {
+    "access": "public"
   },
   "packageManager": "pnpm@10.11.0"
 }

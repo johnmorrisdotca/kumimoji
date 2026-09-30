@@ -10,6 +10,7 @@ import { BASE_KANA, CORNER_FORMS } from "./kana.ts";
  * without fetching the dictionary, and `tileWords` reads the same codes.
  */
 export const KANA_TILE_START = 0xe000;
+/** Where the codes of wild tiles given a kana begin: the kana's place in `BASE_KANA` above this. */
 export const KANA_WILD_START = 0xf000;
 
 const KANA = [...BASE_KANA];
@@ -20,16 +21,19 @@ export function kanaTileCode(kana: string, wild = false): string | null {
   return at === -1 ? null : String.fromCodePoint((wild ? KANA_WILD_START : KANA_TILE_START) + at);
 }
 
+/** What a tile shows: what `tileFace` answers. */
 export type TileFaceOf = {
   /** The letter or kana printed on it: 五 on a wild nobody has given one. */
   glyph: string;
   /** The other forms it plays as, small in its corner (`CORNER_FORMS`). */
   forms: string;
+  /** Whether it is a wild tile, given a letter or not. */
   wild: boolean;
   /** A wild with no letter yet. */
   blank: boolean;
 };
 
+/** What a tile code shows, read without the word list: its letter or kana, its corner forms, and whether it is a wild. */
 export function tileFace(tile: string): TileFaceOf {
   if (tile === "*") return { glyph: "五", forms: "", wild: true, blank: true };
   if (/^[A-Z]$/.test(tile)) return { glyph: tile.toLowerCase(), forms: "", wild: true, blank: false };

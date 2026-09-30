@@ -27,6 +27,7 @@ export type MixShown = {
   commonest: string[];
 };
 
+/** A language's set as a page shows it: every tile with its count, the total, and which are the rarest and the commonest. */
 export function mixShown(language: KumimojiLanguage): MixShown {
   const tiles: MixTile[] =
     language === "english"
@@ -45,7 +46,7 @@ export function mixShown(language: KumimojiLanguage): MixShown {
   };
 }
 
-/**
+/*
  * EVERY HIRAGANA A TILE PLAYS AS, itself first: は is は, ば and ぱ; つ is つ,
  * っ and づ; お is お, ぉ and を. Read off the rule the word check uses
  * (`tileKana`) over the whole hiragana block, so the list is what the game
@@ -54,6 +55,7 @@ export function mixShown(language: KumimojiLanguage): MixShown {
 const HIRAGANA_FIRST = 0x3041;
 const HIRAGANA_LAST = 0x3096;
 
+/** Every hiragana a tile plays as, itself first: は is は, ば and ぱ. None for a kana that is not a tile's own. */
 export function formsOfTile(kana: string): string[] {
   if (tileKana(kana) !== kana) return [];
   const forms = [kana];
@@ -73,8 +75,10 @@ export type LengthRow = {
   wilds: Record<"easy" | "medium" | "hard", number>;
 };
 
+/** The lengths of game, shortest first. */
 export const LENGTHS: readonly KumimojiLength[] = ["short", "medium", "full"];
 
+/** For one opening hand, each length of game: how many tiles it deals, from one set and from two, and how many are wild at each level. */
 export function lengthRows(hand: number = KUMIMOJI_HANDS.classic): LengthRow[] {
   return LENGTHS.map((length) => {
     const tiles = kumimojiTileCount(hand, length);

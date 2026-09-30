@@ -1,6 +1,8 @@
+/** How much of the set a game's bag holds: a short game, half the set, or all of it. */
 export type KumimojiLength = "short" | "medium" | "full";
 /** How many of the bag's tiles are wild: easy the most, hard none (`KUMIMOJI_WILDS`). */
 export type KumimojiLevel = "easy" | "medium" | "hard";
+/** The language of the tiles and of the word list they are judged by. */
 export type KumimojiLanguage = "english" | "japanese";
 
 /** How far the player has turned the table to look at it: quarter turns clockwise, 0 to 3. The view alone; the grid never turns. */

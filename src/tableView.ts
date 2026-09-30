@@ -103,6 +103,7 @@ export function zoomView(view: View, factor: number, px: number, py: number): Vi
   return { tile, x: px - (px - view.x) * scale, y: py - (py - view.y) * scale };
 }
 
+/** The view moved by `dx` and `dy` screen pixels. */
 export function panView(view: View, dx: number, dy: number): View {
   return { ...view, x: view.x + dx, y: view.y + dy };
 }

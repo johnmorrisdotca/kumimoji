@@ -27,9 +27,10 @@ export function placeOf(square: string): { row: number; col: number } {
   return { row: row!, col: col! };
 }
 
-/** The rows and columns the tiles stand within, or null for no tiles. */
+/** The rows and columns a grid's tiles stand within. */
 export type Bounds = { top: number; left: number; bottom: number; right: number };
 
+/** The rows and columns the tiles stand within, or null for no tiles. */
 export function boundsOf(tiles: Tiles): Bounds | null {
   let bounds: Bounds | null = null;
   for (const square of tiles.keys()) {
@@ -42,6 +43,7 @@ export function boundsOf(tiles: Tiles): Bounds | null {
   return bounds;
 }
 
+/** A grid as a string, drawn from its own top-left tile: `cat/2o/2w`. `decodeGrid` reads it back. */
 export function encodeGrid(tiles: Tiles): string {
   const bounds = boundsOf(tiles);
   if (bounds === null) return "";
@@ -233,6 +235,7 @@ export type GridVerdict = {
   notWords: readonly string[];
 };
 
+/** A grid judged against any test of a word: `isWord` answers for a run as spelt, and `readable` says how to name one that is not. `judgeWithWords` is this with a language's list. */
 export function judgeGrid(tiles: Tiles, isWord: (word: string) => boolean, readable: (word: string) => string = (word) => word, rules: GridRules = {}): GridVerdict {
   const misspelt = new Set<string>();
   const notWords: string[] = [];

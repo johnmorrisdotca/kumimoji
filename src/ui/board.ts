@@ -4,17 +4,23 @@ import { tileFace } from "../tileFace.ts";
 /** How a tile on the table stands: part of a sound crossword, in a run that is not a word, or apart from the rest. */
 export type TileMark = "sound" | "misspelt" | "apart";
 
+/** One square of the board drawn. */
 export type BoardSquare = {
+  /** Its key, `squareAt(row, col)`. */
   square: string;
   row: number;
   col: number;
   /** The tile standing there, or null for an empty square. */
   tile: string | null;
+  /** What is printed on the tile; "" for an empty square. */
   glyph: string;
+  /** Whether the tile is a wild. */
   wild: boolean;
+  /** How the tile stands; null for an empty square, or with no verdict. */
   mark: TileMark | null;
 };
 
+/** The part of the table to draw: how many rows and columns, and every square, row by row. */
 export type BoardModel = { rows: number; cols: number; squares: BoardSquare[] };
 
 /** How many empty squares are kept round the tiles on every side, so there is always room to build out. */

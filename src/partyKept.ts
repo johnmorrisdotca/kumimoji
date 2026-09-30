@@ -42,6 +42,7 @@ type Kept = {
   players: { name: string; hand: string; grid: string; computer?: true }[];
 };
 
+/** A table of players as text to keep. `decodeParty` reads it back, and given the word list's `familyKey` checks every tile held against the bag. */
 export function encodeParty(game: PartyGame): string {
   const kept: Kept = {
     v: VERSION,

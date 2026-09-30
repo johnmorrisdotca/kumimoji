@@ -33,6 +33,7 @@ import { KUMIMOJI_PARTY } from "./tiles.constants.ts";
 /** Why nobody can join now, or null when a hand can be dealt. */
 export type JoinRefusal = "over" | "full" | "lastRound" | "bag";
 
+/** Why nobody can join the table now, or null when a hand can be dealt. */
 export function joinRefused(game: PartyGame): JoinRefusal | null {
   if (game.ending !== null) return "over";
   if (game.players.length >= KUMIMOJI_PARTY.most) return "full";
@@ -62,6 +63,7 @@ function freePlayerName(players: readonly PartyPlayer[]): string {
 /** Why this player cannot leave now, or null when they can. */
 export type LeaveRefusal = "over" | "out" | "lastPerson";
 
+/** Why the player at seat `at` cannot leave now, or null when they can. */
 export function leaveRefused(game: PartyGame, at: number): LeaveRefusal | null {
   if (game.ending !== null || game.players[at] === undefined) return "over";
   if (game.out.includes(at)) return "out";

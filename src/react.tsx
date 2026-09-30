@@ -14,7 +14,9 @@ const TILE: CSSProperties = {
   boxShadow: "0 2px 0 rgba(0,0,0,.35)",
 };
 
+/** What `KumimojiBoard` takes: a grid to draw, and any attribute of its `<div>`. */
 export type KumimojiBoardProps = {
+  /** The tiles on the table, by square: `play.tiles`. */
   tiles: Tiles;
   /** From `judgeWithWords`: marks the runs that are not words and the tiles apart. Without it, no marks. */
   verdict?: GridVerdict | null;
@@ -62,6 +64,7 @@ export function KumimojiBoard({ tiles, verdict = null, glyphOf, onSquare, held =
   );
 }
 
+/** What `KumimojiTable` takes: the options of `mountKumimoji`, and any attribute of its `<div>`. */
 export type KumimojiTableProps = KumimojiTableOptions & Omit<HTMLAttributes<HTMLDivElement>, keyof KumimojiTableOptions>;
 
 /**
@@ -70,16 +73,16 @@ export type KumimojiTableProps = KumimojiTableOptions & Omit<HTMLAttributes<HTML
  * has it. Options are read when it mounts; give it a new `key` to start over
  * with different ones.
  */
-export function KumimojiTable({ language, hand, level, gameLength, diagonals, seed, onFinish, ...element }: KumimojiTableProps) {
+export function KumimojiTable({ language, hand, level, gameLength, diagonals, seed, onFinish, onChange, locale, strings, theme, keep, ...element }: KumimojiTableProps) {
   const host = useRef<HTMLDivElement>(null);
-  const latest = useRef(onFinish);
+  const latest = useRef({ onFinish, onChange });
   useEffect(() => {
-    latest.current = onFinish;
+    latest.current = { onFinish, onChange };
   });
   useEffect(() => {
     const target = host.current;
     if (target === null) return;
-    const table = mountKumimoji(target, { language, hand, level, gameLength, diagonals, seed, onFinish: (result) => latest.current?.(result) });
+    const table = mountKumimoji(target, { language, hand, level, gameLength, diagonals, seed, locale, strings, theme, keep, onFinish: (result) => latest.current.onFinish?.(result), onChange: (saved) => latest.current.onChange?.(saved) });
     return () => table.destroy();
     // Mounted once per key, as documented above.
     // eslint-disable-next-line react-hooks/exhaustive-deps

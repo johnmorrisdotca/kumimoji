@@ -146,7 +146,7 @@ export function isFinished(play: TilePlay, verdict: GridVerdict): boolean {
   return play.hand.length === 0 && tilesLeft(play) === 0 && verdict.sound;
 }
 
-/*
+/**
  * A GAME KEPT half way, as one string (`PuzzleRun.progress`): how many tiles
  * were taken, the tiles traded back, the hand in its order and the grid
  * (`encodeGrid`), as `12:q:ae:cat/2o/2w`. The bag is the puzzle's own, from

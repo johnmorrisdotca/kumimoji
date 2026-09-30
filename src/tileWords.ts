@@ -67,6 +67,7 @@ export function unpackLength(packed: string, length: number): string[] {
   return words;
 }
 
+/** The English list read from its packed data: every word, the words by length, the set's mix, and the functions that turn tiles into words. */
 export function unpackTileWords(data: Readonly<Record<number, string>>): TileWords {
   const byLength = new Map<number, string[]>();
   const allowed = new Set<string>();
@@ -209,6 +210,7 @@ export async function loadTileWords(language: KumimojiLanguage = "english"): Pro
   return words;
 }
 
+/** The list already loaded, for judging and dealing. Throws where `loadTileWords` has not yet fetched it: a check that cannot read the list must not answer. */
 export function tileWords(language: KumimojiLanguage = "english"): TileWords {
   const words = loaded.get(language);
   if (words === undefined) throw new Error(`The ${language} Kumimoji words have not been loaded (loadTileWords).`);

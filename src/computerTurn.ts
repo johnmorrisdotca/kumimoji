@@ -35,6 +35,7 @@ export const COMPUTER_STEPS_MOST = 8;
 /** How many settling steps may be needed at the end to be allowed Done at all; one trade a turn and a hand of tiles, so it is bounded anyway. */
 const SETTLING_MOST = 200;
 
+/** A computer seat's whole turn as its steps, in order, for a page to show one at a time. None when it is not a computer's turn or the game is over. */
 export function planComputerTurn(game: PartyGame, words: TileWords): ComputerStep[] {
   const steps: ComputerStep[] = [];
   if (game.ending !== null || !isComputer(game, game.turn)) return steps;

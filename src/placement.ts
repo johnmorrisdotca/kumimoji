@@ -22,6 +22,7 @@
  */
 import { DIAGONAL_RUN_LEAST } from "./grid.ts";
 
+/** A square by its row and column. */
 export type Square = { row: number; col: number };
 
 /** A word's place: its first square, and the squares it lays a new tile on, in the word's order. */

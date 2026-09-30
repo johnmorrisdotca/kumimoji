@@ -8,6 +8,7 @@
 /** A number in [0, 1), like `Math.random`, from a stream a seed fixes. */
 export type Random = () => number;
 
+/** A stream of numbers in [0, 1) that the seed fixes: mulberry32. */
 export function seededRandom(seed: number): Random {
   let state = seed >>> 0;
   return () => {
