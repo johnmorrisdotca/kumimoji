@@ -71,7 +71,7 @@ pnpm add @johnmorrisdotca/kumimoji   # or: npm install @johnmorrisdotca/kumimoji
 Or straight from a GitHub release, pinned to its version:
 
 ```sh
-pnpm add https://github.com/johnmorrisdotca/kumimoji/releases/download/v1.0.0/johnmorrisdotca-kumimoji-1.0.0.tgz
+pnpm add https://github.com/johnmorrisdotca/kumimoji/releases/download/v1.0.1/johnmorrisdotca-kumimoji-1.0.1.tgz
 ```
 
 ES modules with types, and no dependencies. The React components need React 18
