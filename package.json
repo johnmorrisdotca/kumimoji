@@ -1,6 +1,6 @@
 {
   "name": "@johnmorrisdotca/kumimoji",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Kumimoji 組み文字: the race to build a crossword from a bag of letter tiles, in English or Japanese, alone or at a table of two to eight. Seeded deals, word checking, wild tiles, trades, a computer player, a plain-DOM table and React views.",
   "license": "MIT",
   "author": "John Morris <john@johnmorris.ca>",
