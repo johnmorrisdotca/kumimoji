@@ -76,7 +76,7 @@
     "type": "git",
     "url": "git+https://github.com/johnmorrisdotca/kumimoji.git"
   },
-  "license": "MIT",
+  "license": "MIT AND CC-BY-SA-4.0",
   "author": {
     "name": "John Morris",
     "email": "john@johnmorris.ca",
