@@ -15,8 +15,8 @@ In English and in Japanese kana. The rules as pure, seeded TypeScript, two word 
 <p align="center"><a href="https://johnmorrisdotca.github.io/kumimoji/"><strong>Play a game →</strong></a> · <a href="https://johnmorrisdotca.github.io/kumimoji/api.html">API reference</a></p>
 
 <p align="center">
-  <img src="docs/desktop.jpg" alt="An English game half way: a crossword on the green table, a hand of tiles under it, and the buttons to draw, trade and sort" width="720">
-  <img src="docs/phone.jpg" alt="A game in Japanese kana on a phone in dark mode" width="220">
+  <img src="docs/desktop.jpg" alt="An English game half way, under the demo's header with its language chooser and five cloth patches: the set-up choices, a crossword of SYNDIC and the words that cross it on the green table, a tile in hand under it, and the buttons to draw, trade and sort" width="720">
+  <img src="docs/phone.jpg" alt="A game in Japanese kana on a phone in dark mode, in Japanese: a crossword half built on the green table, with a tile in hand and the buttons to draw, trade and sort" width="220">
 </p>
 
 A word game engine for the race to build a crossword. Every player lays their
