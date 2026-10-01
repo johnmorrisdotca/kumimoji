@@ -1,7 +1,7 @@
 // The documents that are made from the source, or that quote it, checked against it.
 // Plain JavaScript, so that reading files needs no Node types. `pnpm docs:make` rewrites what is made.
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import process from "node:process";
 import { pathToFileURL } from "node:url";
@@ -9,6 +9,7 @@ import { pathToFileURL } from "node:url";
 import ts from "typescript";
 import { describe, expect, it } from "vitest";
 
+import { KumimojiTable } from "./element.ts";
 import { kumimojiExported, kumimojiToJSON } from "./export.ts";
 import { generateKumimoji } from "./generate.ts";
 import { squareAt } from "./grid.ts";
@@ -152,6 +153,8 @@ describe("the README's tables", () => {
         for (const code of codes(names)) expect(kumimoji[code.replace(/\(.*$/, "")], code).toBeDefined();
       }
     }
+    expect(table("### The day's seed").length, "the day's seed").toBe(2);
+    for (const [names] of table("### The day's seed")) for (const code of codes(names)) expect(kumimoji[code.replace(/\(.*$/, "")], code).toBeDefined();
     for (const name of ["mountKumimoji", "boardModel", "BOARD_MARGIN", "BOARD_LEAST", "KUMIMOJI_STYLE"]) {
       expect(readme, name).toContain(`\`${name}`);
       expect(ui[name], name).toBeDefined();
@@ -171,6 +174,11 @@ describe("the README's tables", () => {
     const exported = new Set(checker.getExportsOfModule(checker.getSymbolAtLocation(program.getSourceFile("src/index.ts"))).map((symbol) => symbol.name));
     for (const name of listed) expect(exported.has(name), name).toBe(true);
   }, 30000);
+
+  it("the element's attributes are the ones listed", () => {
+    // `length` is the attribute for the option `gameLength`.
+    expect(table("| Attribute | Default | What it does |").map(([name]) => codes(name)[0])).toEqual(KumimojiTable.observedAttributes);
+  });
 
   it("the table's options and handle are the ones listed", () => {
     const source = readFileSync("src/ui/mount.ts", "utf8");
@@ -245,6 +253,33 @@ describe("the package", () => {
     expect(readme).toContain(`"generator": "kumimoji ${pkg.version}"`);
   });
 
+  it("needs Node 22 or later, and says so only that way", () => {
+    expect(pkg.engines.node).toBe(">=22");
+    expect(readme).not.toMatch(/Node 20/);
+    expect(readFileSync("CONTRIBUTING.md", "utf8")).not.toMatch(/Node 20/);
+  });
+
+  it("lists every package of the family, with its kana, as the demo's footer does", () => {
+    const template = readFileSync("scripts/family-template.mjs", "utf8");
+    const family = [...template.matchAll(/\{ id: "([\w-]+)", name: "(\w+)", kana: "([^"]+)" \}/g)].map((match) => ({ id: match[1], name: match[2], kana: match[3] }));
+    expect(family.length).toBeGreaterThanOrEqual(16);
+    const block = readme.slice(readme.indexOf("### The family"), readme.indexOf("\n## ", readme.indexOf("### The family")));
+    for (const { id, name, kana } of family) expect(block, id).toContain(`- [${name}](https://github.com/johnmorrisdotca/${id}) (${kana}`);
+    const words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"];
+    expect(block).toContain(`one of ${words[family.length]} packages`);
+    expect([...block.matchAll(/^- \[/gm)]).toHaveLength(family.length);
+    expect(template).toContain(`{ id: "kumimoji", name: "Kumimoji", kana: "組み文字" }`);
+  });
+
+  it("has the files a visitor looks for: issue templates, a pull request template, a security policy, the notice for the word lists", () => {
+    for (const file of [".github/ISSUE_TEMPLATE/report-a-bug.md", ".github/ISSUE_TEMPLATE/suggest-a-feature.md", ".github/ISSUE_TEMPLATE/fix-a-translation.md", ".github/ISSUE_TEMPLATE/add-my-project.md", ".github/ISSUE_TEMPLATE/word-list.md", ".github/ISSUE_TEMPLATE/config.yml", ".github/pull_request_template.md", "SECURITY.md", "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "LICENSE", "NOTICE.md"]) expect(existsSync(file), file).toBe(true);
+    expect(readme).toContain("issues/new?template=word-list.md");
+  });
+
+  it("keeps SECURITY.md and CODE_OF_CONDUCT.md equal to the family's master text (the shared .github repository), a copy of which is kept in scripts/community", () => {
+    for (const file of ["SECURITY.md", "CODE_OF_CONDUCT.md"]) expect(readFileSync(file, "utf8"), file).toBe(readFileSync(`scripts/community/${file}`, "utf8"));
+  });
+
   it("its description and keywords are fit for npm", () => {
     expect(pkg.description.length).toBeLessThanOrEqual(350);
     expect(new Set(pkg.keywords).size).toBe(pkg.keywords.length);
@@ -259,11 +294,11 @@ describe("the package", () => {
     expect(pkg.publishConfig.exports).toBeUndefined();
     expect(pkg.dependencies).toBeUndefined();
     // The words entry and the loader it registers run when imported: a bundler must not drop them.
-    expect(pkg.sideEffects).toEqual(["./dist/words.js", "./dist/tileWordsModule.js"]);
+    expect(pkg.sideEffects).toEqual(["./dist/words.js", "./dist/tileWordsModule.js", "./dist/element-define.js"]);
   });
 
   it("every export of every entry has a doc comment", () => {
-    const entries = ["src/index.ts", "src/ui.ts", "src/react.tsx", "src/words.ts"];
+    const entries = ["src/index.ts", "src/ui.ts", "src/react.tsx", "src/words.ts", "src/element.ts"];
     const program = ts.createProgram(entries, { allowImportingTsExtensions: true, noEmit: true, jsx: ts.JsxEmit.ReactJSX, moduleResolution: ts.ModuleResolutionKind.Bundler, module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2020, skipLibCheck: true });
     const checker = program.getTypeChecker();
     const bare = [];

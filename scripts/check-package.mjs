@@ -81,6 +81,7 @@ if (!isFinished(play, judgeWithWords(play.tiles, english))) throw new Error("SNO
 if (checkKumimoji(3, dealt.givens, encodeGrid(play.tiles), { level: "hard" }).ok !== true) throw new Error("the finished grid was refused");
 const back = await kumimojiFromJSON(kumimojiToJSON({ deal: dealt, play, elapsedMs: 1000 }));
 if (back === null || encodeGrid(back.play.tiles) !== "snowy") throw new Error("the game did not read back from JSON");
+if (kumimoji.kumimojiDailySeed(new Date("2026-10-01T12:00:00Z")) !== 20261001) throw new Error("the day's seed is not the date as a number");
 if (KUMIMOJI_VERSION !== ${JSON.stringify(pkg.version)}) throw new Error("KUMIMOJI_VERSION is " + KUMIMOJI_VERSION);
 `;
 const wordsEntry = JSON.stringify(`${pkg.name}/words`);
@@ -89,7 +90,8 @@ writeFileSync(
   `${entries.map((entry, i) => `import * as m${i} from ${JSON.stringify(entry)};`).join("\n")}
 const all = [${entries.map((_, i) => `m${i}`).join(", ")}];
 const names = ${JSON.stringify(entries)};
-all.forEach((m, i) => { if (Object.keys(m).length === 0) throw new Error(names[i] + " exports nothing"); });
+// An entry that only defines the tag on a page (the /define one) exports nothing, and is imported for its effect.
+all.forEach((m, i) => { if (Object.keys(m).length === 0 && !names[i].endsWith("/define")) throw new Error(names[i] + " exports nothing"); });
 const kumimoji = m0;
 ${game}
 console.log(names.join(" "));
@@ -98,7 +100,7 @@ console.log(names.join(" "));
 writeFileSync(
   join(project, "cjs.cjs"),
   `const names = ${JSON.stringify(entries)};
-for (const name of names) { const m = require(name); if (Object.keys(m).length === 0) throw new Error(name + " exports nothing"); }
+for (const name of names) { const m = require(name); if (Object.keys(m).length === 0 && !name.endsWith("/define")) throw new Error(name + " exports nothing"); }
 require(${wordsEntry});
 const kumimoji = require(${JSON.stringify(pkg.name)});
 (async () => {

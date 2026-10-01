@@ -37,12 +37,12 @@ test("the address asks for a language, and a device remembers the one chosen", a
   await expect(page.locator(PLAYING)).toBeVisible();
   await tap(page, '[data-lang="ja"]');
   await page.goto(`http://kumimoji.test/${bare}`);
-  await expect(page.locator('[data-testid="km-sort"]')).toHaveText("並べ替え");
+  await expect(page.locator('#table [data-testid="km-sort"]')).toHaveText("並べ替え");
   s = await sound(page, errors);
   expect(s.lang).toBe("ja");
   await tap(page, '[data-lang="en"]');
   await page.goto(`http://kumimoji.test/${bare}`);
-  await expect(page.locator('[data-testid="km-sort"]')).toHaveText("Sort");
+  await expect(page.locator('#table [data-testid="km-sort"]')).toHaveText("Sort");
 });
 
 test("a first visit follows the browser's language, in its words and in its tiles", async ({ browser }) => {

@@ -48,6 +48,8 @@ const page = `<!doctype html>
         ${choice("wilds", [["level=easy", { say: "easy" }], ["level=medium", { say: "medium" }], ["level=hard", { say: "hard" }]], ["How many wild tiles are in the bag: most, some or none. A wild stands for any letter. It takes effect when you press New game.", "袋に入れるワイルドタイル（どの文字にもなるタイル）の量です（多め・少し・なし）。「新しいゲーム」を押すと反映されます。"])}
         <button type="button" class="fam-button" data-set="diagonals=true" data-say="diagonals" data-tip-en="Also read words that run on a diagonal, not only across and down. A switch: it takes effect when you press New game." data-tip-ja="縦と横に加えて、斜めに並んだ言葉も読みます。オンとオフの切り替えで、「新しいゲーム」を押すと反映されます。"></button>
         <button type="button" class="fam-button" data-accent="true" id="new" data-say="newGame"></button>
+        <button type="button" class="fam-button" id="daily" data-say="daily" data-help-after data-help-en="Deal a game from today's seed, the same bag for everybody in the world today, with the tiles, hand, wilds and diagonals chosen above." data-help-ja="今日のシードでゲームを配ります。今日は世界中の誰でも同じ袋です。タイル、手札、ワイルド、斜めは上で選んだものになります。"></button>
+        <button type="button" class="fam-button" id="share" data-say="share" data-help-after data-help-en="Copy a link that deals this game's bag, with its tiles, hand, wilds and diagonals, to whoever opens it." data-help-ja="このゲームの袋（タイル、手札、ワイルド、斜め）を配るリンクをコピーします。開いた人にも同じ袋が配られます。"></button>
       </div>
       <div id="table"></div>
       ${familyUnreviewed({ id })}
@@ -58,10 +60,16 @@ const page = `<!doctype html>
           ${tries.map(([name, code]) => `<li><button type="button" data-try="${name}"><code>${code.replace(/"/g, "&quot;")}</code><span data-say="try${name[0].toUpperCase()}${name.slice(1)}"></span></button></li>`).join("\n          ")}
         </ul>
       </section>
+      <section class="more tag" aria-labelledby="tag-title">
+        <h2 id="tag-title" data-say="tagTitle"></h2>
+        <p data-say="tagText"></p>
+        <kumimoji-table id="tag" data-testid="tag" language="english" hand="3" level="hard" seed="44" keep="off"></kumimoji-table>
+      </section>
       <p class="credits fam-fine"><span data-say="credits"></span> <a href="https://github.com/johnmorrisdotca/kumimoji/blob/main/NOTICE.md" data-say="creditsLink"></a></p>
       ${familyFooter({ id })}
     </main>
     <script>${FAMILY_SCRIPT}</script>
+    <script type="module" src="dist/element-define.js"></script>
     <script type="module" src="demo.js"></script>
   </body>
 </html>

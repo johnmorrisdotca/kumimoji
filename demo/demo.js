@@ -2,7 +2,7 @@
 // device between visits, and spoken in the language the header's chooser picks. The language of the
 // page and the language of the tiles are two things: an English page can play kana.
 /* global familyLanguage */
-import { kumimojiFromJSON, kumimojiToJSON } from "./dist/index.js";
+import { kumimojiDailySeed, kumimojiFromJSON, kumimojiToJSON } from "./dist/index.js";
 import { mountKumimoji } from "./dist/ui.js";
 
 // The page's own words, in the two languages the table speaks. Set as text, never as HTML.
@@ -22,6 +22,12 @@ const WORDS = {
     hard: "None",
     diagonals: "Diagonals",
     newGame: "New game",
+    daily: "Today's game",
+    share: "Copy link",
+    copied: "Copied",
+    copyFailed: "Could not copy",
+    tagTitle: "As a tag",
+    tagText: "The same table in one element, with no framework: the smallest game there is, from a hand of three, dealt from a seed.",
     moreTitle: "Other games",
     moreText: "Each of these deals a new game another way, and says what the table was given to do it. To move a tile on the table, tap it and then a square; tap it twice to take it back. A tile you cannot use can be traded for three.",
     trySmall: "The smallest game there is: NOW, then SNOW, then SNOWY",
@@ -48,6 +54,12 @@ const WORDS = {
     hard: "なし",
     diagonals: "斜めも読む",
     newGame: "新しいゲーム",
+    daily: "今日のゲーム",
+    share: "リンクをコピー",
+    copied: "コピーしました",
+    copyFailed: "コピーできませんでした",
+    tagTitle: "タグとして",
+    tagText: "同じテーブルを、フレームワークなしの一つの要素で。手札3枚のいちばん小さなゲームを、シードから配ります。",
     moreTitle: "ほかのゲーム",
     moreText: "下のボタンは、それぞれ別の設定で新しいゲームを配ります。ボタンには、そのときテーブルに渡す設定が書いてあります。テーブルのタイルを動かすには、タイルをタップしてからマスをタップします。同じタイルを2回タップすると手札に戻ります。使えないタイルは、3枚と交換できます。",
     trySmall: "いちばん小さなゲーム: NOW、SNOW、SNOWY の順に作ります",
@@ -68,14 +80,23 @@ const oneOf = (name, values) => (values.includes(query.get(name)) ? query.get(na
 const seed = number("seed", (value) => Number.isInteger(value) && value >= 0 && value <= 0xffffffff);
 
 let table = null;
-const language = familyLanguage({ id: "kumimoji", words: WORDS, onChange: (lang) => table?.setLocale(lang) });
+const language = familyLanguage({
+  id: "kumimoji",
+  words: WORDS,
+  onChange: (lang) => {
+    table?.setLocale(lang);
+    // The table in a tag follows the page's language the same way, by its attribute.
+    document.getElementById("tag")?.setAttribute("lang", lang);
+  },
+});
+document.getElementById("tag")?.setAttribute("lang", language.lang);
 
 // What the row above the table shows and the next game is dealt as. On a first visit the tiles follow the page's language.
 const setUp = {
   language: oneOf("words", ["english", "japanese"]) ?? (language.lang === "ja" ? "japanese" : "english"),
   hand: number("hand", (value) => [3, 7, 11].includes(value)) ?? 7,
   level: oneOf("level", ["easy", "medium", "hard"]) ?? "medium",
-  gameLength: "short",
+  gameLength: oneOf("length", ["short", "medium", "full"]) ?? "short",
   diagonals: query.get("diagonals") === "1",
 };
 
@@ -105,7 +126,7 @@ async function kept() {
 }
 
 // A game left half way is put back, unless the address asks for a deal of its own.
-const before = seed === undefined && !query.has("words") && !query.has("hand") ? await kept() : null;
+const before = seed === undefined && !query.has("words") && !query.has("hand") && !query.has("length") ? await kept() : null;
 if (before !== null) Object.assign(setUp, { language: before.deal.language, hand: before.deal.size, level: before.deal.level, gameLength: before.deal.gameLength, diagonals: before.deal.diagonals === true });
 
 table = mountKumimoji(document.getElementById("table"), {
@@ -135,6 +156,39 @@ for (const button of document.querySelectorAll("[data-set]")) {
   });
 }
 document.getElementById("new").addEventListener("click", () => start());
+document.getElementById("daily").addEventListener("click", () => start({ seed: kumimojiDailySeed(new Date()) }));
+
+/** Say what a button did for a moment, then say what it is for again. */
+function said(button, text) {
+  const key = button.dataset.say;
+  button.textContent = text;
+  button.dataset.said = "true";
+  setTimeout(() => {
+    button.textContent = WORDS[language.lang][key];
+    delete button.dataset.said;
+  }, 1500);
+}
+
+/** The link that deals the game on the table to whoever opens it: its seed, and the set-up that goes with it. */
+function linkOf(deal) {
+  const url = new URL(location.href);
+  const asked = { seed: deal.seed, words: deal.language, hand: deal.size, level: deal.level, length: deal.gameLength, lang: language.lang };
+  if (deal.diagonals === true) asked.diagonals = "1";
+  url.search = new URLSearchParams(asked).toString();
+  url.hash = "";
+  return url.href;
+}
+document.getElementById("share").addEventListener("click", async () => {
+  const button = document.getElementById("share");
+  const deal = table.saved()?.deal;
+  try {
+    if (deal === undefined) throw new Error("no game yet");
+    await navigator.clipboard.writeText(linkOf(deal));
+    said(button, WORDS[language.lang].copied);
+  } catch {
+    said(button, WORDS[language.lang].copyFailed);
+  }
+});
 
 const TRIES = {
   small: { setUp: { language: "english", hand: 3, level: "hard", gameLength: "short", diagonals: false }, seed: 44 },

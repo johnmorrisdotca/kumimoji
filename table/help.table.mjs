@@ -12,7 +12,7 @@ test("Help is off at first, and on it shows a line under each option row, in eit
   expect(await rows.count()).toBeGreaterThan(0);
   await expect(page.locator("[data-help-switch]")).toHaveAttribute("aria-pressed", "false");
   await expect(lines.first()).toBeHidden();
-  const surface = page.locator('.km-board').first();
+  const surface = page.locator('#table .km-board').first();
   const before = await surface.boundingBox();
   await page.locator("[data-help-switch]").click();
   await expect(page.locator("html")).toHaveAttribute("data-help", "on");

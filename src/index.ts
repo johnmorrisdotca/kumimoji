@@ -42,6 +42,7 @@ export * from "./computer.types.ts";
 export * from "./computerPlay.ts";
 export * from "./computerTurn.ts";
 export * from "./random.ts";
+export * from "./daily.ts";
 export * from "./export.ts";
 export * from "./strings.ts";
 export { KUMIMOJI_VERSION } from "./version.ts";

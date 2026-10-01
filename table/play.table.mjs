@@ -38,12 +38,12 @@ test("a whole game by taps: NOW, then SNOW, then SNOWY", async ({ page }) => {
   expect(s.handWords).toBe("No tiles in hand");
   expect(s.controls[0]).toBe("Draw");
 
-  await tap(page, '[data-testid="km-draw"]');
+  await tap(page, '#table [data-testid="km-draw"]');
   s = await sound(page, errors);
   expect(s.hand).toEqual(["s"]);
   expect(s.left).toBe(1);
   await lay(page, 0, 0, -1);
-  await tap(page, '[data-testid="km-draw"]');
+  await tap(page, '#table [data-testid="km-draw"]');
   s = await state(page);
   expect(s.hand).toEqual(["y"]);
   expect(s.status).toMatch(/^0 tiles left in the bag/);
@@ -53,7 +53,7 @@ test("a whole game by taps: NOW, then SNOW, then SNOWY", async ({ page }) => {
   expect(s.table).toEqual({ "0,-1": "s", "0,0": "n", "0,1": "o", "0,2": "w", "0,3": "y" });
   expect(s.status).toMatch(/^Finished in 0:\d\d\. Every tile laid, every run a word\.$/);
   expect(s.controls).toEqual(["New game"]);
-  await tap(page, '[data-testid="km-new"]');
+  await tap(page, '#table [data-testid="km-new"]');
   await expect(page.locator(PLAYING)).toBeVisible();
   expect((await state(page)).hand.length).toBe(3);
 });
@@ -68,11 +68,11 @@ test("a tile is taken back by tapping it twice, and all of them by Lift all; Sor
   let s = await sound(page, errors);
   expect(s.hand).toEqual(["o", "n"]);
   expect(Object.values(s.table)).toEqual(["w"]);
-  await tap(page, '[data-testid="km-lift"]');
+  await tap(page, '#table [data-testid="km-lift"]');
   s = await sound(page, errors);
   expect(s.table).toEqual({});
   expect(s.hand).toEqual(["o", "n", "w"]);
-  await tap(page, '[data-testid="km-sort"]');
+  await tap(page, '#table [data-testid="km-sort"]');
   expect((await state(page)).hand).toEqual(["n", "o", "w"]);
 });
 
@@ -93,7 +93,7 @@ test("a tile is traded for three, and a wild is given its letter before it is la
   expect(s.picker.length).toBe(26);
   await tap(page, `${ROOT} [data-square="0,0"]`);
   expect((await state(page)).table).toEqual({});
-  await tap(page, '[data-testid="km-picker"] button >> nth=4');
+  await tap(page, '#table [data-testid="km-picker"] button >> nth=4');
   s = await sound(page, errors);
   expect(s.hand[wild]).toBe("e");
   await tap(page, `${ROOT} [data-square="0,0"]`);
@@ -106,7 +106,7 @@ test("a tile is traded for three, and a wild is given its letter before it is la
   const left = s.left;
   await tap(page, `${ROOT} [data-hand="0"]`);
   expect((await state(page)).controls[1]).toBe("Trade for three");
-  await tap(page, '[data-testid="km-trade"]');
+  await tap(page, '#table [data-testid="km-trade"]');
   s = await sound(page, errors);
   expect(s.hand.length).toBe(8);
   expect(s.left).toBe(left - 2);

@@ -6,10 +6,24 @@ All notable changes to this project are written down here. The format follows
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-01
+
+Nothing that was exported has changed; the rules, the word lists, every deal and every saved game are exactly as they were.
+
+### Added
+
+- **`<kumimoji-table>`**, a game alone as a tag, with no framework: `@johnmorrisdotca/kumimoji/element/define` defines it (or `…/element` holds the class alone), and `language`, `hand`, `level`, `length`, `diagonals`, `seed`, `lang` and `keep` are attributes, read again when they change. It fires `kumimoji-change` after every change to the game and `kumimoji-finish` when it is won. A table the rules do not offer draws nothing.
+- **A bag a day**: `kumimojiDailySeed(date)` is the UTC date as a number (2026-10-01 is `20261001`), the same seed for everybody and the same number as Tane's `dailySeed`; `kumimojiDay(date)` writes the day. The tag takes `seed="daily"`, and the demo has Today's game.
+- **Played from a keyboard.** Tab lands on one square of the table and one tile of the hand; the arrow keys move between squares, and Left, Right, Home and End between the hand's tiles; Enter or Space picks up and lays; Escape lets go of a tile. The keyboard stays where it was after each move, on the squares, the hand and the buttons under the table. The table's notes are a polite live region. One new word in both languages (`tableKeys`) describes the table for a screen reader.
+- **Demo:** a table in a tag, Today's game, and Copy link, which copies an address that deals the same game (its seed, tiles, hand, wilds, length and diagonals).
+- **README:** an Accessibility section, "The element", "The day's seed", and the list of all sixteen packages of the family.
+- A *word list* issue template, a pull request template, SECURITY.md and CODE_OF_CONDUCT.md as the family's shared text (held equal by a test), and the family's house rules in CONTRIBUTING.md.
+
 ### Changed
 
+- **Node 22 or later** (`engines`), where it said 20, which is out of support and was never tested. The package's `sideEffects` also names the file that defines the tag.
 - **A Help switch in the demo.** Beside the language chooser in the family header, shared by every demo. Off (the default) the page is as it was; on, each option row (the tiles, the hand, the wilds) says in one plain line what it does, in English or Japanese, and every button in it has the same words as its hover text. Kept on the device.
-
+- The README's pictures are taken again, with the Help switch in the header.
 
 ## [1.1.1] - 2026-10-01
 

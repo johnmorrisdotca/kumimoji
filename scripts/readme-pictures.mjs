@@ -62,12 +62,12 @@ async function shot({ width, height, colorScheme, lang, language, seed, words, p
     return route.fulfill({ body: readFileSync(file), contentType: TYPES[file.slice(file.lastIndexOf("."))] ?? "application/octet-stream" });
   });
   await page.goto(`${host}/?seed=${seed}&hand=7&level=hard&words=${language}&lang=${lang}`);
-  await page.waitForSelector('[data-testid="km-root"][data-state="playing"]');
+  await page.waitForSelector('#table [data-testid="km-root"][data-state="playing"]');
   for (const step of await taps({ language, seed, words })) {
-    if (step.draw) await page.locator('[data-testid="km-draw"]').click();
+    if (step.draw) await page.locator('#table [data-testid="km-draw"]').click();
     else {
-      await page.locator(`[data-hand="${step.hand}"]`).click();
-      await page.locator(`[data-square="${step.square}"]`).click();
+      await page.locator(`#table [data-hand="${step.hand}"]`).click();
+      await page.locator(`#table [data-square="${step.square}"]`).click();
     }
   }
   await page.waitForTimeout(300);
@@ -81,5 +81,5 @@ async function shot({ width, height, colorScheme, lang, language, seed, words, p
 // English from the top of the page, so the header, the language chooser and the cloth patches show: a crossword half built.
 await shot({ width: 1280, height: 900, colorScheme: "light", lang: "en", language: "english", seed: 77, words: 7, path: join(docs, "desktop.jpg") });
 // Kana on a phone, scrolled to the table.
-await shot({ width: 390, height: 844, colorScheme: "dark", lang: "ja", language: "japanese", seed: 1, words: 5, path: join(docs, "phone.jpg"), scrollTo: '[data-testid="km-root"]' });
+await shot({ width: 390, height: 844, colorScheme: "dark", lang: "ja", language: "japanese", seed: 1, words: 5, path: join(docs, "phone.jpg"), scrollTo: '#table [data-testid="km-root"]' });
 await browser.close();

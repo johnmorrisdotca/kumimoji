@@ -9,7 +9,7 @@ import { expect, test } from "@playwright/test";
 const site = join(dirname(fileURLToPath(import.meta.url)), "..", "site");
 const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".md": "text/markdown" };
 
-export const ROOT = '[data-testid="km-root"]';
+export const ROOT = '#table [data-testid="km-root"]';
 /** The table once a game is dealt. */
 export const PLAYING = `${ROOT}[data-state="playing"]`;
 /** The smallest game there is: a hand of three from seed 44, which deals N W O, then S, then Y. */
@@ -52,25 +52,25 @@ export function state(page) {
     const q = (s) => document.querySelector(s);
     const all = (s) => [...document.querySelectorAll(s)];
     const box = (e) => e.getBoundingClientRect();
-    const root = q('[data-testid="km-root"]');
+    const root = q('#table [data-testid="km-root"]');
     return {
       lang: document.documentElement.lang,
       state: root.dataset.state,
       seed: root.dataset.seed,
       left: Number(root.dataset.left),
       japanese: root.classList.contains("km-japanese"),
-      status: q('[data-testid="km-status"]').textContent,
-      notes: q('[data-testid="km-notes"]').textContent,
-      hand: all('[data-testid="km-hand"] [data-hand]').map((tile) => tile.dataset.tile),
-      handWords: q('[data-testid="km-hand"]').textContent,
-      table: Object.fromEntries(all(".km-board .km-tile").map((tile) => [tile.dataset.square, tile.dataset.tile])),
-      wrong: all(".km-board .km-misspelt").map((tile) => tile.dataset.square),
-      wilds: all(".km-board .km-wild").map((tile) => tile.dataset.square),
-      squares: all(".km-board .km-square, .km-board .km-tile").length,
-      picker: all('[data-testid="km-picker"] button').map((b) => b.textContent),
-      controls: all('[data-testid="km-controls"] button').map((b) => `${b.textContent}${b.disabled ? " (off)" : ""}`),
-      keep: all('[data-testid="km-keep"] button').map((b) => b.textContent),
-      note: q('[data-testid="km-note"]')?.textContent ?? "",
+      status: q('#table [data-testid="km-status"]').textContent,
+      notes: q('#table [data-testid="km-notes"]').textContent,
+      hand: all('#table [data-testid="km-hand"] [data-hand]').map((tile) => tile.dataset.tile),
+      handWords: q('#table [data-testid="km-hand"]').textContent,
+      table: Object.fromEntries(all("#table .km-board .km-tile").map((tile) => [tile.dataset.square, tile.dataset.tile])),
+      wrong: all("#table .km-board .km-misspelt").map((tile) => tile.dataset.square),
+      wilds: all("#table .km-board .km-wild").map((tile) => tile.dataset.square),
+      squares: all("#table .km-board .km-square, .km-board .km-tile").length,
+      picker: all('#table [data-testid="km-picker"] button').map((b) => b.textContent),
+      controls: all('#table [data-testid="km-controls"] button').map((b) => `${b.textContent}${b.disabled ? " (off)" : ""}`),
+      keep: all('#table [data-testid="km-keep"] button').map((b) => b.textContent),
+      note: q('#table [data-testid="km-note"]')?.textContent ?? "",
       unreviewed: !q("#unreviewed").hidden,
       pitch: q('[data-say="pitch"]').textContent,
       pressed: all('[data-set][aria-pressed="true"]').map((b) => b.dataset.set),

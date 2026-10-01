@@ -28,7 +28,7 @@ export const KUMIMOJI_STYLE = `
 .km-misspelt { box-shadow: 0 0 0 3px var(--km-wrong) inset, 0 2px 0 rgba(0,0,0,.35); }
 .km-apart { opacity: .6; }
 .km-held { outline: 3px solid var(--km-held); outline-offset: 1px; }
-.km-square:focus-visible, .km-button:focus-visible, .km-keep-title:focus-visible { outline: 3px solid var(--km-held); outline-offset: 2px; }
+.km-square:focus-visible, .km-in-hand:focus-visible, .km-button:focus-visible, .km-keep-title:focus-visible { outline: 3px solid var(--km-held); outline-offset: 2px; }
 .km-notes { margin: 0; min-height: 1.4em; font-size: 14px; opacity: .8; overflow-wrap: anywhere; }
 .km-hand { display: flex; flex-wrap: wrap; gap: 6px; min-height: calc(var(--km-square) + 16px); align-items: center; padding: 8px; border-radius: 10px; background: var(--km-panel); }
 .km-empty { opacity: .6; font-size: 14px; }

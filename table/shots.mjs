@@ -22,10 +22,10 @@ for (const width of [390, 1280]) {
       });
       // A game a few tiles in, in the language of the page: a word laid, one that is not, and the fold open.
       await page.goto(`http://kumimoji.test/?seed=2026&hand=7&level=medium&words=${lang === "ja" ? "japanese" : "english"}&lang=${lang}`);
-      await page.waitForSelector('[data-testid="km-root"][data-state="playing"]');
+      await page.waitForSelector('#table [data-testid="km-root"][data-state="playing"]');
       const lay = async (handAt, row, col) => {
-        await page.locator(`[data-hand="${handAt}"]`).click();
-        await page.locator(`[data-square="${row},${col}"]`).click();
+        await page.locator(`#table [data-hand="${handAt}"]`).click();
+        await page.locator(`#table [data-square="${row},${col}"]`).click();
       };
       if (lang === "ja") {
         await lay(5, 0, 0);
@@ -36,7 +36,7 @@ for (const width of [390, 1280]) {
         await lay(5, 0, 1);
         await lay(1, 1, 1);
       }
-      await page.locator('[data-testid="km-keep"] summary').click();
+      await page.locator('#table [data-testid="km-keep"] summary').click();
       await page.screenshot({ path: join(folder, `${name}-${width}-${colorScheme}-${lang}.png`), fullPage: true });
       await context.close();
     }

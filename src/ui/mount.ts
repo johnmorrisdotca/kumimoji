@@ -111,6 +111,9 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
   let dealt: KumimojiDeal | null = null;
   let play: TilePlay | null = null;
   let held: Held = null;
+  // Where a keyboard is: the square and the hand tile that Tab lands on, and the one the arrow keys move from.
+  let onSquare: string | null = null;
+  let onHand = 0;
   let started = 0;
   let finishedAt: number | null = null;
   let destroyed = false;
@@ -130,6 +133,7 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
   board.dataset.testid = "km-board";
   const notes = node("p", "km-notes");
   notes.dataset.testid = "km-notes";
+  notes.setAttribute("aria-live", "polite");
   const hand = node("div", "km-hand");
   hand.dataset.testid = "km-hand";
   hand.setAttribute("role", "group");
@@ -243,6 +247,54 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
     if (at !== null && at !== undefined) tapHand(Number(at));
   });
 
+  // Keyboard play. The squares and the hand's tiles are buttons, so Enter and Space tap them; each is one stop for
+  // Tab, and the arrow keys move between squares (by the grid) and between the hand's tiles. Escape puts a held tile down.
+  board.addEventListener("keydown", (event) => {
+    const cell = (event.target as Element).closest<HTMLElement>("[data-square]");
+    const grid = board.querySelector<HTMLElement>(".km-grid");
+    if (cell === null || grid === null || event.altKey || event.ctrlKey || event.metaKey) return;
+    const cells = [...grid.children] as HTMLElement[];
+    const cols = Number(grid.dataset.cols);
+    const at = cells.indexOf(cell);
+    const step = event.key === "ArrowLeft" ? (at % cols > 0 ? -1 : 0) : event.key === "ArrowRight" ? (at % cols < cols - 1 ? 1 : 0) : event.key === "ArrowUp" ? (at - cols >= 0 ? -cols : 0) : event.key === "ArrowDown" ? (at + cols < cells.length ? cols : 0) : null;
+    if (step === null) return;
+    event.preventDefault();
+    const next = cells[at + step];
+    if (step === 0 || next === undefined) return;
+    cell.tabIndex = -1;
+    next.tabIndex = 0;
+    onSquare = next.dataset.square ?? null;
+    next.focus();
+  });
+  board.addEventListener("focusin", (event) => {
+    const square = (event.target as Element).closest("[data-square]")?.getAttribute("data-square");
+    if (square !== null && square !== undefined) onSquare = square;
+  });
+  hand.addEventListener("focusin", (event) => {
+    const at = (event.target as Element).closest("[data-hand]")?.getAttribute("data-hand");
+    if (at !== null && at !== undefined) onHand = Number(at);
+  });
+  hand.addEventListener("keydown", (event) => {
+    const tile = (event.target as Element).closest<HTMLElement>("[data-hand]");
+    if (tile === null || event.altKey || event.ctrlKey || event.metaKey) return;
+    const tiles = [...hand.querySelectorAll<HTMLElement>("[data-hand]")];
+    const at = tiles.indexOf(tile);
+    const to = event.key === "ArrowLeft" ? at - 1 : event.key === "ArrowRight" ? at + 1 : event.key === "Home" ? 0 : event.key === "End" ? tiles.length - 1 : null;
+    if (to === null) return;
+    event.preventDefault();
+    const next = tiles[to];
+    if (next === undefined) return;
+    tile.tabIndex = -1;
+    next.tabIndex = 0;
+    onHand = to;
+    next.focus();
+  });
+  root.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || held === null) return;
+    held = null;
+    render();
+  });
+
   function renderStatus() {
     root.dataset.state = play === null ? "dealing" : finishedAt !== null ? "finished" : "playing";
     if (play === null) {
@@ -261,6 +313,9 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
     grid.style.gridTemplateColumns = `repeat(${model.cols}, var(--km-square))`;
     grid.setAttribute("role", "group");
     grid.setAttribute("aria-label", say.tableLabel);
+    grid.setAttribute("aria-description", say.tableKeys);
+    grid.dataset.cols = String(model.cols);
+    const cells: HTMLButtonElement[] = [];
     for (const square of model.squares) {
       const cell = node("button", "km-square");
       cell.type = "button";
@@ -276,7 +331,15 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
         cell.setAttribute("aria-label", say.emptySquare);
       }
       if (held?.from === "table" && held.square === square.square) cell.classList.add("km-held");
+      cell.tabIndex = -1;
+      cells.push(cell);
       grid.append(cell);
+    }
+    // The one Tab lands on: where the keyboard was, else a tile, else the middle.
+    const stop = cells.find((cell) => cell.dataset.square === onSquare) ?? cells.find((cell) => cell.classList.contains("km-tile")) ?? cells[Math.floor(cells.length / 2)];
+    if (stop !== undefined) {
+      stop.tabIndex = 0;
+      onSquare = stop.dataset.square ?? null;
     }
     board.replaceChildren(grid);
     notes.textContent = verdict.notWords.length > 0 ? kumimojiSay(say.notWords, { words: verdict.notWords.join(", ") }) : verdict.apart.size > 0 ? say.apart : "";
@@ -295,6 +358,7 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
       if (held?.from === "hand" && held.at === at) made.classList.add("km-held");
       made.dataset.tile = face.blank ? "*" : words!.glyphOf(tile);
       made.setAttribute("aria-label", face.blank ? say.wildBlank : face.wild ? kumimojiSay(say.wildTile, { tile: words!.glyphOf(tile) }) : words!.glyphOf(tile));
+      made.tabIndex = at === Math.min(onHand, play!.hand.length - 1) ? 0 : -1;
       hand.append(made);
     });
     if (play!.hand.length === 0 && finishedAt === null) hand.append(node("span", "km-empty", say.noTiles));
@@ -360,8 +424,29 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
     keepNote.textContent = note;
   }
 
+  /** Where the keyboard is, so that it can be put back after everything is drawn again: the zone, and which of it. */
+  function keyboardAt(): { zone: "board" | "hand" | "controls" | "picker"; id: string } | null {
+    const on = document.activeElement;
+    if (on === null || !root.contains(on)) return null;
+    const mark = (zone: "board" | "hand" | "controls" | "picker", id: string | undefined) => (id === undefined ? null : { zone, id });
+    if (board.contains(on)) return mark("board", (on as HTMLElement).dataset.square);
+    if (hand.contains(on)) return mark("hand", (on as HTMLElement).dataset.hand);
+    if (controls.contains(on)) return mark("controls", (on as HTMLElement).dataset.testid);
+    if (picker.contains(on)) return mark("picker", String([...picker.querySelectorAll("button")].indexOf(on as HTMLButtonElement)));
+    return null;
+  }
+
+  function keyboardBack(at: ReturnType<typeof keyboardAt>) {
+    if (at === null) return;
+    const zone = { board, hand, controls, picker }[at.zone];
+    const found = at.zone === "board" ? zone.querySelector<HTMLElement>(`[data-square="${at.id}"]`) : at.zone === "hand" ? zone.querySelector<HTMLElement>(`[data-hand="${at.id}"]`) : at.zone === "controls" ? zone.querySelector<HTMLElement>(`[data-testid="${at.id}"]`) : zone.querySelectorAll<HTMLElement>("button")[Number(at.id)];
+    // A button that has become disabled cannot hold the focus; the table keeps it rather than dropping it on the page.
+    if (found !== undefined && found !== null && !(found as HTMLButtonElement).disabled) found.focus({ preventScroll: true });
+  }
+
   function render() {
     if (destroyed) return;
+    const where = keyboardAt();
     root.lang = locale;
     renderStatus();
     renderKeep();
@@ -371,6 +456,7 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
     renderPicker();
     renderHand();
     renderControls(verdict);
+    keyboardBack(where);
   }
 
   const handle: KumimojiTableHandle = {

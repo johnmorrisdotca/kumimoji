@@ -5,3 +5,6 @@
 #table { min-height: 420px; }
 .credits { margin: 28px 0 0; }
 .more li > button code { overflow-wrap: anywhere; }
+.tag kumimoji-table { display: block; margin-top: 10px; }
+.tag .km-root { --km-ink: var(--ink); --km-panel: var(--surface); --km-font: var(--font); --km-felt: var(--felt); --km-accent: var(--felt); --km-accent-ink: var(--felt-ink); }
+.fam-button[data-said="true"] { opacity: .8; }

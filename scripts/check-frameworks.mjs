@@ -40,7 +40,11 @@ function example(heading, lang) {
   return found[1];
 }
 // A page with no bundler imports the published files by their path.
-const unbundled = (code) => code.replaceAll('"@johnmorrisdotca/kumimoji/ui"', '"./kumimoji/dist/ui.js"').replaceAll('"@johnmorrisdotca/kumimoji"', '"./kumimoji/dist/index.js"');
+const unbundled = (code) =>
+  code
+    .replaceAll('"@johnmorrisdotca/kumimoji/ui"', '"./kumimoji/dist/ui.js"')
+    .replaceAll('"@johnmorrisdotca/kumimoji"', '"./kumimoji/dist/index.js"')
+    .replaceAll("https://cdn.jsdelivr.net/npm/@johnmorrisdotca/kumimoji@1/dist/element-define.js", "./kumimoji/dist/element-define.js");
 
 const projects = {
   // The table in a component's mount hook, which is all any framework needs.
@@ -51,7 +55,7 @@ const projects = {
       "vite.config.js": `import vue from "@vitejs/plugin-vue";\nexport default { base: "./", plugins: [vue()] };\n`,
       "index.html": page(`<script type="module" src="/src/main.js"></script>`),
       "src/main.js": `import { createApp } from "vue";\nimport App from "./App.vue";\ncreateApp(App).mount("#app");\n`,
-      "src/App.vue": example("### 4. Vue", "vue"),
+      "src/App.vue": example("### 5. Vue", "vue"),
     },
   },
   svelte: {
@@ -61,7 +65,7 @@ const projects = {
       "vite.config.js": `import { svelte } from "@sveltejs/vite-plugin-svelte";\nexport default { base: "./", plugins: [svelte()] };\n`,
       "index.html": page(`<script type="module" src="/src/main.js"></script>`),
       "src/main.js": `import { mount } from "svelte";\nimport App from "./App.svelte";\nmount(App, { target: document.getElementById("app") });\n`,
-      "src/App.svelte": example("### 5. Svelte", "svelte"),
+      "src/App.svelte": example("### 6. Svelte", "svelte"),
     },
   },
   angular: {
@@ -86,7 +90,7 @@ const projects = {
       },
       "tsconfig.json": { compilerOptions: { target: "ES2022", module: "ES2022", moduleResolution: "bundler", strict: true, experimentalDecorators: true, skipLibCheck: true, lib: ["ES2022", "dom"] }, files: ["src/main.ts"] },
       "src/index.html": page(`<app-root></app-root>`),
-      "src/main.ts": example("### 6. Angular", "typescript"),
+      "src/main.ts": example("### 7. Angular", "typescript"),
     },
   },
   // The table as a component, and the grid alone under a board of the page's own.
@@ -97,7 +101,7 @@ const projects = {
       "package.json": { name: "check-react", private: true, type: "module", dependencies: { "@johnmorrisdotca/kumimoji": kumimoji, react: "^19.0.0", "react-dom": "^19.0.0" }, devDependencies: { vite: "^7.0.0", "@vitejs/plugin-react": "^5.0.0" } },
       "vite.config.js": `import react from "@vitejs/plugin-react";\nexport default { base: "./", plugins: [react()] };\n`,
       "index.html": page(`<script type="module" src="/src/main.jsx"></script>`),
-      "src/App.jsx": example("### 3. React", "jsx"),
+      "src/App.jsx": example("### 4. React", "jsx"),
       "src/Board.jsx": example("### The React components", "jsx"),
       "src/main.jsx": `import { createRoot } from "react-dom/client";
 import { App } from "./App.jsx";
@@ -120,13 +124,15 @@ createRoot(document.getElementById("app")).render(
       cpSync(join(dir, "node_modules/@johnmorrisdotca/kumimoji"), join(dir, "kumimoji"), { recursive: true, dereference: true });
       rmSync(join(dir, "node_modules"), { recursive: true, force: true });
     },
-    also: ["quick.html", "themed.html"],
+    also: ["quick.html", "themed.html", "tag.html"],
     files: {
       "package.json": { name: "check-plain", private: true, dependencies: { "@johnmorrisdotca/kumimoji": kumimoji } },
       "index.html": page(unbundled(example("### 2. The table, in plain HTML", "html"))),
       // The two other examples that mount a table: the one in "Play in 30 seconds", and the themed one.
       "quick.html": page(`<div id="table"></div><script type="module">${unbundled(example("## Play in 30 seconds", "js"))}</script>`),
       "themed.html": page(`<div id="table"></div><script type="module">${unbundled(example("## Theming", "js"))}</script>`),
+      // The tag, as the README writes it: two tables on one page, with no script of the page's own.
+      "tag.html": page(unbundled(example("### 3. As a tag", "html"))),
     },
   },
 };
@@ -197,9 +203,14 @@ if (process.env.KUMIMOJI_BROWSER !== undefined) {
       for (const other of project.also ?? []) {
         await tab.goto(`http://check.test/${other}`);
         await tab.waitForSelector(`${ROOT}[data-state="playing"]`, { timeout: 60000 });
-        const felt = await tab.locator(ROOT).evaluate((el) => el.style.getPropertyValue("--km-felt"));
+        const felt = await tab.locator(ROOT).first().evaluate((el) => el.style.getPropertyValue("--km-felt"));
         notes.push(`${other} dealt${felt === "" ? "" : ` on a table of ${felt}`}`);
         if (other === "themed.html" && felt !== "#23405a") errors.push("the theme was not set on the table");
+        if (other === "tag.html") {
+          await tab.waitForFunction(() => document.querySelectorAll('kumimoji-table [data-testid="km-root"][data-state="playing"]').length === 2, null, { timeout: 60000 });
+          const kana = await tab.locator("kumimoji-table.km-japanese, kumimoji-table .km-japanese").count();
+          if (kana !== 1) errors.push(`the tags dealt ${kana} tables of kana, not one`);
+        }
       }
       const ok = errors.length === 0 && laid === 1 && largest > 500_000 && fetched.length >= 2;
       console.log(`${ok ? "played " : "FAILED "} ${name.padEnd(8)} in ${engine}: a hand of 7 dealt, a tap laid ${laid} tile and the game was handed back; the word list came as a file of its own (${Math.round(largest / 1000)} kB of ${fetched.length} files)${notes.map((note) => `; ${note}`).join("")}${errors.length > 0 ? ` ${errors.join("; ")}` : ""}`);

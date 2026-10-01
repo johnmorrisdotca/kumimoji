@@ -13,6 +13,7 @@ shown. ␠ marks a space at the start or end of a string.
 | `left` | {n} tiles left in the bag · {time} | 袋の残り{n}枚 · {time} |
 | `finished` | Finished in {time}. Every tile laid, every run a word. | {time}で完成しました。すべてのタイルを置き、どの並びも単語になっています。 |
 | `tableLabel` | The table | テーブル |
+| `tableKeys` | Arrow keys move between squares, Enter or Space taps one, and Escape lets go of a tile you have picked up. | 矢印キーでマスを移動し、Enterキーかスペースキーでタップします。Escapeキーで、選んだタイルの選択を解除します。 |
 | `handLabel` | Your hand | 手札 |
 | `emptySquare` | Empty square | 空きマス |
 | `wildTile` | {tile}, wild | {tile}（ワイルド） |

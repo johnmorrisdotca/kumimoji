@@ -1,9 +1,11 @@
 {
   "name": "@johnmorrisdotca/kumimoji",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Crossword tile race: a word game engine where each player builds a crossword from a bag of letter tiles, in English or Japanese kana, alone against the clock or at a table of two to eight. Seeded deals, word checking, wild tiles, a computer player, and a playable table for React, Vue, Svelte, Angular or plain HTML. Zero dependencies.",
   "keywords": [
     "word-game",
+    "custom-element",
+    "web-component",
     "word-puzzle",
     "crossword",
     "crossword-game",
@@ -102,6 +104,14 @@
     "./react": {
       "types": "./dist/react.d.ts",
       "default": "./dist/react.js"
+    },
+    "./element": {
+      "types": "./dist/element.d.ts",
+      "default": "./dist/element.js"
+    },
+    "./element/define": {
+      "types": "./dist/element-define.d.ts",
+      "default": "./dist/element-define.js"
     }
   },
   "files": [
@@ -114,10 +124,11 @@
   ],
   "sideEffects": [
     "./dist/words.js",
-    "./dist/tileWordsModule.js"
+    "./dist/tileWordsModule.js",
+    "./dist/element-define.js"
   ],
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
