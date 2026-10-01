@@ -6,6 +6,19 @@ All notable changes to this project are written down here. The format follows
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-10-01
+
+Nothing that was exported has changed.
+
+### Added
+
+- **An API reference page**, `api.html` on the demo site: every export of every entry point, with its signature and its doc comment, made from the source when the site is built so it cannot fall behind the code. The README and the demo's header link to it, and a test holds it to the source.
+- **An Architecture section in the README**: how the source is split and what each file is for, held to the real files by a test.
+
+### Changed
+
+- The family's footer lists Jarajara.
+
 ## [1.1.0] - 2026-09-30
 
 Nothing that was exported has changed, a seed deals the bag it always dealt,
@@ -94,7 +107,8 @@ The first release.
   `@johnmorrisdotca/kumimoji/react`.
 - A static demo for GitHub Pages.
 
-[Unreleased]: https://github.com/johnmorrisdotca/kumimoji/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/johnmorrisdotca/kumimoji/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/johnmorrisdotca/kumimoji/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/johnmorrisdotca/kumimoji/releases/tag/v1.1.0
 [1.0.1]: https://github.com/johnmorrisdotca/kumimoji/releases/tag/v1.0.1
 [1.0.0]: https://github.com/johnmorrisdotca/kumimoji/releases/tag/v1.0.0

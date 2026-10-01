@@ -1,6 +1,6 @@
 {
   "name": "@johnmorrisdotca/kumimoji",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Crossword tile race: a word game engine where each player builds a crossword from a bag of letter tiles, in English or Japanese kana, alone against the clock or at a table of two to eight. Seeded deals, word checking, wild tiles, a computer player, and a playable table for React, Vue, Svelte, Angular or plain HTML. Zero dependencies.",
   "keywords": [
     "word-game",

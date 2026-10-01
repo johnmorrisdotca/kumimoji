@@ -12,7 +12,7 @@ In English and in Japanese kana. The rules as pure, seeded TypeScript, two word 
   <img alt="TypeScript" src="https://img.shields.io/badge/types-TypeScript-3178c6">
 </p>
 
-<p align="center"><a href="https://johnmorrisdotca.github.io/kumimoji/"><strong>Play a game →</strong></a></p>
+<p align="center"><a href="https://johnmorrisdotca.github.io/kumimoji/"><strong>Play a game →</strong></a> · <a href="https://johnmorrisdotca.github.io/kumimoji/api.html">API reference</a></p>
 
 <p align="center">
   <img src="docs/desktop.jpg" alt="An English game half way: a crossword on the green table, a hand of tiles under it, and the buttons to draw, trade and sort" width="720">
@@ -249,6 +249,63 @@ fetches when a game is first dealt.
 - **Where it runs.** Current Chrome, Edge, Firefox and Safari, on a desk or a
   phone. The rules have no DOM in them and run in Node 20 and later, Deno,
   Bun and web workers.
+
+## Architecture
+
+The rules are plain functions over plain data with no DOM: a game is a value,
+every move returns the next one, and the same seed deals the same bag in every
+browser. Word lists are loaded only when a game opens, and the table is its own
+entry (`/ui` for plain DOM, `/react` for React), so a page that wants only the
+rules carries none of it. A computer player is pure too, so its turn replays
+exactly after a reload.
+
+```text
+src/
+├── check.ts            whether a finished grid completes a game: the one check a server also runs
+├── computer.types.ts   what a computer did in one step of its turn
+├── computerPlay.ts     the word a computer player lays: from its own hand, with no randomness
+├── computerTurn.ts     a computer's whole turn, planned as steps the page can show one at a time
+├── export.ts           a game written out as JSON or plain text, and read back
+├── generate.ts         making a game from a seed: a crossword laid first, then its tiles become the bag
+├── grid.ts             the grid of tiles on a table with no edges, and how it is written as a string
+├── help.ts             arranging the hand into a word, for a player who asks for help
+├── index.ts            the main entry: the rules, the generator, the computer player and the table's pure helpers
+├── judge.ts            judging a grid against its language's word list, run by run
+├── kana.ts             Japanese tiles: the 45 base kana, and how every other kana is played as one of them
+├── kumimoji.types.ts   the game's types: how much of the set a bag holds, and the rest
+├── party.ts            pass and play: two to eight people round one device, one bag, a hand and a table each
+├── party.types.ts      what a pass-and-play game was set up as
+├── partyKept.ts        a pass-and-play game kept in the browser as one string of JSON
+├── partySeats.ts       people and computers joining and leaving a pass-and-play game between turns
+├── partyTurns.ts       how a pass-and-play turn ends, and how the game does, and who won
+├── placement.ts        where a word can cross a crossword without spoiling it
+├── play.ts             a game being played: the bag, the hand and the table, and every move on them
+├── random.ts           a seeded random, so one seed deals one game in every browser
+├── react.tsx           the "/react" entry: a grid to draw in React
+├── showcase.ts         what the rules page shows of the game, worked out from the game's own tables
+├── strings.ts          every word Kumimoji shows a person, in English and Japanese
+├── tableView.ts        how the table is looked at: which squares are shown, and how big a tile is drawn
+├── tileFace.ts         what a tile code shows, without loading a word list
+├── tileFamily.ts       which tile of the set a tile is, without loading a word list
+├── tileWords.ts        the word list, loaded once when a game opens
+├── tileWordsModule.ts  the same lists where there is no browser, imported only by a server or a test
+├── tiles.constants.ts  every number the game is played by: tile mixes, hand sizes, lengths of a game
+├── turn.ts             turning the table while every tile stays upright
+├── ui.ts               the "/ui" entry: Kumimoji played in the browser, in plain DOM
+├── version.ts          the version of this package, as package.json has it
+├── wilds.ts            a wild tile with no letter read as whatever makes the grid words
+├── words.en.data.ts    the English word list
+├── words.ja.data.ts    the Japanese word list and tile mix
+├── words.ts            the "/words" entry: the word lists, for a place with no browser, such as a server or a test
+└── ui/  the table that draws and plays a game
+    ├── board.ts  how a tile on the table is drawn: sound, in a run that is not a word, or apart
+    ├── mount.ts  the table itself: mounting it on a page, and the options it takes
+    └── style.ts  the table's own styles, every colour and size a CSS variable so a page can restyle it
+```
+
+Tests sit beside the code they test (`*.test.ts`). `scripts/` builds the demo
+and checks the package as npm packs it, `demo/` is the page published on
+GitHub Pages, and `table/` taps it in real browsers.
 
 ## The name
 
@@ -495,7 +552,7 @@ The JSON, as `kumimojiToJSON` writes it:
 {
   "format": 1,
   "game": "kumimoji",
-  "generator": "kumimoji 1.1.0",
+  "generator": "kumimoji 1.1.1",
   "size": 3,
   "level": "hard",
   "seed": 44,
@@ -585,6 +642,8 @@ turn tiles into words: `glyphOf`, `soundOf`, `wordOf`, `wildFor`, `isWild`,
 `codeOf`.
 
 ## API
+
+The [API reference](https://johnmorrisdotca.github.io/kumimoji/api.html) lists every export of every entry point with its signature and its doc comment. It is made from the source by `pnpm site`, so it cannot fall behind the code.
 
 Every function, type and constant has a doc comment, so an editor shows this
 as you type. The entries:

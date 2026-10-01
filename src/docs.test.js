@@ -53,7 +53,7 @@ function runnable(text) {
 describe("the README's examples", () => {
   it("every block is of a kind a check runs, or is a line for a terminal", () => {
     // ts and json here; html, js, jsx, vue, svelte and typescript (Angular) in scripts/check-frameworks.mjs.
-    expect([...new Set(blocks.map((block) => block.lang))].sort()).toEqual(["html", "js", "json", "jsx", "sh", "svelte", "ts", "typescript", "vue"]);
+    expect([...new Set(blocks.map((block) => block.lang))].sort()).toEqual(["html", "js", "json", "jsx", "sh", "svelte", "text", "ts", "typescript", "vue"]);
   });
 
   it("every TypeScript example runs, and every value it states is the value it comes to", async () => {

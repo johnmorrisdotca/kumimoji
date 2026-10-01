@@ -3,6 +3,7 @@
 // compiled library beside it, word lists, notices and all.
 import { cpSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 
+import { API_CSS, apiPage } from "./api.mjs";
 import { FAMILY_SCRIPT, familyFooter, familyHead, familyHeader, familyUnreviewed } from "./family-template.mjs";
 
 const id = "kumimoji";
@@ -38,7 +39,7 @@ const page = `<!doctype html>
   </head>
   <body>
     <main>
-      ${familyHeader({ id })}
+      ${familyHeader({ id, links: [{ href: "api.html", say: "pageApi" }] })}
       <div class="setup fam-row">
         ${choice("words", [["language=english", { say: "english" }], ["language=japanese", { say: "japanese" }]])}
         ${choice("hand", [["hand=7", { text: "7" }], ["hand=11", { text: "11" }]])}
@@ -72,4 +73,7 @@ cpSync("dist", "site/dist", { recursive: true });
 cpSync("NOTICE.md", "site/NOTICE.md");
 cpSync("LICENSE", "site/LICENSE");
 writeFileSync("site/index.html", page);
+// The API reference, made from the source: every export of every entry point.
+writeFileSync("site/api.css", API_CSS);
+writeFileSync("site/api.html", apiPage({ id, name: "Kumimoji", icon: ICON }));
 console.log("site/ is ready: serve it, or let the Pages workflow publish it.");
