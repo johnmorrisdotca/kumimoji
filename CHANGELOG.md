@@ -6,6 +6,21 @@ All notable changes to this project are written down here. The format follows
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-10-05
+
+Nothing that was exported has changed.
+
+### Added
+
+- A test holds every `@johnmorrisdotca/kumimoji@N` version pin in the README to this package's major version.
+
+### Changed
+
+- The family's list, in the README and in the demo's footer, names all twenty-four packages, Karakuri and Houseki included.
+- The npm description is one sentence of 250 characters or fewer, so npm and its search show it whole; it is also the repository's About text. `homepage` is the demo site and `author` is `"John Morris"`, the same in every package.
+- The GitHub Actions workflows use the current versions of the actions (checkout 7, setup-node 7, pnpm/action-setup 6; configure-pages 6, upload-pages-artifact 5 and deploy-pages 5 for Pages), which clears GitHub's Node 20 deprecation warning.
+- Every entry has an `import` condition beside `default`.
+
 ## [1.2.0] - 2026-10-01
 
 Nothing that was exported has changed; the rules, the word lists, every deal and every saved game are exactly as they were.
@@ -126,7 +141,8 @@ The first release.
   `@johnmorrisdotca/kumimoji/react`.
 - A static demo for GitHub Pages.
 
-[Unreleased]: https://github.com/johnmorrisdotca/kumimoji/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/johnmorrisdotca/kumimoji/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/johnmorrisdotca/kumimoji/compare/v1.2.0...v1.2.1
 [1.1.1]: https://github.com/johnmorrisdotca/kumimoji/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/johnmorrisdotca/kumimoji/releases/tag/v1.1.0
 [1.0.1]: https://github.com/johnmorrisdotca/kumimoji/releases/tag/v1.0.1
