@@ -6,8 +6,16 @@ All notable changes to this project are written down here. The format follows
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-10-06
+
+Nothing that was exported has changed.
+
 ### Changed
 
+- The README takes the family's one layout, fully: a hero picture of the demo on a desk and on a phone in light and dark, a picture of each kind of table (English, kana, a run that is not a word, a hand of eleven, a wild tile), an Examples section of ten examples whose output is what they print, an Install section, and a short list of the calls to learn first. Its pictures are in `docs/images` (WebP, light and dark) and are retaken with `pnpm screenshots:readme` (it replaces `pnpm pictures` and the two JPEGs `docs/desktop.jpg` and `docs/phone.jpg`); they are not in the tarball, and `pnpm test:package` fails if one is.
+- To keep the README under the 64,000 characters npm can show, the long tables of exports (dealing and judging, tiles and grids, playing, the table of players, looking at the table) and the table's, the element's and the React components' options moved to `docs/API.md`, and the source tree moved to `docs/ARCHITECTURE.md`, each with a summary and a link left in the README. Nothing was removed, and the tests that hold these tables to the code read the README and `docs/API.md` together.
+- `pnpm test:readme` type-checks and runs every TypeScript and JavaScript example in the README against the built package, as a CI job of its own, and `pnpm check` holds the README to the family's lint.
+- "The command line" says there is none, and now sits after the languages, where the other sections of the standard's order leave room for it.
 - Repository only: the package and everything it exports are unchanged. `CONTRIBUTING.md` is the family's one text with a section of its own for Kumimoji, held to the master in johnmorrisdotca/.github by `src/family.test.js`; `ci.yml` and `pages.yml` are the family's one text (`pnpm check`, the demo, and the package on Linux, macOS and Windows), and any jobs of the package's own after them.
 
 ### Fixed

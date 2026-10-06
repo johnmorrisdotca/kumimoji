@@ -12,12 +12,26 @@ In English and in Japanese kana. The rules as pure, seeded TypeScript, two word 
   <img alt="TypeScript" src="https://img.shields.io/badge/types-TypeScript-3178c6">
 </p>
 
-<p align="center"><a href="https://johnmorrisdotca.github.io/kumimoji/"><strong>Play a game →</strong></a> · <a href="https://johnmorrisdotca.github.io/kumimoji/api.html">API reference</a></p>
+<p align="center"><a href="https://johnmorrisdotca.github.io/kumimoji/"><strong>Play a game →</strong></a> · <a href="https://johnmorrisdotca.github.io/kumimoji/api.html">API reference</a> · <a href="docs/API.md">The API in full</a></p>
 
-<p align="center">
-  <img src="docs/desktop.jpg" alt="An English game half way, under the demo's header with its language chooser, five cloth patches and Help switch: the set-up choices, a crossword of SYNDIC and the words that cross it on the green table, a tile in hand under it, and the buttons to draw, trade and sort" width="720">
-  <img src="docs/phone.jpg" alt="A game in Japanese kana on a phone in dark mode, in Japanese: a crossword half built on the green table, with a tile in hand and the buttons to draw, trade and sort" width="220">
-</p>
+<table align="center">
+<tr>
+<td align="center" valign="top">
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/johnmorrisdotca/kumimoji/main/docs/images/hero-desk-dark.webp">
+<img src="https://raw.githubusercontent.com/johnmorrisdotca/kumimoji/main/docs/images/hero-desk-light.webp" alt="The demo on a desk, in English: the page's header with its language chooser and cloth swatches, the choices for tiles, hand and wild tiles, and a green table with a crossword half built from the words SYNDIC, MAUP and PA crossing, one tile left in the hand and the buttons to draw, trade, sort and lift all." width="720">
+</picture>
+<br><em>An English game half way, on a desk: a crossword of SYNDIC and the words that cross it.</em>
+</td>
+<td align="center" valign="top">
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/johnmorrisdotca/kumimoji/main/docs/images/hero-phone-dark.webp">
+<img src="https://raw.githubusercontent.com/johnmorrisdotca/kumimoji/main/docs/images/hero-phone-light.webp" alt="The demo on a phone, in Japanese kana: a green table with a crossword built from kana tiles, and a hand and buttons under it." width="220">
+</picture>
+<br><em>A game in kana on a phone, in the device's light or dark.</em>
+</td>
+</tr>
+</table>
 
 A word game engine for the race to build a crossword. Every player lays their
 own tiles as words that cross, draws another when the hand is used and every
@@ -69,7 +83,7 @@ isFinished(play, judgeWithWords(play.tiles, words)); // → true
 
 NOW, then SNOW, then SNOWY. And a table to play on, in a page:
 
-```js
+```js no-run
 import { mountKumimoji } from "@johnmorrisdotca/kumimoji/ui";
 
 mountKumimoji(document.getElementById("table"), { language: "english", hand: 7 });
@@ -90,7 +104,107 @@ Or with nothing to install, [play a game in the demo](https://johnmorrisdotca.gi
   on the や tile, and a list of 163,461 readings.
 - **Learners and teachers** of English or Japanese spelling.
 
+## Features
+
+- **Dealt from a seed.** `generateKumimoji` lays a crossword first and deals
+  its tiles, so every bag can be finished.
+- **English and Japanese.** 144 tiles in each: the English letters, or 45 base
+  kana where が plays as か, ゃ as や and を as お. 110,316 English words and
+  163,461 Japanese readings, of 2 to 15 tiles.
+- **Wild tiles** that take any letter or kana, and are read as that in every
+  word they are part of.
+- **Trades.** A tile you cannot use goes back into the bag for three.
+- **Diagonals**, if chosen: every diagonal run of three or more must be a word
+  too.
+- **Three lengths.** A short game, half the set, or all 144 tiles; and two
+  English sets at once.
+- **The rules as plain functions.** A game in progress is a value (`TilePlay`):
+  `deal`, `placeFromHand`, `moveOnTable`, `liftToHand`, `draw` and `trade` each
+  return a new one.
+- **A table of two to eight** sharing one bag, with a last round, resigning,
+  joining and leaving, kept as text, and a computer player for any seat.
+- **Help**, if chosen: the words the hand's own tiles spell.
+- **A table to play on.** `mountKumimoji` plays a whole game alone in plain
+  DOM, saves it and loads it back; `KumimojiBoard` draws a grid in React.
+- **A tag.** `<kumimoji-table>` is the same game in one element, with no
+  framework.
+- **One bag a day.** `kumimojiDailySeed(new Date())` is the same seed for
+  everybody, worldwide.
+- **Played from a keyboard.** Arrow keys between squares and tiles, Enter or
+  Space to pick up and lay; see [Accessibility](#accessibility).
+- **The table's words in English and Japanese**, and any other language by a
+  table of your own. **Themeable**: every colour is a CSS variable.
+
+### What's in it
+
+Each picture is the table the package draws, taken from [the demo](https://johnmorrisdotca.github.io/kumimoji/) with `pnpm screenshots:readme`, in light and dark. The game is dealt from a seed, and the words are laid by the package's own computer player, so the same pictures come again.
+
+<table>
+<tr>
+<td align="center" valign="top" width="50%">
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/johnmorrisdotca/kumimoji/main/docs/images/english-desk-dark.webp">
+<img src="https://raw.githubusercontent.com/johnmorrisdotca/kumimoji/main/docs/images/english-desk-light.webp" alt="An English board on the green table: SYNDIC across with MAUP and PA crossing it, and U hanging under the N, drawn on a grid of empty squares that has no edge." width="400">
+</picture>
+<br><em><strong>English.</strong> 144 tiles, 110,316 words.</em>
+</td>
+<td align="center" valign="top" width="50%">
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/johnmorrisdotca/kumimoji/main/docs/images/kana-desk-dark.webp">
+<img src="https://raw.githubusercontent.com/johnmorrisdotca/kumimoji/main/docs/images/kana-desk-light.webp" alt="A Japanese board of kana tiles on the green table, a crossword of hiragana laid across and down on the grid of empty squares." width="400">
+</picture>
+<br><em><strong>Japanese kana.</strong> 45 base kana tiles, 163,461 readings.</em>
+</td>
+</tr>
+<tr>
+<td align="center" valign="top" width="50%">
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/johnmorrisdotca/kumimoji/main/docs/images/not-a-word-desk-dark.webp">
+<img src="https://raw.githubusercontent.com/johnmorrisdotca/kumimoji/main/docs/images/not-a-word-desk-light.webp" alt="A board with two tiles side by side, N and W, each ringed in red, because the two make the run NW, which is not a word." width="400">
+</picture>
+<br><em><strong>A run that is not a word</strong> is ringed, and named under the table.</em>
+</td>
+<td align="center" valign="top" width="50%">
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/johnmorrisdotca/kumimoji/main/docs/images/hand-of-eleven-desk-dark.webp">
+<img src="https://raw.githubusercontent.com/johnmorrisdotca/kumimoji/main/docs/images/hand-of-eleven-desk-light.webp" alt="A board partly built from a hand of eleven tiles, a larger crossword than a hand of seven makes, on the same green table." width="400">
+</picture>
+<br><em><strong>A hand of eleven.</strong> Hands are 3, 7 or 11.</em>
+</td>
+</tr>
+</table>
+
+<p align="center">
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/johnmorrisdotca/kumimoji/main/docs/images/wild-tiles-desk-dark.webp">
+<img src="https://raw.githubusercontent.com/johnmorrisdotca/kumimoji/main/docs/images/wild-tiles-desk-light.webp" alt="A hand of seven tiles, E, T, U, P, L and L in cream and one gold tile with a black star, a wild tile that is any letter or kana the player gives it." width="500">
+</picture>
+<br><em><strong>A wild tile</strong> is the gold star in the hand: the player gives it a letter before it is laid.</em>
+</p>
+
 ## Use it in your project
+
+### Install
+
+```sh
+npm install @johnmorrisdotca/kumimoji
+```
+
+```sh
+pnpm add @johnmorrisdotca/kumimoji
+```
+
+```sh
+yarn add @johnmorrisdotca/kumimoji
+```
+
+A page with no bundler loads the table as a tag from a CDN, naming the major version so that a release that changes what you use is one you choose:
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/@johnmorrisdotca/kumimoji@1/dist/element-define.js"></script>
+```
+
+On a server or in a script, `import "@johnmorrisdotca/kumimoji/words"` first, so that the word lists are read from the package's files.
 
 Kumimoji is five things, each usable without the others: **the rules**, plain
 functions over plain values; **the word lists**, loaded when first needed;
@@ -217,7 +331,7 @@ onBeforeUnmount(() => table?.destroy());
 
 ### 7. Angular
 
-```typescript
+```ts no-check
 import { Component, ElementRef, OnDestroy, afterNextRender, provideZonelessChangeDetection, signal, viewChild } from "@angular/core";
 import { bootstrapApplication } from "@angular/platform-browser";
 import { mountKumimoji, type KumimojiTableHandle } from "@johnmorrisdotca/kumimoji/ui";
@@ -268,156 +382,178 @@ fetches when a game is first dealt.
   phone. The rules have no DOM in them and run in Node 22 and later, Deno,
   Bun and web workers.
 
-## Architecture
+The cookbook, with the output of each example, is under [Examples](#examples).
 
-The rules are plain functions over plain data with no DOM: a game is a value,
-every move returns the next one, and the same seed deals the same bag in every
-browser. Word lists are loaded only when a game opens, and the table is its own
-entry (`/ui` for plain DOM, `/element` for a tag, `/react` for React), so a page that wants only the
-rules carries none of it. A computer player is pure too, so its turn replays
-exactly after a reload.
+## Examples
 
-```text
-src/
-├── check.ts            whether a finished grid completes a game: the one check a server also runs
-├── computer.types.ts   what a computer did in one step of its turn
-├── computerPlay.ts     the word a computer player lays: from its own hand, with no randomness
-├── computerTurn.ts     a computer's whole turn, planned as steps the page can show one at a time
-├── daily.ts            one seed a day, the same for everybody
-├── element-define.ts   the "/element/define" entry: defines <kumimoji-table> on the page by being imported
-├── element.ts          the "/element" entry: the <kumimoji-table> element, a game alone in a tag
-├── export.ts           a game written out as JSON or plain text, and read back
-├── generate.ts         making a game from a seed: a crossword laid first, then its tiles become the bag
-├── grid.ts             the grid of tiles on a table with no edges, and how it is written as a string
-├── help.ts             arranging the hand into a word, for a player who asks for help
-├── index.ts            the main entry: the rules, the generator, the computer player and the table's pure helpers
-├── judge.ts            judging a grid against its language's word list, run by run
-├── kana.ts             Japanese tiles: the 45 base kana, and how every other kana is played as one of them
-├── kumimoji.types.ts   the game's types: how much of the set a bag holds, and the rest
-├── party.ts            pass and play: two to eight people round one device, one bag, a hand and a table each
-├── party.types.ts      what a pass-and-play game was set up as
-├── partyKept.ts        a pass-and-play game kept in the browser as one string of JSON
-├── partySeats.ts       people and computers joining and leaving a pass-and-play game between turns
-├── partyTurns.ts       how a pass-and-play turn ends, and how the game does, and who won
-├── placement.ts        where a word can cross a crossword without spoiling it
-├── play.ts             a game being played: the bag, the hand and the table, and every move on them
-├── random.ts           a seeded random, so one seed deals one game in every browser
-├── react.tsx           the "/react" entry: a grid to draw in React
-├── showcase.ts         what the rules page shows of the game, worked out from the game's own tables
-├── strings.ts          every word Kumimoji shows a person, in English and Japanese
-├── tableView.ts        how the table is looked at: which squares are shown, and how big a tile is drawn
-├── tileFace.ts         what a tile code shows, without loading a word list
-├── tileFamily.ts       which tile of the set a tile is, without loading a word list
-├── tileWords.ts        the word list, loaded once when a game opens
-├── tileWordsModule.ts  the same lists where there is no browser, imported only by a server or a test
-├── tiles.constants.ts  every number the game is played by: tile mixes, hand sizes, lengths of a game
-├── turn.ts             turning the table while every tile stays upright
-├── ui.ts               the "/ui" entry: Kumimoji played in the browser, in plain DOM
-├── version.ts          the version of this package, as package.json has it
-├── wilds.ts            a wild tile with no letter read as whatever makes the grid words
-├── words.en.data.ts    the English word list
-├── words.ja.data.ts    the Japanese word list and tile mix
-├── words.ts            the "/words" entry: the word lists, for a place with no browser, such as a server or a test
-└── ui/  the table that draws and plays a game
-    ├── board.ts  how a tile on the table is drawn: sound, in a run that is not a word, or apart
-    ├── mount.ts  the table itself: mounting it on a page, the options it takes, and playing it from a keyboard
-    └── style.ts  the table's own styles, every colour and size a CSS variable so a page can restyle it
+Every TypeScript and JavaScript block that can run is type-checked against the built package and run by `pnpm test:readme`, so the output after `// →` is what the code prints. The word lists are read from the package's files in Node, so nothing here uses a network.
+
+### A page with nothing else
+
+Save this as a file and open it. The tag is the whole table: set-up, tiles, hand, clock, saving and loading.
+
+```html
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A crossword race</title>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@johnmorrisdotca/kumimoji@1/dist/element-define.js"></script>
+<kumimoji-table language="english" hand="7" seed="daily"></kumimoji-table>
 ```
 
-Tests sit beside the code they test (`*.test.ts`). `scripts/` builds the demo
-and checks the package as npm packs it, `demo/` is the page published on
-GitHub Pages, and `table/` taps it in real browsers.
+### Listen to the tag
 
-## The name
+The tag fires `kumimoji-change` after every change, with the game as it would be saved, and `kumimoji-finish` when the last tile is laid and every run is a word:
 
-*Kumimoji* (組み文字) is made of *kumi* (組み, from 組む, to put together or
-assemble) and *moji* (文字, a letter or character): letters put together,
-which is what a player does with the tiles. Say it in four even beats:
-ku-mi-mo-ji. In Japanese printing the same word names something else, several
-characters set together in the space of one; the game borrows only its plain
-sense.
+```html
+<kumimoji-table id="game" language="japanese" hand="7" seed="2026"></kumimoji-table>
+<p id="note"></p>
+<script type="module">
+  import "https://cdn.jsdelivr.net/npm/@johnmorrisdotca/kumimoji@1/dist/element-define.js";
 
-## Where it comes from, and where it is used
+  const game = document.getElementById("game");
+  game.addEventListener("kumimoji-change", (event) => {
+    localStorage.setItem("kumimoji", JSON.stringify(event.detail.saved));
+  });
+  game.addEventListener("kumimoji-finish", (event) => {
+    document.getElementById("note").textContent = `Done in ${Math.round(event.detail.elapsedMs / 1000)} seconds.`;
+  });
+</script>
+```
 
-Kumimoji was built for [Itsutsu](https://itsutsu.com), a site for board games,
-puzzles, card games and dice games played at your own pace. *Itsutsu* (五つ) is
-Japanese for "five", after five in a row, the game the site began with. It is
-[the Kumimoji played there](https://itsutsu.com/games/kumimoji): alone, in
-races, round one device and across several.
+### Deal the day's bag
 
-### Used by
+`kumimojiDailySeed(date)` is the UTC date as a number, the same for everybody on earth, and the same number as Tane's `dailySeed`. Everybody who deals from it with the same settings gets the same bag in the same order:
 
-- [Itsutsu](https://itsutsu.com), for its game of Kumimoji: its rules, its
-  word lists and its computer player.
+```ts
+import "@johnmorrisdotca/kumimoji/words";
+import { generateKumimoji, kumimojiDay, kumimojiDailySeed, loadTileWords } from "@johnmorrisdotca/kumimoji";
 
-That is the whole list so far. Using Kumimoji in something? Open an
-[*Add my project*](https://github.com/johnmorrisdotca/kumimoji/issues/new?template=add-my-project.md)
-issue and we will add you.
+await loadTileWords("english");
+const now = new Date("2026-10-06T10:00:00Z");
+kumimojiDay(now); // → "2026-10-06"
+kumimojiDailySeed(now); // → 20261006
+const dealt = generateKumimoji(7, "medium", kumimojiDailySeed(now));
+dealt.givens.length; // → 40
+dealt.givens.slice(0, 10); // → "ltlekac*rm"
+```
 
-### The family
+The `*` is a wild tile, which takes any letter. The bag is one character a tile, in the order the tiles come out.
 
-<!-- family:start (made by scripts/family-readme.mjs from scripts/family-template.mjs; change those, not this) -->
-Kumimoji is one of twenty-four packages, each made for the same site, each at
-[github.com/johnmorrisdotca](https://github.com/johnmorrisdotca). The code of every one is MIT.
+### Judge a grid
 
-- [Korokoro](https://github.com/johnmorrisdotca/korokoro) (コロコロ): dice, with notation, exact odds, real sounds and the dice of many games. [Demo](https://johnmorrisdotca.github.io/korokoro/).
-- [Kyuubu](https://github.com/johnmorrisdotca/kyuubu) (キューブ): a turning cube for the browser, 2×2 to 7×7, with record solves to replay. [Demo](https://johnmorrisdotca.github.io/kyuubu/).
-- [Hitotsu](https://github.com/johnmorrisdotca/hitotsu) (一つ): a colour-card shedding game for two to eight, with the house rules people play. [Demo](https://johnmorrisdotca.github.io/hitotsu/).
-- [Toranpu](https://github.com/johnmorrisdotca/toranpu) (トランプ): a deck of playing cards, card games with computer players, and solitaires. [Demo](https://johnmorrisdotca.github.io/toranpu/).
-- [Tane](https://github.com/johnmorrisdotca/tane) (種): seeded random numbers and daily seeds, the same in every browser and on every server. [Demo](https://johnmorrisdotca.github.io/tane/).
-- [Narabe](https://github.com/johnmorrisdotca/narabe) (並べ): one rules engine for abstract board games, from gomoku and Reversi to Go and checkers. [Demo](https://johnmorrisdotca.github.io/narabe/).
-- [Tenka](https://github.com/johnmorrisdotca/tenka) (天下): world conquest for two to six, on a map of the real world. [Demo](https://johnmorrisdotca.github.io/tenka/).
-- [Kumimoji](https://github.com/johnmorrisdotca/kumimoji) (組み文字): a crossword tile race, in English and Japanese kana. [Demo](https://johnmorrisdotca.github.io/kumimoji/).
-- [Tsunagi](https://github.com/johnmorrisdotca/tsunagi) (繋ぎ): a line-joining logic puzzle whose every level has exactly one answer. [Demo](https://johnmorrisdotca.github.io/tsunagi/).
-- [Jarajara](https://github.com/johnmorrisdotca/jarajara) (ジャラジャラ): mahjong tiles drawn as SVG, stacked layouts, and the matching solitaire Awase. [Demo](https://johnmorrisdotca.github.io/jarajara/).
-- [Suido](https://github.com/johnmorrisdotca/suido) (水道): a pipe puzzle: turn the pieces until the water reaches every drain. [Demo](https://johnmorrisdotca.github.io/suido/).
-- [Domino](https://github.com/johnmorrisdotca/domino) (ドミノ): dominoes and Mexican Train. [Demo](https://johnmorrisdotca.github.io/domino/).
-- [Kotoba](https://github.com/johnmorrisdotca/kotoba) (言葉): word lists and word-game rules in English, French, German and Japanese. [Demo](https://johnmorrisdotca.github.io/kotoba/).
-- [Sugoroku](https://github.com/johnmorrisdotca/sugoroku) (双六): backgammon and its variants, with the doubling cube and match play. [Demo](https://johnmorrisdotca.github.io/sugoroku/).
-- [Kazu](https://github.com/johnmorrisdotca/kazu) (数): grid number puzzles: Sudoku and its variants, Futoshiki and Skyscrapers. [Demo](https://johnmorrisdotca.github.io/kazu/).
-- [Meikyuu](https://github.com/johnmorrisdotca/meikyuu) (迷宮): mazes on squares, hexagons, triangles and circles, made from a seed and drawn through with a finger or the mouse. [Demo](https://johnmorrisdotca.github.io/meikyuu/).
-- [Hikidashi](https://github.com/johnmorrisdotca/hikidashi) (引き出し): a drawer of small Japanese text tools: era dates, kanji numerals, readings and sentence difficulty. [Demo](https://johnmorrisdotca.github.io/hikidashi/).
-- [Chizu](https://github.com/johnmorrisdotca/chizu) (地図): maps of the world and of countries' regions, in English and Japanese, with a quiz and callouts. [Demo](https://johnmorrisdotca.github.io/chizu/).
-- [Bushu](https://github.com/johnmorrisdotca/bushu) (部首): find a kanji by the parts it is made of. [Demo](https://johnmorrisdotca.github.io/bushu/).
-- [Tobiishi](https://github.com/johnmorrisdotca/tobiishi) (飛び石): peg solitaire with nine boards and seeded solvable challenges. [Demo](https://johnmorrisdotca.github.io/tobiishi/).
-- [Jirai](https://github.com/johnmorrisdotca/jirai) (地雷): minesweeper on shaped grids with verified no-guess boards. [Demo](https://johnmorrisdotca.github.io/jirai/).
-- [Gunjin](https://github.com/johnmorrisdotca/gunjin) (軍人): five hidden-rank strategy games with pass-the-device play. [Demo](https://johnmorrisdotca.github.io/gunjin/).
-- [Karakuri](https://github.com/johnmorrisdotca/karakuri) (からくり): eight hyper-casual puzzle games, some of them physics: draw a shield, pull pins, cut ropes, slide blocks, pour tubes. [Demo](https://johnmorrisdotca.github.io/karakuri/).
-- [Houseki](https://github.com/johnmorrisdotca/houseki) (宝石): gem and stone matching puzzles: falling triplets, stone collapse, colour chains and gem swap. [Demo](https://johnmorrisdotca.github.io/houseki/).
+`judgeWithWords(tiles, words)` says what is wrong with a grid: the tiles in runs that are not words, and the tiles standing apart from the crossword. A table draws the first as a red ring and fades the second:
 
-**This package is Kumimoji.** The demos of all twenty-four share one header and footer, so each links the rest.
-<!-- family:end -->
+```ts
+import "@johnmorrisdotca/kumimoji/words";
+import { decodeGrid, judgeWithWords, loadTileWords, squareAt } from "@johnmorrisdotca/kumimoji";
 
-## Features
+const words = await loadTileWords("english");
+const crossword = decodeGrid("cat/2o/2w")!;
+judgeWithWords(crossword, words).sound; // → true
 
-- **Dealt from a seed.** `generateKumimoji` lays a crossword first and deals
-  its tiles, so every bag can be finished.
-- **English and Japanese.** 144 tiles in each: the English letters, or 45 base
-  kana where が plays as か, ゃ as や and を as お. 110,316 English words and
-  163,461 Japanese readings, of 2 to 15 tiles.
-- **Wild tiles** that take any letter or kana, and are read as that in every
-  word they are part of.
-- **Trades.** A tile you cannot use goes back into the bag for three.
-- **Diagonals**, if chosen: every diagonal run of three or more must be a word
-  too.
-- **Three lengths.** A short game, half the set, or all 144 tiles; and two
-  English sets at once.
-- **The rules as plain functions.** A game in progress is a value (`TilePlay`):
-  `deal`, `placeFromHand`, `moveOnTable`, `liftToHand`, `draw` and `trade` each
-  return a new one.
-- **A table of two to eight** sharing one bag, with a last round, resigning,
-  joining and leaving, kept as text, and a computer player for any seat.
-- **Help**, if chosen: the words the hand's own tiles spell.
-- **A table to play on.** `mountKumimoji` plays a whole game alone in plain
-  DOM, saves it and loads it back; `KumimojiBoard` draws a grid in React.
-- **A tag.** `<kumimoji-table>` is the same game in one element, with no
-  framework.
-- **One bag a day.** `kumimojiDailySeed(new Date())` is the same seed for
-  everybody, worldwide.
-- **Played from a keyboard.** Arrow keys between squares and tiles, Enter or
-  Space to pick up and lay; see [Accessibility](#accessibility).
-- **The table's words in English and Japanese**, and any other language by a
-  table of your own. **Themeable**: every colour is a CSS variable.
+const scattered = new Map(crossword);
+scattered.set(squareAt(4, 4), "x");                  // a tile that touches nothing
+const verdict = judgeWithWords(scattered, words);
+verdict.sound; // → false
+[...verdict.apart]; // → ["4,4"]
+```
+
+### What the computer player would lay
+
+`bestLaying(play, words)` finds the word the computer player lays from a hand and a table, with no randomness, so a turn replays exactly after a reload:
+
+```ts
+import "@johnmorrisdotca/kumimoji/words";
+import { bestLaying, deal, generateKumimoji, loadTileWords, wordsInHand } from "@johnmorrisdotca/kumimoji";
+
+const words = await loadTileWords("english");
+const play = deal(generateKumimoji(7, "hard", 2026).givens, 7);
+play.hand.join(""); // → "xbsnnny"
+bestLaying(play, words)?.word; // → "by"
+wordsInHand(play.hand, words); // → ["by"]
+```
+
+`wordsInHand` is the same list a player is offered as help when the game was set up with it.
+
+### A computer's turn, step by step
+
+`planComputerTurn(game, words)` lists a computer seat's whole turn as steps, in order, for a page to show one at a time; `afterComputerTurn` is the game after all of them:
+
+```ts
+import "@johnmorrisdotca/kumimoji/words";
+import { afterComputerTurn, endTurn, generateKumimoji, handCanSpell, judgeWithWords, loadTileWords, nameOf, planComputerTurn, seatPlay, startParty } from "@johnmorrisdotca/kumimoji";
+
+const words = await loadTileWords("english");
+const settings = { size: 7, level: "hard", seed: 2026, gameLength: "short", language: "english", doubleSet: false, diagonals: false, hints: false } as const;
+let game = startParty(settings, generateKumimoji(7, "hard", 2026).givens, ["Ann", { name: "Computer", computer: true }]);
+game = endTurn(game, judgeWithWords(seatPlay(game).tiles, words), (hand) => handCanSpell(hand, words));   // Ann passes
+nameOf(game, game.turn); // → "Computer 1"
+
+const steps = planComputerTurn(game, words);
+steps.map(({ said }) => (said.kind === "laid" ? `laid ${said.word}` : said.kind)); // → ["laid enamor", "traded", "laid cate", "drew", "done"]
+nameOf(afterComputerTurn(game, words), 0); // → "Ann"
+```
+
+### Points for a finished game
+
+A finished game scores 10 a tile, and up to as much again for speed (this one is 770 points at a minute and a half, and 500 at fifteen minutes, when no speed bonus is left). A server that has checked a grid can award the same points the table shows:
+
+```ts
+import "@johnmorrisdotca/kumimoji/words";
+import { generateKumimoji, kumimojiPoints, loadTileWords } from "@johnmorrisdotca/kumimoji";
+
+await loadTileWords("english");
+const dealt = generateKumimoji(7, "hard", 2026);
+kumimojiPoints(dealt.givens, 90_000); // → 770
+kumimojiPoints(dealt.givens, 900_000); // → 500
+```
+
+### Check a race on a server
+
+Players racing a seed are dealt the same bag, so a server that is handed only the seed and a finished grid checks the whole game in time proportional to the grid, with no search:
+
+```ts
+import "@johnmorrisdotca/kumimoji/words";
+import { checkKumimoji, generateKumimoji, loadTileWords } from "@johnmorrisdotca/kumimoji";
+
+await loadTileWords("english");
+const dealt = generateKumimoji(3, "hard", 44);
+checkKumimoji(3, dealt.givens, "snowy", { level: "hard" }); // → { ok: true }
+checkKumimoji(3, dealt.givens, "snows", { level: "hard" }); // → { ok: false, reason: "the grid does not use exactly the tiles of the bag" }
+```
+
+### Mount the table with options
+
+`mountKumimoji` plays a whole game alone in one element, and hands back the game as plain data after each change:
+
+```ts no-run
+import { mountKumimoji } from "@johnmorrisdotca/kumimoji/ui";
+
+const table = mountKumimoji(document.getElementById("table")!, {
+  language: "japanese",
+  hand: 11,
+  level: "easy",                 // the most wild tiles
+  gameLength: "medium",          // half the set
+  seed: 2026,
+  locale: "ja",                  // the table's own words
+  onFinish: (result) => console.log("done", result),
+});
+await table.newGame({ language: "english", hand: 7 });   // another game, on the same table
+table.destroy();
+```
+
+### A look of your own
+
+Every colour is a CSS variable on `.km-root`, so a stylesheet or the `theme` option can restyle the table:
+
+```ts no-run
+import { mountKumimoji } from "@johnmorrisdotca/kumimoji/ui";
+
+mountKumimoji(document.getElementById("table")!, {
+  theme: { "--km-felt": "#23405a", "--km-tile": "#fffdf7", "--km-wild": "#d4a017", "--km-square": "40px" },
+});
+```
 
 ## How to play
 
@@ -611,7 +747,7 @@ The JSON, as `kumimojiToJSON` writes it:
 {
   "format": 1,
   "game": "kumimoji",
-  "generator": "kumimoji 1.2.1",
+  "generator": "kumimoji 1.2.2",
   "size": 3,
   "level": "hard",
   "seed": 44,
@@ -721,76 +857,22 @@ as you type. The entries:
 | `@johnmorrisdotca/kumimoji/element/define` | Defines `<kumimoji-table>` on the page by being imported; exports nothing |
 | `@johnmorrisdotca/kumimoji/react` | `KumimojiBoard` and `KumimojiTable` |
 
-### Dealing and judging
+### The calls to learn first
 
-| Export | What it does |
+| Call | What it does |
 | --- | --- |
 | `generateKumimoji(hand, level, seed, options?)` | A game dealt from a seed: the bag, and one grid that finishes it |
-| `judgeWithWords(tiles, words, rules?)` | What is wrong with a grid: the tiles in runs that are not words, the tiles apart, and whether it is sound |
-| `judgeGrid(tiles, isWord, readable?, rules?)` | The same against any test of a word |
-| `runsOf(tiles, rules?)`, `groupsOf(tiles, links?)` | Every run the grid is read by; the tiles in groups that touch |
-| `checkKumimoji(size, givens, answer, options?)` | Whether a grid finishes a game: the one check a server runs |
-| `kumimojiPoints(givens, elapsedMs)` | A finished game's points |
-| `readWilds(tiles, words, rules?)`, `WILD_SEARCH_MOST` | A grid with each wild that has no letter read as the one that makes its runs words, or `null`; and how far it looks before giving up |
-| `wordsInHand(hand, words)`, `handSpelling(play, word)` | Help: the words a hand spells, and the hand arranged as one |
-| `crossingFit`, `diagonalsRead` | Where a word may be laid crossing a tile, and the diagonal runs a new tile would make, for a generator or a computer player |
-| `seededRandom(seed)`, `shuffled(items, random)` | The seeded random a deal is drawn from |
+| `deal(bag, handSize)` and `placeFromHand`, `moveOnTable`, `liftToHand`, `draw`, `trade` | The opening hand, and each move, every one returning a new game |
+| `judgeWithWords(tiles, words)` | What is wrong with a grid, or that it is sound |
+| `isFinished(play, verdict)` | Whether the bag is empty, the hand used and every run a word in one piece |
+| `checkKumimoji(size, givens, answer, options?)` | The one check a server runs on a finished grid |
+| `loadTileWords(language)` | A word list, fetched when first needed |
+| `mountKumimoji(element, options?)` and `<kumimoji-table>` | The table, in one call or one tag |
+| `kumimojiToJSON`, `kumimojiFromJSON` | A game kept, and read back without trusting it |
 
-### Tiles and grids
+### The long tables
 
-| Export | What it does |
-| --- | --- |
-| `squareAt(row, col)`, `placeOf(square)` | A square's key, and back |
-| `encodeGrid(tiles)`, `decodeGrid(code)`, `boundsOf(tiles)` | A grid as a string, and back; the rows and columns it stands within |
-| `lettersOf(letters)`, `sameLetters(a, b)` | How many of each tile, and whether two tallies match |
-| `tileFace(tile)`, `tileDescription(tile)`, `kanaTileCode(kana, wild?)` | What a tile shows; what a screen reader says; a kana's tile |
-| `tileKana(kana)`, `BASE_KANA`, `CORNER_FORMS`, `formsOfTile(kana)` | The tile a kana is played with, the 45 tiles, and the forms each plays as |
-| `familyKeyOf(language)` | Which tile of the set a code is, without the word list |
-| `loadTileWords`, `tileWords`, `tileWordsReady` | The word list: fetched, handed back, asked after |
-| `unpackTileWords`, `unpackLength`, `tileWordsFrom`, `readTileWordsWith` | How a list is read from its packed data, for the loader |
-| `mixShown(language)`, `lengthRows(hand?)`, `LENGTHS`, `TRY_IT` | A set and the lengths of game as a page shows them |
-
-### Playing, and a game kept
-
-The moves are in [Playing](#playing) above. With them:
-
-| Export | What it does |
-| --- | --- |
-| `tilesLeft(play)` | How many tiles are still in the bag |
-| `encodeTileProgress(play)`, `readTileProgress(code)`, `decodeTileProgress(code, bag, language?)` | A game half way as one string; its shape read; and opened again on its own bag |
-| `kumimojiToJSON(saved)`, `kumimojiFromJSON(text)`, `kumimojiExported(saved)` | A game as JSON, and back, or `null` |
-| `kumimojiToText(saved, strings?)`, `gridToText(tiles, language?)`, `kumimojiClock(ms)` | A game, a grid and a time as text |
-| `KUMIMOJI_EXPORT_FORMAT`, `KUMIMOJI_VERSION` | The JSON's format number, and this package's version |
-| `KUMIMOJI_STRINGS`, `kumimojiStrings(locale, own?)`, `kumimojiSay(line, values)` | The table's words in English and Japanese |
-
-### A table of players
-
-| Export | What it does |
-| --- | --- |
-| `startParty(settings, bag, seats)` | A table dealt: two to eight seats, each a name or `{ name, computer }` |
-| `seatPlay(game)`, `withSeatPlay(game, play)` | The player to move's hand and table as a `TilePlay`, and the game with it put back |
-| `endTurn(game, verdict, handSpells)`, `doneRefused(…)` | End the turn; why Done is refused, if it is |
-| `drawAll(game)`, `mayDrawAll(game, verdict)` | Everyone draws together |
-| `resign(game)`, `mayResign(game)` | Give up the game |
-| `joinParty(game, seat)`, `joinRefused(game)`, `leaveParty(game, at)`, `leaveRefused(game, at)` | Joining and leaving a game under way |
-| `isOver(game)`, `winnersOf(game)`, `goesOut(game, verdict)`, `isLastTurn(game)`, `lastStanding(game)` | How the game stands and ends |
-| `mayTradeThisTurn(game)`, `mustTradeFirst(game, handSpells)`, `laidThisTurn(game)`, `handCanSpell(hand, words)` | What this turn may and must do |
-| `nameOf(game, at)`, `tidyName(name)`, `computerName(players)`, `isComputer(game, at)` | Names, and whether a seat is a computer's |
-| `stillIn(game)`, `nextIn(game, from)`, `partyTilesLeft(game)`, `tilesHeldBy(game, at)`, `tableTally(tiles)` | Who is in, whose turn is next, and the tiles |
-| `partyTilesNeeded`, `partyFits`, `partyLength`, `partyPlayersAsked` | Whether a bag is big enough for a table, for a set-up screen |
-| `passViewStart(game)`, `stepView(game, from, by)` | Whose table a shared screen shows |
-| `encodeParty(game)`, `decodeParty(code, familyKey?)`, `readSettings(value)`, `holdsItsBag(game, familyKey)`, `isPartyFor` | A table kept as text, read back and checked, and matched to the set-up it was dealt for |
-| `afterComputerTurn(game, words)`, `planComputerTurn(game, words)`, `COMPUTER_STEPS_MOST` | A computer seat's turn, whole or step by step |
-| `bestLaying(play, words, rules?)`, `tradeChoice(hand, words)`, `judgeTiles(tiles, words, rules?)` | What the computer would lay, and trade |
-
-### Looking at the table
-
-A table with no edges is looked at through a view, which the package keeps
-apart from the game: `tableArea`, `fitView`, `fittedMost`, `zoomView`,
-`panView`, `keepInReach`, `overflows`, `squareUnder`, `edgePan` and the
-numbers in `TABLE`. A player may turn the table a quarter at a time with every
-tile kept upright: `nextTurn`, `turnPlace`, `unturnPlace`, `turnArea`,
-`turnView`, `typingWay` and `arrowStep`.
+The tables of every export for dealing and judging, tiles and grids, playing and keeping a game, a table of players and looking at the table are in [docs/API.md](docs/API.md), and every export of every entry point, with its signature and doc comment, is in the [API reference](https://johnmorrisdotca.github.io/kumimoji/api.html). The types the package exports are listed there too.
 
 The types are `TilePlay`, `Tiles`, `GridVerdict`, `GridRules`, `Run`,
 `RunLine`, `Bounds`, `Square`, `CrossingFit`, `KumimojiDeal`,
@@ -803,65 +885,11 @@ The types are `TilePlay`, `Tiles`, `GridVerdict`, `GridRules`, `Run`,
 
 ### The table
 
-`mountKumimoji(element, options?)` from `@johnmorrisdotca/kumimoji/ui` deals
-and plays a whole game alone in the element, and returns a handle.
-
-| Option | Default | What it does |
-| --- | --- | --- |
-| `language` | `"english"` | The language of the tiles: `"english"` or `"japanese"` |
-| `hand` | `7` | The opening hand: 3, 7 or 11 tiles |
-| `level` | `"medium"` | Wild tiles: `"easy"` the most, `"medium"` some, `"hard"` none |
-| `gameLength` | `"short"` | `"short"`, `"medium"`, or `"full"`, all 144 tiles |
-| `diagonals` | `false` | Every diagonal run of three or more must be a word too |
-| `seed` | a new one each game | The seed the bag is dealt from |
-| `onFinish` | | Called when the last tile is laid and every run is a word, with the time it took |
-| `onChange` | | Called after every change, with the game as it would be saved |
-| `locale` | the page's `lang` | The language of the table's words: `"en"` or `"ja"` |
-| `strings` | | Words of your own, laid over the locale's |
-| `theme` | | CSS variables set on the table itself |
-| `keep` | `true` | Whether the table offers saving and loading |
-
-| Handle | What it does |
-| --- | --- |
-| `play()` | The game as it stands, or `null` while it is being dealt |
-| `saved()` | The game as it would be saved, or `null` while it is being dealt |
-| `newGame(options?)` | A new game; any of the first six options may change |
-| `setGame(saved)` | Put a game on the table: one read back by `kumimojiFromJSON` |
-| `setLocale(locale, strings?)` | Change the language of the table's words |
-| `destroy()` | Take the table off the page and stop its clock |
-
-To play it: tap a tile in your hand and then a square to lay it; tap a tile on
-the table and then a square to move it, or tap it again to take it back. A
-wild is given its letter before it is laid. To draw a board yourself, the same
-entry has `boardModel(tiles, verdict, glyphOf?)`, which works out the squares
-to draw and how each tile stands, with `BOARD_MARGIN` and `BOARD_LEAST`, and
-`KUMIMOJI_STYLE`, the table's stylesheet as a string.
+`mountKumimoji(element, options?)` from `@johnmorrisdotca/kumimoji/ui` deals and plays a whole game alone in the element and returns a handle (`play()`, `saved()`, `newGame(options?)`, `setGame(saved)`, `setLocale(locale, strings?)`, `destroy()`). Its options are `language`, `hand`, `level`, `gameLength`, `diagonals`, `seed`, `onFinish`, `onChange`, `locale`, `strings`, `theme` and `keep`; each, with its default, is in [docs/API.md](docs/API.md#the-table).
 
 ### The element
 
-`<kumimoji-table>` is `mountKumimoji` as a tag: `@johnmorrisdotca/kumimoji/element/define`
-defines it, and `@johnmorrisdotca/kumimoji/element` holds the class alone. Each
-attribute is read again when it changes, and a change to any but `lang` deals a
-new game. A table the rules do not offer (a hand of 5, say) draws nothing.
-
-| Attribute | Default | What it does |
-| --- | --- | --- |
-| `language` | `english` | The tiles: `english` or `japanese` kana |
-| `hand` | `7` | The opening hand: 3, 7 or 11 |
-| `level` | `medium` | Wild tiles: `easy` the most, `medium` some, `hard` none |
-| `length` | `short` | `short`, `medium` or `full`, all 144 tiles |
-| `diagonals` | off | `on` to read every diagonal run of three or more too |
-| `seed` | a new one each game | A whole number to deal from, or `daily` for the day's seed |
-| `lang` | the page's | The language of the table's words: `en` or `ja` |
-| `keep` | on | `off` leaves saving and loading out |
-
-It fires `kumimoji-change` after every change to the game, with the game as it
-would be saved as `event.detail.saved`, and `kumimoji-finish` when the last
-tile is laid and every run is a word, with the deal, the play and the time it
-took as `event.detail`; both bubble. It has `saved` (the game as it would be
-saved), `table` (the handle `mountKumimoji` returns), `newGame(options?)` and
-`setGame(saved)`. To style it, set the table's variables on `kumimoji-table
-.km-root`: see [Theming](#theming).
+`<kumimoji-table>` is `mountKumimoji` as a tag: `@johnmorrisdotca/kumimoji/element/define` defines it. Its attributes are `language`, `hand`, `level`, `length`, `diagonals`, `seed` (a number, or `daily`), `lang` and `keep`; it fires `kumimoji-change` and `kumimoji-finish`, which bubble. Every attribute, event and property is in [docs/API.md](docs/API.md#the-element).
 
 ### The React components
 
@@ -900,26 +928,6 @@ export function Board() {
 else for its `<div>`. Options are read when it mounts; give it a new `key` to
 start over with different ones.
 
-## Accessibility
-
-- **A keyboard plays it.** Every square and every tile in the hand is a button
-  with a name. Tab lands on one square of the table and on one tile of the
-  hand, the arrow keys move between squares (and Left, Right, Home and End
-  between the hand's tiles), Enter or Space picks a tile up and lays it, and
-  Escape lets go of a tile you have picked up. The keyboard stays where it was
-  after each move, including on the buttons under the table, and the table's
-  description says so.
-- **What is happening is said.** The line above the table, with the tiles left
-  and the time, and the line saying which runs are not words, are polite live
-  regions, and so is the note after saving or loading.
-- **Targets are big enough.** Every button is at least 44 pixels each way,
-  which a test holds at a phone's width.
-- **Not by colour alone.** A run that is not a word is ringed and listed in
-  words; a tile apart from the crossword is faded and said so.
-- **Motion.** There is none to reduce: the table has no animation.
-- **Not yet.** Letters cannot be typed to lay a tile, and a screen reader hears
-  the table as a grid of squares, not as the words they make.
-
 ## Theming
 
 Every colour is a CSS variable on `.km-root`. Set them in your stylesheet on
@@ -945,7 +953,7 @@ on the table itself and so wins in light and dark alike.
 
 A slate table with ivory tiles, a little smaller:
 
-```js
+```js no-run
 import { mountKumimoji } from "@johnmorrisdotca/kumimoji/ui";
 
 mountKumimoji(document.getElementById("table"), {
@@ -955,6 +963,47 @@ mountKumimoji(document.getElementById("table"), {
 
 `KumimojiBoard` draws with colours of its own; style it through its `style`
 and `className`.
+
+## Limits
+
+| Limit | Value | Constant |
+| --- | --- | --- |
+| Opening hand | 3, 7 or 11 | `KUMIMOJI_HANDS` |
+| A word | 2 to 15 tiles | |
+| A finished grid, either way | 60 squares | `KUMIMOJI_GRID_MOST` |
+| Players at a table | 2 to 8 | `KUMIMOJI_PARTY` |
+| A player's name | 20 characters | `KUMIMOJI_PARTY` |
+| Words one hand is offered as help | 40 | `HELP_WORDS_MOST` |
+| A seed | a whole number from 0 to 4,294,967,295 | |
+| Two sets at once | English only | |
+
+## Accessibility
+
+- **A keyboard plays it.** Every square and every tile in the hand is a button
+  with a name. Tab lands on one square of the table and on one tile of the
+  hand, the arrow keys move between squares (and Left, Right, Home and End
+  between the hand's tiles), Enter or Space picks a tile up and lays it, and
+  Escape lets go of a tile you have picked up. The keyboard stays where it was
+  after each move, including on the buttons under the table, and the table's
+  description says so.
+- **What is happening is said.** The line above the table, with the tiles left
+  and the time, and the line saying which runs are not words, are polite live
+  regions, and so is the note after saving or loading.
+- **Targets are big enough.** Every button is at least 44 pixels each way,
+  which a test holds at a phone's width.
+- **Not by colour alone.** A run that is not a word is ringed and listed in
+  words; a tile apart from the crossword is faded and said so.
+- **Motion.** There is none to reduce: the table has no animation.
+- **Not yet.** Letters cannot be typed to lay a tile, and a screen reader hears
+  the table as a grid of squares, not as the words they make.
+
+## Browser support
+
+Any current browser: Chrome, Edge, Firefox and Safari, on a desk or a phone.
+It needs ES2020 and dynamic `import()`. The table is tested in Chromium and in
+WebKit, Safari's engine, at phone size with touch and on a desktop. The rules
+run in Node 22 and later, Deno, Bun and web workers, and load by `import` and
+by `require()`.
 
 ## Languages
 
@@ -980,27 +1029,6 @@ kumimojiStrings("en", { draw: "Robar" }).draw; // → "Robar"
 
 A new language for the tiles is another matter: it needs a real dictionary of
 that language, whose licence lets its words be shipped.
-
-## Limits
-
-| Limit | Value | Constant |
-| --- | --- | --- |
-| Opening hand | 3, 7 or 11 | `KUMIMOJI_HANDS` |
-| A word | 2 to 15 tiles | |
-| A finished grid, either way | 60 squares | `KUMIMOJI_GRID_MOST` |
-| Players at a table | 2 to 8 | `KUMIMOJI_PARTY` |
-| A player's name | 20 characters | `KUMIMOJI_PARTY` |
-| Words one hand is offered as help | 40 | `HELP_WORDS_MOST` |
-| A seed | a whole number from 0 to 4,294,967,295 | |
-| Two sets at once | English only | |
-
-## Browser support
-
-Any current browser: Chrome, Edge, Firefox and Safari, on a desk or a phone.
-It needs ES2020 and dynamic `import()`. The table is tested in Chromium and in
-WebKit, Safari's engine, at phone size with touch and on a desktop. The rules
-run in Node 22 and later, Deno, Bun and web workers, and load by `import` and
-by `require()`.
 
 ## The command line
 
@@ -1034,23 +1062,105 @@ runs from a static page and costs nothing to host.
 
 Ideas and pull requests are welcome.
 
-## Contributing
+## Architecture
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md). In short:
+The rules are plain functions over plain data with no DOM: a game is a value,
+every move returns the next one, and the same seed deals the same bag in every
+browser. Word lists are loaded only when a game opens, and the table is its own
+entry (`/ui` for plain DOM, `/element` for a tag, `/react` for React), so a page that wants only the
+rules carries none of it. A computer player is pure too, so its turn replays
+exactly after a reload.
+
+The file-by-file tree, with a line on each source file, is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): the rules (`grid`, `judge`, `play`, `generate`, `check`), the table of players (`party*`), the computer player (`computer*`), the Japanese tiles (`kana`), the word lists (`words*`), and the three faces (`ui`, `element`, `react`). Tests sit beside the code they test (`*.test.ts`). `scripts/` builds the demo
+and checks the package as npm packs it, `demo/` is the page published on
+GitHub Pages, and `table/` taps it in real browsers.
+
+## The name
+
+*Kumimoji* (組み文字) is made of *kumi* (組み, from 組む, to put together or
+assemble) and *moji* (文字, a letter or character): letters put together,
+which is what a player does with the tiles. Say it in four even beats:
+ku-mi-mo-ji. In Japanese printing the same word names something else, several
+characters set together in the space of one; the game borrows only its plain
+sense.
+
+## Where it comes from, and where it is used
+
+Kumimoji was built for [Itsutsu](https://itsutsu.com), a site for board games,
+puzzles, card games and dice games played at your own pace. *Itsutsu* (五つ) is
+Japanese for "five", after five in a row, the game the site began with. It is
+[the Kumimoji played there](https://itsutsu.com/games/kumimoji): alone, in
+races, round one device and across several.
+
+### Used by
+
+- [Itsutsu](https://itsutsu.com), for its game of Kumimoji: its rules, its
+  word lists and its computer player.
+
+That is the whole list so far. Using Kumimoji in something? Open an
+[*Add my project*](https://github.com/johnmorrisdotca/kumimoji/issues/new?template=add-my-project.md)
+issue and we will add you.
+
+### The family
+
+<!-- family:start (made by scripts/family-readme.mjs from scripts/family-template.mjs; change those, not this) -->
+Kumimoji is one of twenty-four packages, each made for the same site, each at
+[github.com/johnmorrisdotca](https://github.com/johnmorrisdotca). The code of every one is MIT.
+
+- [Korokoro](https://github.com/johnmorrisdotca/korokoro) (コロコロ): dice, with notation, exact odds, real sounds and the dice of many games. [Demo](https://johnmorrisdotca.github.io/korokoro/).
+- [Kyuubu](https://github.com/johnmorrisdotca/kyuubu) (キューブ): a turning cube for the browser, 2×2 to 7×7, with record solves to replay. [Demo](https://johnmorrisdotca.github.io/kyuubu/).
+- [Hitotsu](https://github.com/johnmorrisdotca/hitotsu) (一つ): a colour-card shedding game for two to eight, with the house rules people play. [Demo](https://johnmorrisdotca.github.io/hitotsu/).
+- [Toranpu](https://github.com/johnmorrisdotca/toranpu) (トランプ): a deck of playing cards, card games with computer players, and solitaires. [Demo](https://johnmorrisdotca.github.io/toranpu/).
+- [Tane](https://github.com/johnmorrisdotca/tane) (種): seeded random numbers and daily seeds, the same in every browser and on every server. [Demo](https://johnmorrisdotca.github.io/tane/).
+- [Narabe](https://github.com/johnmorrisdotca/narabe) (並べ): one rules engine for abstract board games, from gomoku and Reversi to Go and checkers. [Demo](https://johnmorrisdotca.github.io/narabe/).
+- [Tenka](https://github.com/johnmorrisdotca/tenka) (天下): world conquest for two to six, on a map of the real world. [Demo](https://johnmorrisdotca.github.io/tenka/).
+- [Kumimoji](https://github.com/johnmorrisdotca/kumimoji) (組み文字): a crossword tile race, in English and Japanese kana. [Demo](https://johnmorrisdotca.github.io/kumimoji/).
+- [Tsunagi](https://github.com/johnmorrisdotca/tsunagi) (繋ぎ): a line-joining logic puzzle whose every level has exactly one answer. [Demo](https://johnmorrisdotca.github.io/tsunagi/).
+- [Jarajara](https://github.com/johnmorrisdotca/jarajara) (ジャラジャラ): mahjong tiles drawn as SVG, stacked layouts, and the matching solitaire Awase. [Demo](https://johnmorrisdotca.github.io/jarajara/).
+- [Suido](https://github.com/johnmorrisdotca/suido) (水道): a pipe puzzle: turn the pieces until the water reaches every drain. [Demo](https://johnmorrisdotca.github.io/suido/).
+- [Domino](https://github.com/johnmorrisdotca/domino) (ドミノ): dominoes and Mexican Train. [Demo](https://johnmorrisdotca.github.io/domino/).
+- [Kotoba](https://github.com/johnmorrisdotca/kotoba) (言葉): word lists and word-game rules in English, French, German and Japanese. [Demo](https://johnmorrisdotca.github.io/kotoba/).
+- [Sugoroku](https://github.com/johnmorrisdotca/sugoroku) (双六): backgammon and its variants, with the doubling cube and match play. [Demo](https://johnmorrisdotca.github.io/sugoroku/).
+- [Kazu](https://github.com/johnmorrisdotca/kazu) (数): grid number puzzles: Sudoku and its variants, Futoshiki and Skyscrapers. [Demo](https://johnmorrisdotca.github.io/kazu/).
+- [Meikyuu](https://github.com/johnmorrisdotca/meikyuu) (迷宮): mazes on squares, hexagons, triangles and circles, made from a seed and drawn through with a finger or the mouse. [Demo](https://johnmorrisdotca.github.io/meikyuu/).
+- [Hikidashi](https://github.com/johnmorrisdotca/hikidashi) (引き出し): a drawer of small Japanese text tools: era dates, kanji numerals, readings and sentence difficulty. [Demo](https://johnmorrisdotca.github.io/hikidashi/).
+- [Chizu](https://github.com/johnmorrisdotca/chizu) (地図): maps of the world and of countries' regions, in English and Japanese, with a quiz and callouts. [Demo](https://johnmorrisdotca.github.io/chizu/).
+- [Bushu](https://github.com/johnmorrisdotca/bushu) (部首): find a kanji by the parts it is made of. [Demo](https://johnmorrisdotca.github.io/bushu/).
+- [Tobiishi](https://github.com/johnmorrisdotca/tobiishi) (飛び石): peg solitaire with nine boards and seeded solvable challenges. [Demo](https://johnmorrisdotca.github.io/tobiishi/).
+- [Jirai](https://github.com/johnmorrisdotca/jirai) (地雷): minesweeper on shaped grids with verified no-guess boards. [Demo](https://johnmorrisdotca.github.io/jirai/).
+- [Gunjin](https://github.com/johnmorrisdotca/gunjin) (軍人): five hidden-rank strategy games with pass-the-device play. [Demo](https://johnmorrisdotca.github.io/gunjin/).
+- [Karakuri](https://github.com/johnmorrisdotca/karakuri) (からくり): eight hyper-casual puzzle games, some of them physics: draw a shield, pull pins, cut ropes, slide blocks, pour tubes. [Demo](https://johnmorrisdotca.github.io/karakuri/).
+- [Houseki](https://github.com/johnmorrisdotca/houseki) (宝石): gem and stone matching puzzles: falling triplets, stone collapse, colour chains and gem swap. [Demo](https://johnmorrisdotca.github.io/houseki/).
+
+**This package is Kumimoji.** The demos of all twenty-four share one header and footer, so each links the rest.
+<!-- family:end -->
+
+## Development
 
 ```sh
-pnpm install
-pnpm check        # lint, types and tests
-pnpm test:table   # the demo in real browsers, by taps
-pnpm site         # build the demo into ./site, then serve it
-pnpm pictures     # take the README's two pictures from the built demo
+pnpm install --frozen-lockfile
+pnpm check             # lint, types and tests, including the checks on the README's tables and examples
+pnpm test:table        # the demo in real browsers, by taps
+pnpm test:package      # pack it as npm does, install it and import every entry
+pnpm test:frameworks   # the six framework examples, built from the packed tarball and played
+pnpm test:readme       # every TypeScript and JavaScript example in this README, type-checked and run
+pnpm site              # build the demo into ./site
+pnpm screenshots:readme  # retake the README's pictures into docs/images (builds the demo first)
 ```
+
+The pictures are taken on the maintainer's Mac and are retaken only when the look changes; they are in `docs/images` and are not in the package that npm installs.
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md). In short: run `pnpm check` before you push (see [Development](#development)).
 
 Please follow the [code of conduct](./CODE_OF_CONDUCT.md). A way to make a check or a deal run for long, or markup that gets out of the drawing, is for the [security policy](./SECURITY.md), not a public issue.
 
 ## Changes
 
 See [CHANGELOG.md](./CHANGELOG.md).
+
+The latest release is 1.2.2: the README takes the family's full layout, with pictures of the table and examples that are run.
 
 ## Licence
 

@@ -1,6 +1,6 @@
 {
   "name": "@johnmorrisdotca/kumimoji",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Crossword tile race: each player builds a crossword from a bag of letter tiles, in English or Japanese kana, alone against the clock or at a table of two to eight. Seeded deals, a computer player and a playable table. Zero dependencies.",
   "keywords": [
     "word-game",
@@ -143,9 +143,10 @@
     "test:frameworks": "pnpm build && node scripts/check-frameworks.mjs",
     "check": "pnpm lint && pnpm typecheck && pnpm test",
     "site": "pnpm build && node scripts/site.mjs",
-    "pictures": "pnpm site && node scripts/readme-pictures.mjs",
     "docs:make": "node scripts/docs.mjs",
-    "prepublishOnly": "pnpm check && pnpm build"
+    "prepublishOnly": "pnpm check && pnpm build",
+    "screenshots:readme": "pnpm site && node scripts/readme-pictures.mjs",
+    "test:readme": "pnpm build && node scripts/check-readme-examples.mjs"
   },
   "peerDependencies": {
     "react": ">=18"

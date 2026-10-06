@@ -19,11 +19,13 @@ import { loadTileWordsFromModule } from "./tileWordsModule.ts";
 import { KUMIMOJI_STYLE } from "./ui/style.ts";
 import { KUMIMOJI_VERSION } from "./version.ts";
 
-const readme = readFileSync("README.md", "utf8");
+// The README and the page of the API tables it links: what the package says about itself is held to the code across both.
+const readme = `${readFileSync("README.md", "utf8")}\n${readFileSync("docs/API.md", "utf8")}`;
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
 
 /** Every fenced block of the README: its language and its text. */
-const blocks = [...readme.matchAll(/^```(\w*)\n([\s\S]*?)^```$/gm)].map((found) => ({ lang: found[1], text: found[2] }));
+// A fence may carry a flag after its language (`ts no-run`, `ts no-check`): such a block is one the master check types or skips, and its kind says so.
+const blocks = [...readme.matchAll(/^```([\w-]*)([^\n]*)\n([\s\S]*?)^```$/gm)].map((found) => ({ lang: `${found[1]}${found[2].trim() === "" ? "" : ` ${found[2].trim()}`}`, text: found[3] }));
 
 /** The entries of the package, as a block of the README imports them, and the source each one is. */
 const ENTRIES = {
@@ -53,8 +55,8 @@ function runnable(text) {
 
 describe("the README's examples", () => {
   it("every block is of a kind a check runs, or is a line for a terminal", () => {
-    // ts and json here; html, js, jsx, vue, svelte and typescript (Angular) in scripts/check-frameworks.mjs.
-    expect([...new Set(blocks.map((block) => block.lang))].sort()).toEqual(["html", "js", "json", "jsx", "sh", "svelte", "text", "ts", "typescript", "vue"]);
+    // ts and json here, and every ts block again by `pnpm test:readme`; html, jsx, vue, svelte and ts no-check (Angular) in scripts/check-frameworks.mjs; no-run blocks need a browser.
+    expect([...new Set(blocks.map((block) => block.lang))].sort()).toEqual(["html", "js no-run", "json", "jsx", "sh", "svelte", "ts", "ts no-check", "ts no-run", "vue"]);
   });
 
   it("every TypeScript example runs, and every value it states is the value it comes to", async () => {
@@ -146,7 +148,7 @@ describe("the README's tables", () => {
       expect(rows.length).toBeGreaterThan(4);
       for (const row of rows) for (const name of codes(row[2])) expect(kumimoji[name], name).toBeDefined();
     }
-    for (const heading of ["| Move | What it does |", "### Dealing and judging", "### Tiles and grids", "### Playing, and a game kept", "| `startParty(settings, bag, seats)`"]) {
+    for (const heading of ["| Move | What it does |", "## Dealing and judging", "## Tiles and grids", "## Playing, and a game kept", "| `startParty(settings, bag, seats)`"]) {
       const rows = heading.startsWith("| `") ? table(heading).concat([[heading.split(" | ")[0].slice(2)]]) : table(heading);
       expect(rows.length, heading).toBeGreaterThan(5);
       for (const [names] of rows) {

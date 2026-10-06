@@ -1,25 +1,14 @@
-// Takes the pictures the README shows, from the built demo in `site/`: `pnpm pictures` (builds the demo, then runs this).
-// The page is served to a browser without a port, never fetched from the live site, and the same each run:
-// the game is dealt from a seed, and the words laid are the ones the package's own computer player lays,
-// tapped in one tile at a time as a person would. Motion is reduced.
-// Output: docs/desktop.jpg (1280 wide, light, English) and docs/phone.jpg (390 by 844, dark, Japanese kana).
-import { existsSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-
-import { chromium } from "@playwright/test";
+// Takes the pictures the README shows, from the built demo in `site/`: `pnpm screenshots:readme` (builds the demo, then runs this).
+// The family's standard is in johnmorrisdotca/.github (README-STANDARD.md); the shared part is readme-pictures-lib.mjs.
+// The page is served to a browser without a port, never fetched from the live site, and is the same each run: the game is
+// dealt from a seed, and the words laid are the ones the package's own computer player lays, tapped in one tile at a time as a
+// person would. Motion is reduced. Output: docs/images/<subject>-<desk|phone>-<light|dark>.webp.
+import { takePictures } from "./readme-pictures-lib.mjs";
 
 import "../dist/words.js";
 import { bestLaying, deal, draw, generateKumimoji, judgeTiles, loadTileWords, mayDraw } from "../dist/index.js";
 
-const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const site = join(root, "site");
-const docs = join(root, "docs");
-const host = "http://kumimoji.test";
-const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".md": "text/markdown" };
-const QUALITY = 76;
-
-if (!existsSync(join(site, "index.html"))) throw new Error("site/ is not built: run `pnpm pictures` (it builds the demo first)");
+const TABLE = '#table [data-testid="km-root"]';
 
 /** The taps that lay `words` words the computer player would lay on a bag dealt from `seed`: a tile from the hand onto a square, or a draw. */
 async function taps({ language, seed, words }) {
@@ -50,19 +39,9 @@ async function taps({ language, seed, words }) {
   return steps;
 }
 
-const browser = await chromium.launch();
 
-async function shot({ width, height, colorScheme, lang, language, seed, words, path, scrollTo }) {
-  const context = await browser.newContext({ viewport: { width, height }, colorScheme, reducedMotion: "reduce", locale: "en-US", deviceScaleFactor: 2 });
-  const page = await context.newPage();
-  await page.route(`${host}/**`, (route) => {
-    const { pathname } = new URL(route.request().url());
-    const file = join(site, pathname === "/" ? "index.html" : pathname);
-    if (!existsSync(file)) return route.fulfill({ status: 404, body: "" });
-    return route.fulfill({ body: readFileSync(file), contentType: TYPES[file.slice(file.lastIndexOf("."))] ?? "application/octet-stream" });
-  });
-  await page.goto(`${host}/?seed=${seed}&hand=7&level=hard&words=${language}&lang=${lang}`);
-  await page.waitForSelector('#table [data-testid="km-root"][data-state="playing"]');
+/** Lay `words` words by taps, then wait for the table to settle. */
+const laid = ({ language, seed, words }) => async (page) => {
   for (const step of await taps({ language, seed, words })) {
     if (step.draw) await page.locator('#table [data-testid="km-draw"]').click();
     else {
@@ -70,16 +49,47 @@ async function shot({ width, height, colorScheme, lang, language, seed, words, p
       await page.locator(`#table [data-square="${step.square}"]`).click();
     }
   }
-  await page.waitForTimeout(300);
-  if (scrollTo) await page.locator(scrollTo).evaluate((element) => window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY - 16));
-  else await page.evaluate(() => window.scrollTo(0, 0));
-  await page.mouse.move(0, 0);
-  await page.screenshot({ path, type: "jpeg", quality: QUALITY });
-  await context.close();
-}
+};
+const address = ({ seed, hand = 7, level = "hard", words = "english", lang = "en", extra = "" }) => `/?seed=${seed}&hand=${hand}&level=${level}&words=${words}&lang=${lang}${extra}`;
 
-// English from the top of the page, so the header, the language chooser and the cloth patches show: a crossword half built.
-await shot({ width: 1280, height: 900, colorScheme: "light", lang: "en", language: "english", seed: 77, words: 7, path: join(docs, "desktop.jpg") });
-// Kana on a phone, scrolled to the table.
-await shot({ width: 390, height: 844, colorScheme: "dark", lang: "ja", language: "japanese", seed: 1, words: 5, path: join(docs, "phone.jpg"), scrollTo: '#table [data-testid="km-root"]' });
-await browser.close();
+/** The table alone, cropped. */
+const table = (subject, query, play, shape = {}) => ({ subject, views: ["desk"], scale: 2, url: address(query), ready: `${TABLE}[data-state="playing"]`, target: `${TABLE} [data-testid="km-board"]`, prepare: laid(play), ...shape });
+
+await takePictures({
+  shots: [
+    // English from the top of the page, so the header, the language chooser and the cloth patches show: a crossword half built.
+    // On a phone, in kana, scrolled to the table.
+    {
+      subject: "hero",
+      views: ["desk", "phone"],
+      height: 900,
+      url: address({ seed: 77 }),
+      ready: `${TABLE}[data-state="playing"]`,
+      async prepare(page, { view }) {
+        if (view === "phone") {
+          await page.goto(`http://kumimoji.test${address({ seed: 1, words: "japanese", lang: "ja" })}`);
+          await page.waitForSelector(`${TABLE}[data-state="playing"]`);
+          await laid({ language: "japanese", seed: 1, words: 5 })(page);
+          await page.locator(TABLE).evaluate((element) => window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY - 16));
+        } else {
+          await laid({ language: "english", seed: 77, words: 7 })(page);
+          await page.evaluate(() => window.scrollTo(0, 0));
+        }
+      },
+    },
+    table("english", { seed: 77 }, { language: "english", seed: 77, words: 7 }),
+    table("kana", { seed: 1, words: "japanese", lang: "ja" }, { language: "japanese", seed: 1, words: 5 }),
+    table("wild-tiles", { seed: 5, level: "easy" }, { language: "english", seed: 5, words: 0 }, { target: `${TABLE} [data-testid="km-hand"]` }),
+    // The smallest game there is (seed 44, a hand of three): N beside W is not a word, and the table rings both.
+    table("not-a-word", { seed: 44, hand: 3 }, { language: "english", seed: 44, words: 0 }, {
+      async prepare(page) {
+        for (const square of ["0,0", "0,1"]) {
+          await page.locator('#table [data-hand="0"]').click();
+          await page.locator(`#table [data-square="${square}"]`).click();
+        }
+        await page.locator(`${TABLE} .km-misspelt`).first().waitFor();
+      },
+    }),
+    table("hand-of-eleven", { seed: 33, hand: 11 }, { language: "english", seed: 33, words: 5 }),
+  ],
+});
