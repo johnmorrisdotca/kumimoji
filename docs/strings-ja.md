@@ -9,6 +9,7 @@ shown. ␠ marks a space at the start or end of a string.
 | Name | English | Japanese |
 | --- | --- | --- |
 | `dealing` | Dealing… | 配っています… |
+| `loadError` | The word list could not be loaded. Try again. | 単語の一覧を読み込めませんでした。もう一度お試しください。 |
 | `leftOne` | 1 tile left in the bag · {time} | 袋の残り1枚 · {time} |
 | `left` | {n} tiles left in the bag · {time} | 袋の残り{n}枚 · {time} |
 | `finished` | Finished in {time}. Every tile laid, every run a word. | {time}で完成しました。すべてのタイルを置き、どの並びも単語になっています。 |

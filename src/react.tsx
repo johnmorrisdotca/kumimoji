@@ -64,25 +64,40 @@ export function KumimojiBoard({ tiles, verdict = null, glyphOf, onSquare, held =
   );
 }
 
-/** What `KumimojiTable` takes: the options of `mountKumimoji`, and any attribute of its `<div>`. */
+/**
+ * Native table options, readiness/error choices and attributes of the host div.
+ * @example
+ * ```ts
+ * import type { KumimojiTableProps } from "@johnmorrisdotca/kumimoji/react";
+ * const props: KumimojiTableProps = { controls: true, keep: false, onError: error => console.log(error.message) };
+ * console.log(props.controls);
+ * ```
+ */
 export type KumimojiTableProps = KumimojiTableOptions & Omit<HTMLAttributes<HTMLDivElement>, keyof KumimojiTableOptions>;
 
 /**
  * A whole game alone, as a React component: the plain-DOM table
  * (`mountKumimoji`) mounted into this component's element once the browser
  * has it. Options are read when it mounts; give it a new `key` to start over
- * with different ones.
+ * with different ones. Native callbacks are forwarded independently of host DOM events.
+ * @param props - Native table choices and host-div attributes.
+ * @returns A div whose effect owns the native table and cleanup.
+ * @example
+ * ```ts
+ * import { KumimojiTable } from "@johnmorrisdotca/kumimoji/react";
+ * console.log(typeof KumimojiTable);
+ * ```
  */
-export function KumimojiTable({ language, hand, level, gameLength, diagonals, seed, onFinish, onChange, locale, strings, theme, keep, ...element }: KumimojiTableProps) {
+export function KumimojiTable({ language, hand, level, gameLength, diagonals, seed, onFinish, onChange, locale, strings, theme, keep, controls, saved, onError, ...element }: KumimojiTableProps) {
   const host = useRef<HTMLDivElement>(null);
-  const latest = useRef({ onFinish, onChange });
+  const latest = useRef({ onFinish, onChange, onError });
   useEffect(() => {
-    latest.current = { onFinish, onChange };
+    latest.current = { onFinish, onChange, onError };
   });
   useEffect(() => {
     const target = host.current;
     if (target === null) return;
-    const table = mountKumimoji(target, { language, hand, level, gameLength, diagonals, seed, locale, strings, theme, keep, onFinish: (result) => latest.current.onFinish?.(result), onChange: (saved) => latest.current.onChange?.(saved) });
+    const table = mountKumimoji(target, { language, hand, level, gameLength, diagonals, seed, locale, strings, theme, keep, controls, saved, onError: error => latest.current.onError?.(error), onFinish: (result) => latest.current.onFinish?.(result), onChange: (saved) => latest.current.onChange?.(saved) });
     return () => table.destroy();
     // Mounted once per key, as documented above.
     // eslint-disable-next-line react-hooks/exhaustive-deps

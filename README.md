@@ -384,6 +384,12 @@ fetches when a game is first dealt.
 
 The cookbook, with the output of each example, is under [Examples](#examples).
 
+### Embed builder and reflected settings
+
+[Build a crossword-table embed](https://johnmorrisdotca.github.io/kumimoji/builder.html), preview English letters or Japanese kana and copy element, iframe, module, React 19, Vue, Svelte, Angular, HTML or URL code. It saves no play automatically. The builder/frame defaults `keep` off; the existing element default remains on for compatibility.
+
+Every attribute reflects to a property. New `daily` accepts today or an explicit UTC date (the `seed="daily"` alias remains); `controls`, device/light/dark `theme`, `size` (small 320px, medium 480px, large 640px), pixel `width` and spoken `label` are available. `table`, `saved`, `newGame()` and `setGame()` remain. `options` accepts every native table choice, including initial saved state and callbacks. Readiness is available as `table.ready`; `table.set(...)` updates presentation without redealing. Load errors are visible and reported through `onError`/`kumimoji-error`. `defineTable` accepts a custom tag and is server-safe. See [the embed guide](docs/embeds.md).
+
 ## Examples
 
 Every TypeScript and JavaScript block that can run is type-checked against the built package and run by `pnpm test:readme`, so the output after `// →` is what the code prints. The word lists are read from the package's files in Node, so nothing here uses a network.
@@ -885,7 +891,7 @@ The types are `TilePlay`, `Tiles`, `GridVerdict`, `GridRules`, `Run`,
 
 ### The table
 
-`mountKumimoji(element, options?)` from `@johnmorrisdotca/kumimoji/ui` deals and plays a whole game alone in the element and returns a handle (`play()`, `saved()`, `newGame(options?)`, `setGame(saved)`, `setLocale(locale, strings?)`, `destroy()`). Its options are `language`, `hand`, `level`, `gameLength`, `diagonals`, `seed`, `onFinish`, `onChange`, `locale`, `strings`, `theme` and `keep`; each, with its default, is in [docs/API.md](docs/API.md#the-table).
+`mountKumimoji(element, options?)` from `@johnmorrisdotca/kumimoji/ui` deals and plays a whole game alone in the element and returns a handle (`play()`, `saved()`, `newGame(options?)`, `setGame(saved)`, `setLocale(locale, strings?)`, `ready`, `set(options)`, `destroy()`). Its options are `language`, `hand`, `level`, `gameLength`, `diagonals`, `seed`, `onFinish`, `onChange`, `locale`, `strings`, `theme`, `keep`, `controls`, `saved` and `onError`; each, with its default, is in [docs/API.md](docs/API.md#the-table).
 
 ### The element
 
@@ -1147,14 +1153,14 @@ Kumimoji is one of twenty-eight packages, each made for the same site, each at
 
 **Geography & data**
 
-- [address-plus](https://github.com/johnmorrisdotca/address-plus) (アドレスプラス): parse and format addresses in the United States, Canada and Japan. [Demo](https://johnmorrisdotca.github.io/address-plus/).
+- [address-plus](https://github.com/johnmorrisdotca/address-plus) (アドレスプラス): parse and format addresses in the United States, Canada, Japan, Australia and the United Kingdom. [Demo](https://johnmorrisdotca.github.io/address-plus/).
 - [Chizu](https://github.com/johnmorrisdotca/chizu) (地図): maps of the world and of countries' regions, in English and Japanese, with a quiz and callouts. [Demo](https://johnmorrisdotca.github.io/chizu/).
 - [Hata](https://github.com/johnmorrisdotca/hata) (旗): country and regional flags as SVG, at their true proportions and keyed by ISO code. [Demo](https://johnmorrisdotca.github.io/hata/).
 - [Kuni](https://github.com/johnmorrisdotca/kuni) (国): countries and their regions, with ISO codes and names in English and Japanese. [Demo](https://johnmorrisdotca.github.io/kuni/).
 
 **Developer tools**
 
-- [REST in Pieces](https://github.com/spxis/rest-in-pieces) (レスト・イン・ピーシズ): seeded test data and REST APIs for frontend development, with latency and error drills. [Demo](https://spxis.github.io/rest-in-pieces/).
+- [REST in Pieces](https://github.com/spxis/rest-in-pieces) (レスト・イン・ピーシーズ): seeded test data and REST APIs for frontend development, with latency and error drills. [Demo](https://spxis.github.io/rest-in-pieces/).
 
 
 **This package is Kumimoji.** The demos of all twenty-eight share one header and footer, so each links the rest.

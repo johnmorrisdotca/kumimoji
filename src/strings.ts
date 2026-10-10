@@ -17,6 +17,7 @@ export type KumimojiLocale = "en" | "ja";
 
 const EN = {
   dealing: "Dealing…",
+  loadError: "The word list could not be loaded. Try again.",
   leftOne: "1 tile left in the bag · {time}",
   left: "{n} tiles left in the bag · {time}",
   finished: "Finished in {time}. Every tile laid, every run a word.",
@@ -58,6 +59,7 @@ export type KumimojiStrings = { [Name in keyof typeof EN]: string };
 
 const JA: KumimojiStrings = {
   dealing: "配っています…",
+  loadError: "単語の一覧を読み込めませんでした。もう一度お試しください。",
   leftOne: "袋の残り1枚 · {time}",
   left: "袋の残り{n}枚 · {time}",
   finished: "{time}で完成しました。すべてのタイルを置き、どの並びも単語になっています。",

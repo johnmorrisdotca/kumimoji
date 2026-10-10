@@ -11,6 +11,7 @@ exactly after a reload.
 
 ```text
 src/
+├── embed-day.ts                 shared UTC embed-date validation
 ├── check.ts            whether a finished grid completes a game: the one check a server also runs
 ├── computer.types.ts   what a computer did in one step of its turn
 ├── computerPlay.ts     the word a computer player lays: from its own hand, with no randomness

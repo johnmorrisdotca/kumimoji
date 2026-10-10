@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+- Add the shared crossword-table builder and validated iframe route with reflected settings and display options. Preserve native saved/table access and gameplay methods; presentation updates now retain play.
+- Add native ready/set, optional initial saved state, control visibility and localized load failures, forwarded by the React wrapper. Preserve event shapes with composed JSON-safe snapshots and add load/error events.
+
+
 All notable changes to this project are written down here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).

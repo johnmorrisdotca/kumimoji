@@ -185,7 +185,7 @@ describe("the README's tables", () => {
 
   it("the table's options and handle are the ones listed", () => {
     const source = readFileSync("src/ui/mount.ts", "utf8");
-    const fields = (type) => [...new RegExp(`export type ${type} = \\{([\\s\\S]*?)\\n\\};`).exec(source)[1].matchAll(/^ {2}(\w+)\??:/gm)].map((found) => found[1]);
+    const fields = (type) => [...new RegExp(`export type ${type} = \\{([\\s\\S]*?)\\n\\};`).exec(source)[1].matchAll(/^ {2}(?:readonly )?(\w+)\??:/gm)].map((found) => found[1]);
     expect(table("| Option | Default | What it does |").map(([name]) => codes(name)[0])).toEqual(fields("KumimojiTableOptions"));
     expect(table("| Handle | What it does |").map(([name]) => codes(name)[0].replace(/\(.*$/, ""))).toEqual(fields("KumimojiTableHandle"));
   });

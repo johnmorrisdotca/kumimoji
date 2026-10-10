@@ -37,6 +37,7 @@ export const KUMIMOJI_STYLE = `
 .km-picker-title { width: 100%; font-size: 14px; }
 .km-picker .km-button { padding: 0 8px; text-transform: uppercase; }
 .km-japanese .km-picker .km-button { text-transform: none; }
+.km-controls[hidden] { display: none; }
 .km-controls { display: flex; flex-wrap: wrap; gap: 8px; }
 .km-button { font: inherit; min-height: 44px; min-width: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--km-line); background: var(--km-panel); color: var(--km-ink); cursor: pointer; touch-action: manipulation; }
 .km-button:disabled { opacity: .45; cursor: default; }

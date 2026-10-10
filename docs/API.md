@@ -101,9 +101,14 @@ and plays a whole game alone in the element, and returns a handle.
 | `strings` | | Words of your own, laid over the locale's |
 | `theme` | | CSS variables set on the table itself |
 | `keep` | `true` | Whether the table offers saving and loading |
+| `controls` | true | Show native play-action buttons; a host can supply its own |
+| `saved` | none | Restore a validated saved game initially |
+| `onError` | none | Report a word-list or initial restoration error |
 
 | Handle | What it does |
 | --- | --- |
+| `ready` | Settles when the initial deal or restoration is ready |
+| `set(options)` | Change locale, words, palette, keep and controls without redealing |
 | `play()` | The game as it stands, or `null` while it is being dealt |
 | `saved()` | The game as it would be saved, or `null` while it is being dealt |
 | `newGame(options?)` | A new game; any of the first six options may change |
@@ -122,8 +127,7 @@ to draw and how each tile stands, with `BOARD_MARGIN` and `BOARD_LEAST`, and
 
 `<kumimoji-table>` is `mountKumimoji` as a tag: `@johnmorrisdotca/kumimoji/element/define`
 defines it, and `@johnmorrisdotca/kumimoji/element` holds the class alone. Each
-attribute is read again when it changes, and a change to any but `lang` deals a
-new game. A table the rules do not offer (a hand of 5, say) draws nothing.
+attribute is read again when it changes. Game inputs redeal; display, locale, keep and controls preserve play. Invalid input shows a status and an error event.
 
 | Attribute | Default | What it does |
 | --- | --- | --- |
@@ -135,11 +139,20 @@ new game. A table the rules do not offer (a hand of 5, say) draws nothing.
 | `seed` | a new one each game | A whole number to deal from, or `daily` for the day's seed |
 | `lang` | the page's | The language of the table's words: `en` or `ja` |
 | `keep` | on | `off` leaves saving and loading out |
+| `daily` | off | today or an explicit validated UTC date; takes priority over seed |
+| `controls` | on | Show native play-action buttons |
+| `theme` | auto | auto/light/dark display palette |
+| `size` | unset | small/medium/large display width (320/480/640px) |
+| `width` | unset | Pixel display width, capped to the parent |
+| `label` | unset | Spoken group name |
 
 It fires `kumimoji-change` after every change to the game, with the game as it
 would be saved as `event.detail.saved`, and `kumimoji-finish` when the last
 tile is laid and every run is a word, with the deal, the play and the time it
-took as `event.detail`; both bubble. It has `saved` (the game as it would be
+took as `event.detail`; both bubble and cross shadow roots with JSON-safe snapshots. It has `saved` (the game as it would be
 saved), `table` (the handle `mountKumimoji` returns), `newGame(options?)` and
 `setGame(saved)`. To style it, set the table's variables on `kumimoji-table
 .km-root`: see [Theming](#theming).
+
+
+The element also exports defineTable(tagName?, registry?) for a custom tag (safe on a server), full native options through options, and reflected properties for every attribute. Native saved/table getters and newGame/setGame remain. Kumimoji-load gives the deal seed/day, and kumimoji-error gives a plain message. See [the embed guide](embeds.md) for all host formats and the validated frame route.

@@ -10,7 +10,16 @@ import { loadTileWords, type TileWords } from "../tileWords.ts";
 import { boardModel } from "./board.ts";
 import { KUMIMOJI_STYLE } from "./style.ts";
 
-/** What `mountKumimoji` may be given. Everything is optional: with nothing, it is a short English game from a hand of seven, with some wild tiles. */
+/**
+ * Optional initial game, presentation, readiness and callback choices.
+ * With nothing, it is a short English game from a hand of seven, with some wild tiles.
+ * @example
+ * ```ts
+ * import type { KumimojiTableOptions } from "@johnmorrisdotca/kumimoji/ui";
+ * const options: KumimojiTableOptions = { hand: 7, keep: false, controls: true };
+ * console.log(options.hand);
+ * ```
+ */
 export type KumimojiTableOptions = {
   /** The language of the tiles: `"english"` or `"japanese"` kana. English by default. */
   language?: KumimojiLanguage;
@@ -36,13 +45,31 @@ export type KumimojiTableOptions = {
   theme?: Readonly<Record<string, string>>;
   /** Whether the table offers saving and loading. True by default. */
   keep?: boolean;
+  /** Show native play-action buttons; a host hiding them supplies its own actions. */
+  controls?: boolean;
+  /** A validated saved game to restore initially instead of dealing a new one. */
+  saved?: KumimojiSaved;
+  /** Called after a word-list load or initial restoration fails. */
+  onError?: (error: Error) => void;
 };
 
 /** The options that make a game, which a new game may change. */
 type GameOptions = Pick<KumimojiTableOptions, "language" | "hand" | "level" | "gameLength" | "diagonals" | "seed">;
 
-/** What `mountKumimoji` hands back: the game being played, and the ways to change it from outside. */
+/**
+ * Readiness, structured play and presentation/game controls for a mounted table.
+ * @example
+ * ```ts
+ * import type { KumimojiTableHandle } from "@johnmorrisdotca/kumimoji/ui";
+ * const setJapanese = (table: KumimojiTableHandle): void => table.set({ locale: "ja" });
+ * console.log(typeof setJapanese);
+ * ```
+ */
 export type KumimojiTableHandle = {
+  /** Settles once the initial deal or restored game is ready. */
+  readonly ready: Promise<void>;
+  /** Change presentation and controls without redealing. */
+  set: (options: Pick<KumimojiTableOptions, "locale" | "strings" | "theme" | "keep" | "controls">) => void;
   /** The game as it stands, or null while it is being dealt. */
   play: () => TilePlay | null;
   /** The game as it would be saved (`kumimojiToJSON`), or null while it is being dealt. */
@@ -99,6 +126,18 @@ function save(name: string, type: string, text: string): void {
  * game loads back.
  *
  * The word list is fetched the first time a game in its language is dealt.
+ * @param target - The host element for this table.
+ * @param options - Initial deal or saved state, presentation and callbacks.
+ * @returns The native handle, including ready and presentation updates without redealing.
+ * @example
+ * ```ts
+ * import { mountKumimoji } from "@johnmorrisdotca/kumimoji/ui";
+ * if (typeof document !== "undefined") {
+ *   const table = mountKumimoji(document.createElement("div"), { keep: false });
+ *   void table.ready.then(() => table.destroy());
+ * }
+ * console.log(typeof mountKumimoji);
+ * ```
  */
 export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions = {}): KumimojiTableHandle {
   let settings: GameOptions = { language: options.language, hand: options.hand, level: options.level, gameLength: options.gameLength, diagonals: options.diagonals, seed: options.seed };
@@ -140,6 +179,7 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
   const picker = node("div", "km-picker");
   picker.dataset.testid = "km-picker";
   const controls = node("div", "km-controls");
+  controls.hidden = options.controls === false;
   controls.dataset.testid = "km-controls";
   const keep = node("details", "km-keep");
   keep.dataset.testid = "km-keep";
@@ -459,7 +499,19 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
     keyboardBack(where);
   }
 
+  let initialReady: Promise<void> = Promise.resolve();
   const handle: KumimojiTableHandle = {
+    get ready() { return initialReady; },
+    set: (changes) => {
+      for (const name of Object.keys(options.theme ?? {})) if (changes.theme !== undefined && !(name in changes.theme)) root.style.removeProperty(name);
+      if (changes.theme !== undefined) for (const [name, value] of Object.entries(changes.theme)) root.style.setProperty(name, value);
+      options = { ...options, ...changes };
+      if (changes.locale !== undefined) locale = changes.locale;
+      if (changes.strings !== undefined) own = changes.strings;
+      say = kumimojiStrings(locale, own);
+      if (options.keep === false) keep.remove(); else if (keep.parentNode !== root) root.append(keep);
+      controls.hidden = options.controls === false; render();
+    },
     play: () => play,
     saved: savedNow,
     setGame: async (saved) => {
@@ -516,6 +568,7 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
     },
   };
 
-  void handle.newGame(settings);
+  initialReady = options.saved === undefined ? handle.newGame(settings) : handle.setGame(options.saved);
+  void initialReady.catch((error: unknown) => { if (destroyed) return; const problem = error instanceof Error ? error : new Error(String(error)); status.textContent = say.loadError; options.onError?.(problem); });
   return handle;
 }
