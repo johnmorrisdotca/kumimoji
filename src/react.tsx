@@ -88,7 +88,8 @@ export type KumimojiTableProps = KumimojiTableOptions & Omit<HTMLAttributes<HTML
  * console.log(typeof KumimojiTable);
  * ```
  */
-export function KumimojiTable({ language, hand, level, gameLength, diagonals, seed, onFinish, onChange, locale, strings, theme, keep, controls, saved, onError, ...element }: KumimojiTableProps) {
+export function KumimojiTable(props: KumimojiTableProps) {
+  const { language, hand, level, gameLength, diagonals, seed, onFinish, onChange, locale, strings, theme, keep, controls, saved, onError, ...element } = props;
   const host = useRef<HTMLDivElement>(null);
   const latest = useRef({ onFinish, onChange, onError });
   useEffect(() => {

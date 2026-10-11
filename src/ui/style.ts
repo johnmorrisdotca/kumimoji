@@ -3,6 +3,11 @@
  * variable so a page can wear it in its own colours (set them on the element
  * or any ancestor, or pass them as `theme`). Light and dark follow the
  * reader's system. Everything to be tapped is at least 44px.
+  * @example
+ * ```ts
+ * import { KUMIMOJI_STYLE } from "@johnmorrisdotca/kumimoji/ui";
+ * console.log(KUMIMOJI_STYLE.includes(".km-root")); // true
+ * ```
  */
 export const KUMIMOJI_STYLE = `
 .km-root {
