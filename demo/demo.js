@@ -8,6 +8,7 @@ import { mountKumimoji } from "./dist/ui.js";
 // The page's own words, in the two languages the table speaks. Set as text, never as HTML.
 const WORDS = {
   en: {
+    pageDocs: "Docs",
     pageApi: "API reference",
     pitch: "Build one crossword from every tile in the bag. Tap a tile in your hand, then a square. When your hand is empty and every run is a word, draw the next tile.",
     name: "Kumimoji (組み文字) is Japanese for letters put together.",
@@ -40,6 +41,7 @@ const WORDS = {
     foot: "Every bag is dealt from a seed, by laying a crossword first, so every game can be finished. Your game stays on this device.",
   },
   ja: {
+    pageDocs: "ドキュメント",
     pageApi: "API（英語）",
     pitch: "袋のタイルをすべて使って、1つのクロスワードを作ります。手札のタイルをタップしてから、マスをタップして置きます。手札がなくなり、どの並びも単語になったら、次の1枚を引きます。",
     name: "「組み文字」は、文字を組み合わせるという意味です。",
@@ -84,6 +86,7 @@ const language = familyLanguage({
   id: "kumimoji",
   words: WORDS,
   onChange: (lang) => {
+    docsLink(lang);
     table?.setLocale(lang);
     // The table in a tag follows the page's language the same way, by its attribute.
     document.getElementById("tag")?.setAttribute("lang", lang);
@@ -198,3 +201,6 @@ const TRIES = {
   diagonals: { setUp: { language: "english", hand: 7, level: "easy", gameLength: "short", diagonals: true } },
 };
 for (const button of document.querySelectorAll("[data-try]")) button.addEventListener("click", () => start(TRIES[button.dataset.try]));
+
+function docsLink(lang) { document.querySelector('[data-say="pageDocs"]')?.setAttribute("href", lang === "ja" ? "docs/ja/index.html" : "docs/index.html"); }
+docsLink(language.lang);

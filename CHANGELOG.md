@@ -6,6 +6,8 @@ All notable changes to this project are written down here. The format follows
 
 ## [Unreleased]
 
+- Add the bilingual documentation site, checked public examples, paired guides, local search and machine-readable pages.
+
 - Add the shared crossword-table builder and validated iframe route with reflected settings and display options. Preserve native saved/table access and gameplay methods; presentation updates now retain play.
 - Add native ready/set, optional initial saved state, control visibility and localized load failures, forwarded by the React wrapper. Preserve event shapes with composed JSON-safe snapshots and add load/error events.
 

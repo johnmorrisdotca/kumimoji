@@ -8,3 +8,6 @@
 .tag kumimoji-table { display: block; margin-top: 10px; }
 .tag .km-root { --km-ink: var(--ink); --km-panel: var(--surface); --km-font: var(--font); --km-felt: var(--felt); --km-accent: var(--felt); --km-accent-ink: var(--felt-ink); }
 .fam-button[data-said="true"] { opacity: .8; }
+
+/* Keep navigation width stable across languages. */
+header nav a[data-say="pageDocs"] { inline-size: 8rem; justify-content: center; flex: none; }

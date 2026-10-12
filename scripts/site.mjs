@@ -30,9 +30,9 @@ const page = `<!doctype html>
   <head>
     ${familyHead({
       id,
-      title: "Kumimoji · the crossword tile race, in English and Japanese",
+      title: "Kumimoji 組み文字 — Crossword tile game in English and Japanese",
       description: "Build one crossword from every tile in the bag, in English or in Japanese kana: lay tiles as words that cross, draw when every run is a word, and race the clock. Free and open source.",
-      ogTitle: "Kumimoji crossword tile race",
+      ogTitle: "Kumimoji 組み文字 — Crossword tile game in English and Japanese",
       ogDescription: "Build one crossword from every tile in the bag, in English or Japanese.",
     })}
     <link rel="icon" href="${ICON}" />
@@ -41,7 +41,7 @@ const page = `<!doctype html>
   </head>
   <body>
     <main>
-      ${familyHeader({ id, links: [{ href: "api.html", say: "pageApi" }] })}
+      ${familyHeader({ id, links: [{ href: "docs/index.html", say: "pageDocs" }, { href: "api.html", say: "pageApi" }] })}
       <div class="setup fam-row">
         ${choice("words", [["language=english", { say: "english" }], ["language=japanese", { say: "japanese" }]], ["Choose the tiles in the bag: English letters, or Japanese kana. It takes effect when you press New game.", "袋に入れるタイルを選びます（英語の文字か、日本語のかな）。「新しいゲーム」を押すと反映されます。"])}
         ${choice("hand", [["hand=7", { text: "7" }], ["hand=11", { text: "11" }]], ["How many tiles you hold at a time: 7 or 11. It takes effect when you press New game.", "手元に持つタイルの枚数です（7枚か11枚）。「新しいゲーム」を押すと反映されます。"])}
@@ -89,7 +89,7 @@ writeFileSync("site/api.html", apiPage({ id, name: "Kumimoji", icon: ICON }));
 console.log("site/ is ready: serve it, or let the Pages workflow publish it.");
 
 writeFileSync("site/family-embed-builder.js", `export const FAMILY_EMBED_BUILDER_WORDS = ${JSON.stringify(FAMILY_EMBED_BUILDER_WORDS)};\nexport ${familyEmbedBuilder.toString()};\n`);
-const builderParts = { builderHead: familyHead({ id, title: "Kumimoji · build a crossword embed", description: "Choose tiles and a seed, preview a crossword table and copy the embed code." }), builderHeader: familyHeader({ id, links: [{ href: "./", say: "toGallery" }] }), unreviewed: familyUnreviewed({ id }), footer: familyFooter({ id }), script: `<script>${FAMILY_SCRIPT}</script>` };
+const builderParts = { builderHead: familyHead({ id, title: "Kumimoji · build a crossword embed", description: "Choose tiles and a seed, preview a crossword table and copy the embed code." }), builderHeader: familyHeader({ id, links: [{ href: "./", say: "toGallery" }, { href: "docs/index.html", say: "pageDocs" }, { href: "api.html", say: "pageApi" }] }), unreviewed: familyUnreviewed({ id }), footer: familyFooter({ id }), script: `<script>${FAMILY_SCRIPT}</script>` };
 writeFileSync("site/builder.html", readFileSync("demo/builder.html", "utf8").replace(/<!-- family:([A-Za-z]+) -->/g, (_match, key) => builderParts[key]));
 cpSync("demo/embed", "site/embed", { recursive: true });
 for (const file of ["builder.js", "builder.css"]) cpSync(`demo/${file}`, `site/${file}`);

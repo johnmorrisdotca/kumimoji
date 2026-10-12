@@ -1,4 +1,4 @@
-<h1 align="center">Kumimoji <sub>組み文字</sub></h1>
+<h1 align="center">Kumimoji <sub>組み文字</sub> — Crossword tile game in English and Japanese</h1>
 
 <p align="center"><strong>The crossword tile race: a word game where you build one crossword from a bag of letter tiles.</strong><br>
 In English and in Japanese kana. The rules as pure, seeded TypeScript, two word lists, a computer player, and a table to play on in React, Vue, Svelte, Angular or plain HTML.</p>
@@ -10,9 +10,11 @@ In English and in Japanese kana. The rules as pure, seeded TypeScript, two word 
   <a href="./NOTICE.md"><img alt="Japanese word list: CC BY-SA 4.0" src="https://img.shields.io/badge/Japanese%20words-CC%20BY--SA%204.0-b5452c"></a>
   <img alt="No dependencies" src="https://img.shields.io/badge/dependencies-0-2f5d4a">
   <img alt="TypeScript" src="https://img.shields.io/badge/types-TypeScript-3178c6">
+  <a href="https://johnmorrisdotca.github.io/kumimoji/docs/api/main/index.html"><img alt="689.5 kB minified and gzipped" src="https://img.shields.io/badge/min%2Bgzip-689.5%20kB-2f5d4a"></a>
+  <a href="https://www.npmjs.com/package/@johnmorrisdotca/kumimoji#provenance"><img alt="Published with npm provenance" src="https://img.shields.io/badge/npm-provenance-2f5d4a"></a>
 </p>
 
-<p align="center"><a href="https://johnmorrisdotca.github.io/kumimoji/"><strong>Play a game →</strong></a> · <a href="https://johnmorrisdotca.github.io/kumimoji/api.html">API reference</a> · <a href="docs/API.md">The API in full</a></p>
+<p align="center"><a href="https://johnmorrisdotca.github.io/kumimoji/"><strong>Play a game →</strong></a> · <a href="https://johnmorrisdotca.github.io/kumimoji/docs/">Documentation</a> · <a href="https://johnmorrisdotca.github.io/kumimoji/docs/guides/getting-started.html">Getting started</a> · <a href="https://johnmorrisdotca.github.io/kumimoji/api.html">API reference</a> · <a href="docs/API.md">The API in full</a></p>
 
 <table align="center">
 <tr>
@@ -183,6 +185,19 @@ Each picture is the table the package draws, taken from [the demo](https://johnm
 </p>
 
 ## Use it in your project
+
+### Install under another name
+
+```sh
+npm install word-game@npm:@johnmorrisdotca/kumimoji
+```
+
+```ts no-check
+import "word-game/words";
+import { loadTileWords, generateKumimoji } from "word-game";
+await loadTileWords("english");
+console.log(generateKumimoji(7,"easy",42).seed);
+```
 
 ### Install
 
@@ -849,7 +864,7 @@ turn tiles into words: `glyphOf`, `soundOf`, `wordOf`, `wildFor`, `isWild`,
 
 ## API
 
-The [API reference](https://johnmorrisdotca.github.io/kumimoji/api.html) lists every export of every entry point with its signature and its doc comment. It is made from the source by `pnpm site`, so it cannot fall behind the code.
+The [documentation](https://johnmorrisdotca.github.io/kumimoji/docs/) includes bilingual guides, local search, signatures, parameters, return values and checked examples, built from source by `pnpm docs:site`. The [API index](https://johnmorrisdotca.github.io/kumimoji/api.html) preserves export anchors.
 
 Every function, type and constant has a doc comment, so an editor shows this
 as you type. The entries:
