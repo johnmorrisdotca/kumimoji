@@ -16,6 +16,12 @@ import type { KumimojiLength } from "./kumimoji.types.ts";
  *
  * To tune the letters, change the counts here. The total is checked by
  * `tiles.test.ts`, so an edit that loses a tile says so.
+ *
+ * @example
+ * ```ts
+ * import { TILE_MIX } from "@johnmorrisdotca/kumimoji";
+ * console.log(TILE_MIX);
+ * ```
  */
 export const TILE_MIX: Readonly<Record<string, number>> = {
   a: 13, b: 3, c: 3, d: 6, e: 18, f: 3, g: 4, h: 3, i: 12, j: 2, k: 2, l: 5, m: 3,
@@ -35,6 +41,12 @@ export const TILE_MIX: Readonly<Record<string, number>> = {
  * Fixed here rather than taken from the monthly dictionary refresh, which
  * prints what it measures beside this table (`scripts/word-lists-ja.mjs`): a
  * kept game's bag is checked against these counts.
+ *
+ * @example
+ * ```ts
+ * import { JAPANESE_TILE_MIX } from "@johnmorrisdotca/kumimoji";
+ * console.log(JAPANESE_TILE_MIX);
+ * ```
  */
 export const JAPANESE_TILE_MIX: Readonly<Record<string, number>> = {
   あ: 2, い: 11, う: 12, え: 1, お: 2, か: 7, き: 6, く: 6, け: 3, こ: 4,
@@ -44,7 +56,14 @@ export const JAPANESE_TILE_MIX: Readonly<Record<string, number>> = {
   る: 3, れ: 1, ろ: 1, わ: 1, ん: 11,
 };
 
-/** The whole set, counted from the table. */
+/** The whole set, counted from the table.
+ *
+ * @example
+ * ```ts
+ * import { TILE_MIX_TOTAL } from "@johnmorrisdotca/kumimoji";
+ * console.log(TILE_MIX_TOTAL);
+ * ```
+ */
 export const TILE_MIX_TOTAL = Object.values(TILE_MIX).reduce((sum, count) => sum + count, 0);
 
 /**
@@ -54,6 +73,12 @@ export const TILE_MIX_TOTAL = Object.values(TILE_MIX).reduce((sum, count) => sum
  * grows with them (`tableView.ts`), so a grid is as wide and as tall as its
  * player builds it. This is only the most a finished grid may measure either
  * way before the check refuses it unread: fifty tiles in one line is fifty.
+ *
+ * @example
+ * ```ts
+ * import { KUMIMOJI_GRID_MOST } from "@johnmorrisdotca/kumimoji";
+ * console.log(KUMIMOJI_GRID_MOST);
+ * ```
  */
 export const KUMIMOJI_GRID_MOST = 60;
 
@@ -62,12 +87,24 @@ export const KUMIMOJI_GRID_MOST = 60;
  * 2026-09-26: "you were given seven or 11 starting tiles". Three is for the
  * browser tests alone — a game that can be finished in a few presses — and is
  * never offered on the set-up screen.
+ *
+ * @example
+ * ```ts
+ * import { KUMIMOJI_HANDS } from "@johnmorrisdotca/kumimoji";
+ * console.log(KUMIMOJI_HANDS);
+ * ```
  */
 export const KUMIMOJI_HANDS = { tiny: 3, quick: 7, classic: 11 } as const;
 
 /**
  * SHORT GAME TOTALS, by opening hand. Medium and Full derive from the tile
  * inventory in `kumimojiTileCount`; these stay the existing Short lengths.
+ *
+ * @example
+ * ```ts
+ * import { KUMIMOJI_BAG } from "@johnmorrisdotca/kumimoji";
+ * console.log(KUMIMOJI_BAG);
+ * ```
  */
 export const KUMIMOJI_BAG: Readonly<Record<number, number>> = {
   [KUMIMOJI_HANDS.tiny]: 5,
@@ -75,14 +112,34 @@ export const KUMIMOJI_BAG: Readonly<Record<number, number>> = {
   [KUMIMOJI_HANDS.classic]: 50,
 };
 
-/** Wild tiles per original 40/50-tile game, included within the bag total. */
+/** Wild tiles per original 40/50-tile game, included within the bag total.
+ *
+ * @example
+ * ```ts
+ * import { KUMIMOJI_WILDS } from "@johnmorrisdotca/kumimoji";
+ * console.log(KUMIMOJI_WILDS);
+ * ```
+ */
 export const KUMIMOJI_WILDS: Readonly<Record<number, Readonly<Record<"easy" | "medium" | "hard", number>>>> = {
   [KUMIMOJI_HANDS.tiny]: { easy: 0, medium: 0, hard: 0 },
   [KUMIMOJI_HANDS.quick]: { easy: 6, medium: 3, hard: 0 },
   [KUMIMOJI_HANDS.classic]: { easy: 8, medium: 4, hard: 0 },
 };
 
-/** Tile count for a selected length and inventory size. Double supplies two sets. */
+/** Tile count for a selected length and inventory size. Double supplies two sets.
+ *
+ * @param hand - The hand size or tile codes, as declared by the function signature.
+ * @param length - The game length or decoded word length, as declared.
+ * @param setSize - The number of physical tiles in the language set.
+ * @param doubleSet - Whether to use two English tile sets.
+ * @returns Tile count for a selected length and inventory size. Double supplies two sets.
+ * @example
+ * ```ts
+ * import { kumimojiTileCount } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(kumimojiTileCount(7,"short"));
+ * ```
+ */
 export function kumimojiTileCount(hand: number, length: KumimojiLength, setSize = TILE_MIX_TOTAL, doubleSet = false): number {
   const short = KUMIMOJI_BAG[hand];
   if (short === undefined) throw new Error(`No Kumimoji with a hand of ${hand}.`);
@@ -95,7 +152,19 @@ export function kumimojiTileCount(hand: number, length: KumimojiLength, setSize 
   return available;
 }
 
-/** Wilds scale with the bag; doubling the tile set doubles the wild count too. */
+/** Wilds scale with the bag; doubling the tile set doubles the wild count too.
+ *
+ * @param hand - The hand size or tile codes, as declared by the function signature.
+ * @param level - The difficulty that determines the wildcard allowance.
+ * @param totalTiles - The total number of physical tiles in this bag.
+ * @returns Wilds scale with the bag; doubling the tile set doubles the wild count too.
+ * @example
+ * ```ts
+ * import { kumimojiWildCount, kumimojiTileCount } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(kumimojiWildCount(7,"easy",kumimojiTileCount(7,"short")));
+ * ```
+ */
 export function kumimojiWildCount(hand: number, level: "easy" | "medium" | "hard", totalTiles: number): number {
   const short = KUMIMOJI_BAG[hand];
   const wilds = KUMIMOJI_WILDS[hand];
@@ -104,7 +173,14 @@ export function kumimojiWildCount(hand: number, level: "easy" | "medium" | "hard
   return Math.round((wilds[level] * totalTiles) / short);
 }
 
-/** How many tiles one Draw takes from the bag, once the hand is used and the grid is sound. */
+/** How many tiles one Draw takes from the bag, once the hand is used and the grid is sound.
+ *
+ * @example
+ * ```ts
+ * import { KUMIMOJI_DRAW } from "@johnmorrisdotca/kumimoji";
+ * console.log(KUMIMOJI_DRAW);
+ * ```
+ */
 export const KUMIMOJI_DRAW = 1;
 
 /**
@@ -112,6 +188,12 @@ export const KUMIMOJI_DRAW = 1;
  * classic way out of a hand of Q, X and J. The tile given back goes to the
  * bottom of the bag, so it comes round again before the end; offered only
  * while the bag has three to give.
+ *
+ * @example
+ * ```ts
+ * import { KUMIMOJI_TRADE } from "@johnmorrisdotca/kumimoji";
+ * console.log(KUMIMOJI_TRADE);
+ * ```
  */
 export const KUMIMOJI_TRADE = { give: 1, take: 3 } as const;
 
@@ -121,6 +203,12 @@ export const KUMIMOJI_TRADE = { give: 1, take: 3 } as const;
  * speed, which falls away evenly until a game that took half a minute a tile
  * earns no speed at all. A Classic game of fifty tiles in ten minutes is
  * 500 + 300 = 800. The time is the browser's clock, as every solo time here is.
+ *
+ * @example
+ * ```ts
+ * import { KUMIMOJI_SCORE } from "@johnmorrisdotca/kumimoji";
+ * console.log(KUMIMOJI_SCORE);
+ * ```
  */
 export const KUMIMOJI_SCORE = { tile: 10, slowestMsATile: 30_000 } as const;
 
@@ -136,5 +224,11 @@ export const KUMIMOJI_SCORE = { tile: 10, slowestMsATile: 30_000 } as const;
  * set, and chooses it when the count reaches it (John, 2026-09-28: "when having
  * 6 or more players, we should recommend the double size 288 version"); in
  * Japanese, which has no Double, the Full game instead.
+ *
+ * @example
+ * ```ts
+ * import { KUMIMOJI_PARTY } from "@johnmorrisdotca/kumimoji";
+ * console.log(KUMIMOJI_PARTY);
+ * ```
  */
 export const KUMIMOJI_PARTY = { least: 2, most: 8, nameMost: 20, doubleFrom: 6 } as const;

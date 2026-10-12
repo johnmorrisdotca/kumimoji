@@ -16,6 +16,20 @@ import { tileWords } from "./tileWords.ts";
  * Written out here rather than asked of the play page, which is what made the
  * grid; the list must have been loaded (`loadTileWords`), and a check that
  * cannot read it refuses.
+ *
+ * @param size - The supported initial hand size.
+ * @param givens - The original bag of internal tile codes.
+ * @param answer - The encoded completed grid to verify.
+ * @param options - Native game, component or presentation options.
+ * @returns WHETHER A GRID FINISHES A KUMIMOJI: the one check the server also runs. O(squares) and a lookup a word, nothing searched: the grid uses exactly the tiles of the bag, as many of each, it is all one piece, and every run of two or more across or down is in the list — and, for a game set up with Diagonals, every run of three or more along a diagonal. Which tiles were traded on the way does not matter — a finished game holds the whole bag whatever came out of it when — so the answer is the grid alone.
+ * @example
+ * ```ts
+ * import { checkKumimoji } from "@johnmorrisdotca/kumimoji";
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ *
+ * await loadTileWordsFromModule("english");
+ * console.log(checkKumimoji(3,"cat","cat",{level:"hard"}));
+ * ```
  */
 export function checkKumimoji(size: number, givens: string, answer: string, options: KumimojiOptions & { level?: KumimojiLevel } = {}): KumimojiCheck {
   const gameLength = options.gameLength ?? "short";
@@ -55,7 +69,18 @@ export function checkKumimoji(size: number, givens: string, answer: string, opti
   return { ok: true };
 }
 
-/** A finished game's leaderboard points (`KUMIMOJI_SCORE`): ten a tile, and up to as much again for speed. */
+/** A finished game's leaderboard points (`KUMIMOJI_SCORE`): ten a tile, and up to as much again for speed.
+ *
+ * @param givens - The original bag of internal tile codes.
+ * @param elapsedMs - The elapsed solve time in milliseconds.
+ * @returns A finished game's leaderboard points (`KUMIMOJI_SCORE`): ten a tile, and up to as much again for speed.
+ * @example
+ * ```ts
+ * import { kumimojiPoints } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(kumimojiPoints("cat",12000));
+ * ```
+ */
 export function kumimojiPoints(givens: string, elapsedMs: number): number {
   const tiles = givens.length;
   const base = KUMIMOJI_SCORE.tile * tiles;

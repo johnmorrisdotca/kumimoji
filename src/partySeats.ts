@@ -30,10 +30,32 @@ import { KUMIMOJI_PARTY } from "./tiles.constants.ts";
  * when everybody else resigns — unless somebody joins first.
  */
 
-/** Why nobody can join now, or null when a hand can be dealt. */
+/** Why nobody can join now, or null when a hand can be dealt.
+ *
+ * @example
+ * ```ts
+ * import type { JoinRefusal } from "@johnmorrisdotca/kumimoji";
+ *
+ * const value: JoinRefusal = "full";
+ * console.log(value);
+ * ```
+ */
 export type JoinRefusal = "over" | "full" | "lastRound" | "bag";
 
-/** Why nobody can join the table now, or null when a hand can be dealt. */
+/** Why nobody can join the table now, or null when a hand can be dealt.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @returns Why nobody can join the table now, or null when a hand can be dealt.
+ * @example
+ * ```ts
+ * import { joinRefused, startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(joinRefused(game));
+ * ```
+ */
 export function joinRefused(game: PartyGame): JoinRefusal | null {
   if (game.ending !== null) return "over";
   if (game.players.length >= KUMIMOJI_PARTY.most) return "full";
@@ -42,7 +64,21 @@ export function joinRefused(game: PartyGame): JoinRefusal | null {
   return null;
 }
 
-/** A player, or a computer, sat down after the last seat with the next hand out of the bag. */
+/** A player, or a computer, sat down after the last seat with the next hand out of the bag.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @param seat - The local name and computer flag for the joining player.
+ * @returns A player, or a computer, sat down after the last seat with the next hand out of the bag.
+ * @example
+ * ```ts
+ * import { joinParty, startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(joinParty(game,{name:"Seat 3"}).players.length);
+ * ```
+ */
 export function joinParty(game: PartyGame, seat: PartySeat): PartyGame {
   if (joinRefused(game) !== null) return game;
   const hand = [...(game.bag + game.returned).slice(game.taken, game.taken + game.settings.size)];
@@ -60,10 +96,33 @@ function freePlayerName(players: readonly PartyPlayer[]): string {
   for (let number = 1; ; number += 1) if (!taken.has(`Player ${number}`)) return `Player ${number}`;
 }
 
-/** Why this player cannot leave now, or null when they can. */
+/** Why this player cannot leave now, or null when they can.
+ *
+ * @example
+ * ```ts
+ * import type { LeaveRefusal } from "@johnmorrisdotca/kumimoji";
+ *
+ * const value: LeaveRefusal = "lastPerson";
+ * console.log(value);
+ * ```
+ */
 export type LeaveRefusal = "over" | "out" | "lastPerson";
 
-/** Why the player at seat `at` cannot leave now, or null when they can. */
+/** Why the player at seat `at` cannot leave now, or null when they can.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @param at - The word offset, seat index or date specified by this signature.
+ * @returns Why the player at seat `at` cannot leave now, or null when they can.
+ * @example
+ * ```ts
+ * import { leaveRefused, startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(leaveRefused(game,0));
+ * ```
+ */
 export function leaveRefused(game: PartyGame, at: number): LeaveRefusal | null {
   if (game.ending !== null || game.players[at] === undefined) return "over";
   if (game.out.includes(at)) return "out";
@@ -71,7 +130,21 @@ export function leaveRefused(game: PartyGame, at: number): LeaveRefusal | null {
   return null;
 }
 
-/** How many tiles a player would put back in the bag by leaving: their hand and their table. */
+/** How many tiles a player would put back in the bag by leaving: their hand and their table.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @param at - The word offset, seat index or date specified by this signature.
+ * @returns How many tiles a player would put back in the bag by leaving: their hand and their table.
+ * @example
+ * ```ts
+ * import { startParty, tilesHeldBy } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(tilesHeldBy(game,0));
+ * ```
+ */
 export function tilesHeldBy(game: PartyGame, at: number): number {
   const player = game.players[at];
   return player === undefined ? 0 : player.hand.length + player.tiles.size;
@@ -92,6 +165,19 @@ export function tilesHeldBy(game: PartyGame, at: number): number {
  * round to the next still to have their last turn; a last round with nobody
  * left to play ends. With nobody still in — everybody left has resigned —
  * the game ends tied between them.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @param at - The word offset, seat index or date specified by this signature.
+ * @returns A PLAYER LEAVES. Their tiles go back into the bag and the bag is shuffled — with the game's own seed and how far it has gone, so the same game left the same way deals the same tiles after a reload. A wild goes back blank.
+ * @example
+ * ```ts
+ * import { leaveParty, startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(leaveParty(game,0).players.length);
+ * ```
  */
 export function leaveParty(game: PartyGame, at: number): PartyGame {
   if (leaveRefused(game, at) !== null) return game;

@@ -30,12 +30,35 @@ import type { TileWords } from "./tileWords.ts";
  *   at all: nothing to lay, nothing to trade for, and it is not its last turn.
  */
 
-/** The most things a computer does in one turn before pressing Done: at the page's pause, a turn of about three seconds. */
+/** The most things a computer does in one turn before pressing Done: at the page's pause, a turn of about three seconds.
+ *
+ * @example
+ * ```ts
+ * import { COMPUTER_STEPS_MOST } from "@johnmorrisdotca/kumimoji";
+ * console.log(COMPUTER_STEPS_MOST);
+ * ```
+ */
 export const COMPUTER_STEPS_MOST = 8;
 /** How many settling steps may be needed at the end to be allowed Done at all; one trade a turn and a hand of tiles, so it is bounded anyway. */
 const SETTLING_MOST = 200;
 
-/** A computer seat's whole turn as its steps, in order, for a page to show one at a time. None when it is not a computer's turn or the game is over. */
+/** A computer seat's whole turn as its steps, in order, for a page to show one at a time. None when it is not a computer's turn or the game is over.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @param words - The loaded native language word list and tile mappings.
+ * @returns A computer seat's whole turn as its steps, in order, for a page to show one at a time. None when it is not a computer's turn or the game is over.
+ * @example
+ * ```ts no-run
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ * import { planComputerTurn, startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const words = await loadTileWordsFromModule("english");
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(planComputerTurn(game,words).map(step=>step.said));
+ * ```
+ */
 export function planComputerTurn(game: PartyGame, words: TileWords): ComputerStep[] {
   const steps: ComputerStep[] = [];
   if (game.ending !== null || !isComputer(game, game.turn)) return steps;
@@ -92,7 +115,23 @@ export function planComputerTurn(game: PartyGame, words: TileWords): ComputerSte
   return steps;
 }
 
-/** The game a computer's turn passes on: its plan's last step, or the game as it was where there is nothing to play. */
+/** The game a computer's turn passes on: its plan's last step, or the game as it was where there is nothing to play.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @param words - The loaded native language word list and tile mappings.
+ * @returns The game a computer's turn passes on: its plan's last step, or the game as it was where there is nothing to play.
+ * @example
+ * ```ts no-run
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ * import { afterComputerTurn, startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const words = await loadTileWordsFromModule("english");
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(afterComputerTurn(game,words).turn);
+ * ```
+ */
 export function afterComputerTurn(game: PartyGame, words: TileWords): PartyGame {
   return planComputerTurn(game, words).at(-1)?.game ?? game;
 }

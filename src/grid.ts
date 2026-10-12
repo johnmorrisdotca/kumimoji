@@ -13,24 +13,74 @@ import { KUMIMOJI_GRID_MOST } from "./tiles.constants.ts";
  * and COW down from its C. Only
  * where the tiles stand beside one another is written, never where on the
  * table they were, so one grid has one spelling however far it was dragged.
+ *
+ * @example
+ * ```ts
+ * import type { Tiles } from "@johnmorrisdotca/kumimoji";
+ *
+ * const tiles = new Map([["0,0","c"],["0,1","a"],["0,2","t"]]);
+ * const value: Tiles = tiles;
+ * console.log(value);
+ * ```
  */
 export type Tiles = ReadonlyMap<string, string>;
 
-/** A square's name, "row,col". */
+/** A square's name, "row,col".
+ *
+ * @param row - The integer row coordinate, which may be negative.
+ * @param col - The integer column coordinate, which may be negative.
+ * @returns A square's name, "row,col".
+ * @example
+ * ```ts
+ * import { squareAt } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(squareAt(-1,2));
+ * ```
+ */
 export function squareAt(row: number, col: number): string {
   return `${row},${col}`;
 }
 
-/** A square's row and column, from its name. */
+/** A square's row and column, from its name.
+ *
+ * @param square - The row,column square name.
+ * @returns A square's row and column, from its name.
+ * @example
+ * ```ts
+ * import { placeOf } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(placeOf("-1,2"));
+ * ```
+ */
 export function placeOf(square: string): { row: number; col: number } {
   const [row, col] = square.split(",").map(Number);
   return { row: row!, col: col! };
 }
 
-/** The rows and columns a grid's tiles stand within. */
+/** The rows and columns a grid's tiles stand within.
+ *
+ * @example
+ * ```ts
+ * import type { Bounds } from "@johnmorrisdotca/kumimoji";
+ *
+ * const value: Bounds = {top:0,left:0,bottom:0,right:2};
+ * console.log(value);
+ * ```
+ */
 export type Bounds = { top: number; left: number; bottom: number; right: number };
 
-/** The rows and columns the tiles stand within, or null for no tiles. */
+/** The rows and columns the tiles stand within, or null for no tiles.
+ *
+ * @param tiles - The map from row,column square names to internal tile codes.
+ * @returns The rows and columns the tiles stand within, or null for no tiles.
+ * @example
+ * ```ts
+ * import { boundsOf } from "@johnmorrisdotca/kumimoji";
+ *
+ * const tiles = new Map([["0,0","c"],["0,1","a"],["0,2","t"]]);
+ * console.log(boundsOf(tiles));
+ * ```
+ */
 export function boundsOf(tiles: Tiles): Bounds | null {
   let bounds: Bounds | null = null;
   for (const square of tiles.keys()) {
@@ -43,7 +93,18 @@ export function boundsOf(tiles: Tiles): Bounds | null {
   return bounds;
 }
 
-/** A grid as a string, drawn from its own top-left tile: `cat/2o/2w`. `decodeGrid` reads it back. */
+/** A grid as a string, drawn from its own top-left tile: `cat/2o/2w`. `decodeGrid` reads it back.
+ *
+ * @param tiles - The map from row,column square names to internal tile codes.
+ * @returns A grid as a string, drawn from its own top-left tile: `cat/2o/2w`. `decodeGrid` reads it back.
+ * @example
+ * ```ts
+ * import { encodeGrid } from "@johnmorrisdotca/kumimoji";
+ *
+ * const tiles = new Map([["0,0","c"],["0,1","a"],["0,2","t"]]);
+ * console.log(encodeGrid(tiles));
+ * ```
+ */
 export function encodeGrid(tiles: Tiles): string {
   const bounds = boundsOf(tiles);
   if (bounds === null) return "";
@@ -70,6 +131,15 @@ export function encodeGrid(tiles: Tiles): string {
  * A grid read back, its first row at row 0, or null for anything that is not
  * one: a stray character, a capital, a grid wider or taller than any grid of
  * fifty tiles can be. An empty string is no tiles.
+ *
+ * @param code - The encoded grid or progress text.
+ * @returns A grid read back, its first row at row 0, or null for anything that is not one: a stray character, a capital, a grid wider or taller than any grid of fifty tiles can be. An empty string is no tiles.
+ * @example
+ * ```ts
+ * import { decodeGrid } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(decodeGrid("cat"));
+ * ```
  */
 export function decodeGrid(code: string): Map<string, string> | null {
   if (typeof code !== "string") return null;
@@ -110,14 +180,35 @@ export function decodeGrid(code: string): Map<string, string> | null {
   return tiles;
 }
 
-/** How many of each letter. */
+/** How many of each letter.
+ *
+ * @param letters - The iterable tile letters to count.
+ * @returns How many of each letter.
+ * @example
+ * ```ts
+ * import { lettersOf } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(lettersOf("cat"));
+ * ```
+ */
 export function lettersOf(letters: Iterable<string>): Map<string, number> {
   const counts = new Map<string, number>();
   for (const letter of letters) if (letter !== "") counts.set(letter, (counts.get(letter) ?? 0) + 1);
   return counts;
 }
 
-/** Whether two tallies hold the same letters, as many of each. */
+/** Whether two tallies hold the same letters, as many of each.
+ *
+ * @param a - The first letter-count map.
+ * @param b - The second letter-count map.
+ * @returns Whether two tallies hold the same letters, as many of each.
+ * @example
+ * ```ts
+ * import { lettersOf, sameLetters } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(sameLetters(lettersOf("cat"),lettersOf("act")));
+ * ```
+ */
 export function sameLetters(a: Map<string, number>, b: Map<string, number>): boolean {
   if (a.size !== b.size) return false;
   for (const [letter, count] of a) if (b.get(letter) !== count) return false;
@@ -128,6 +219,14 @@ export function sameLetters(a: Map<string, number>, b: Map<string, number>): boo
  * THE LINES A RUN MAY LIE ALONG, each read top to bottom (and across, left to
  * right): across and down always, and the two diagonals when the game was set
  * up with Diagonals — down to the right, and down to the left.
+ *
+ * @example
+ * ```ts
+ * import type { RunLine } from "@johnmorrisdotca/kumimoji";
+ *
+ * const value: RunLine = "across";
+ * console.log(value);
+ * ```
  */
 export type RunLine = "across" | "down" | "downRight" | "downLeft";
 
@@ -139,13 +238,37 @@ const STEP: Record<RunLine, readonly [number, number]> = { across: [0, 1], down:
  * at a corner are what every crossword is full of — the letter above a word
  * and the one beside it — so a pair is free, and only three or more in a
  * line are a diagonal word.
+ *
+ * @example
+ * ```ts
+ * import { DIAGONAL_RUN_LEAST } from "@johnmorrisdotca/kumimoji";
+ * console.log(DIAGONAL_RUN_LEAST);
+ * ```
  */
 export const DIAGONAL_RUN_LEAST = 3;
 
-/** How a grid is read: whether its diagonals are (`KumimojiOptions.diagonals`). */
+/** How a grid is read: whether its diagonals are (`KumimojiOptions.diagonals`).
+ *
+ * @example
+ * ```ts
+ * import type { GridRules } from "@johnmorrisdotca/kumimoji";
+ *
+ * const value: GridRules = {diagonals:true};
+ * console.log(value);
+ * ```
+ */
 export type GridRules = { diagonals?: boolean };
 
-/** A run of tiles along one line: the word it spells and the squares it stands on, in reading order. */
+/** A run of tiles along one line: the word it spells and the squares it stands on, in reading order.
+ *
+ * @example
+ * ```ts
+ * import type { Run } from "@johnmorrisdotca/kumimoji";
+ *
+ * const value: Run = {word:"cat",squares:["0,0","0,1","0,2"],line:"across"};
+ * console.log(value);
+ * ```
+ */
 export type Run = { word: string; squares: string[]; line: RunLine };
 
 function runsAlong(tiles: Tiles, line: RunLine, least: number): Run[] {
@@ -170,6 +293,17 @@ function runsAlong(tiles: Tiles, line: RunLine, least: number): Run[] {
  * Every run the grid is read by: two or more tiles across, then down, and
  * with Diagonals three or more down to the right, then down to the left. A
  * tile with nothing beside it in a line is no run.
+ *
+ * @param tiles - The map from row,column square names to internal tile codes.
+ * @param rules - Whether diagonal runs are also judged.
+ * @returns Every run the grid is read by: two or more tiles across, then down, and with Diagonals three or more down to the right, then down to the left. A tile with nothing beside it in a line is no run.
+ * @example
+ * ```ts
+ * import { runsOf } from "@johnmorrisdotca/kumimoji";
+ *
+ * const tiles = new Map([["0,0","c"],["0,1","a"],["0,2","t"]]);
+ * console.log(runsOf(tiles));
+ * ```
  */
 export function runsOf(tiles: Tiles, rules: GridRules = {}): Run[] {
   const runs = [...runsAlong(tiles, "across", 2), ...runsAlong(tiles, "down", 2)];
@@ -183,6 +317,17 @@ export function runsOf(tiles: Tiles, rules: GridRules = {}): Run[] {
  * other in one of those runs are joined too: a diagonal word holds a
  * crossword together as a word across does. A pair touching at a corner is
  * never a link, because it is never read.
+ *
+ * @param tiles - The map from row,column square names to internal tile codes.
+ * @param links - The runs connecting groups; computed from the grid when omitted.
+ * @returns The tiles in groups that touch across or down, largest first. With `links` — the diagonal runs a grid with Diagonals reads — the tiles next to each other in one of those runs are joined too: a diagonal word holds a crossword together as a word across does. A pair touching at a corner is never a link, because it is never read.
+ * @example
+ * ```ts
+ * import { groupsOf } from "@johnmorrisdotca/kumimoji";
+ *
+ * const tiles = new Map([["0,0","c"],["0,1","a"],["0,2","t"]]);
+ * console.log(groupsOf(tiles));
+ * ```
  */
 export function groupsOf(tiles: Tiles, links: readonly Run[] = []): string[][] {
   const joined = new Map<string, string[]>();
@@ -223,6 +368,18 @@ export function groupsOf(tiles: Tiles, links: readonly Run[] = []): string[][] {
  * With Diagonals (`rules`), the diagonal runs of three or more are runs too:
  * each must be a word, a misspelt one is marked as any other is, and each
  * joins its tiles (`groupsOf`).
+ *
+ * @example
+ * ```ts
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ * import { judgeWithWords } from "@johnmorrisdotca/kumimoji";
+ * import type { GridVerdict } from "@johnmorrisdotca/kumimoji";
+ *
+ * const words = await loadTileWordsFromModule("english");
+ * const verdict = judgeWithWords(new Map([["0,0","c"],["0,1","a"],["0,2","t"]]),words);
+ * const value: GridVerdict = verdict;
+ * console.log(value);
+ * ```
  */
 export type GridVerdict = {
   sound: boolean;
@@ -235,7 +392,21 @@ export type GridVerdict = {
   notWords: readonly string[];
 };
 
-/** A grid judged against any test of a word: `isWord` answers for a run as spelt, and `readable` says how to name one that is not. `judgeWithWords` is this with a language's list. */
+/** A grid judged against any test of a word: `isWord` answers for a run as spelt, and `readable` says how to name one that is not. `judgeWithWords` is this with a language's list.
+ *
+ * @param tiles - The map from row,column square names to internal tile codes.
+ * @param isWord - The predicate that accepts a readable word.
+ * @param readable - The conversion from tile codes to readable words.
+ * @param rules - Whether diagonal runs are also judged.
+ * @returns A grid judged against any test of a word: `isWord` answers for a run as spelt, and `readable` says how to name one that is not. `judgeWithWords` is this with a language's list.
+ * @example
+ * ```ts
+ * import { judgeGrid } from "@johnmorrisdotca/kumimoji";
+ *
+ * const tiles = new Map([["0,0","c"],["0,1","a"],["0,2","t"]]);
+ * console.log(judgeGrid(tiles,word=>word==="cat"));
+ * ```
+ */
 export function judgeGrid(tiles: Tiles, isWord: (word: string) => boolean, readable: (word: string) => string = (word) => word, rules: GridRules = {}): GridVerdict {
   const misspelt = new Set<string>();
   const notWords: string[] = [];

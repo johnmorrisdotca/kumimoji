@@ -12,7 +12,17 @@ readTileWordsWith(async (language) =>
   tileWordsFrom(language, language === "english" ? (await import("./words.en.data.ts")).TILE_WORDS_EN : (await import("./words.ja.data.ts")).TILE_WORDS_JA),
 );
 
-/** The list, read from its module: `loadTileWords` for a caller with no browser. */
+/** The list, read from its module: `loadTileWords` for a caller with no browser.
+ *
+ * @param language - The English or Japanese tile language.
+ * @returns The list, read from its module: `loadTileWords` for a caller with no browser.
+ * @example
+ * ```ts
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ *
+ * console.log((await loadTileWordsFromModule("english")).allowed.size);
+ * ```
+ */
 export function loadTileWordsFromModule(language: KumimojiLanguage = "english"): Promise<TileWords> {
   return loadTileWords(language);
 }

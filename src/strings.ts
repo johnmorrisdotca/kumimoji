@@ -12,7 +12,16 @@
  * this file.
  */
 
-/** The languages the table speaks: English and Japanese. */
+/** The languages the table speaks: English and Japanese.
+ *
+ * @example
+ * ```ts
+ * import type { KumimojiLocale } from "@johnmorrisdotca/kumimoji/ui";
+ *
+ * const value: KumimojiLocale = "ja";
+ * console.log(value);
+ * ```
+ */
 export type KumimojiLocale = "en" | "ja";
 
 const EN = {
@@ -54,7 +63,17 @@ const EN = {
   japanese: "Japanese",
 };
 
-/** Every word the table shows, by name: one table of these for each language. */
+/** Every word the table shows, by name: one table of these for each language.
+ *
+ * @example
+ * ```ts
+ * import type { KumimojiStrings } from "@johnmorrisdotca/kumimoji/ui";
+ * import { kumimojiStrings } from "@johnmorrisdotca/kumimoji/ui";
+ *
+ * const value: KumimojiStrings = kumimojiStrings("ja");
+ * console.log(value);
+ * ```
+ */
 export type KumimojiStrings = { [Name in keyof typeof EN]: string };
 
 const JA: KumimojiStrings = {
@@ -96,15 +115,44 @@ const JA: KumimojiStrings = {
   japanese: "日本語",
 };
 
-/** The table's words in each language it speaks: `KUMIMOJI_STRINGS.en`, `KUMIMOJI_STRINGS.ja`. */
+/** The table's words in each language it speaks: `KUMIMOJI_STRINGS.en`, `KUMIMOJI_STRINGS.ja`.
+ *
+ * @example
+ * ```ts
+ * import { KUMIMOJI_STRINGS } from "@johnmorrisdotca/kumimoji/ui";
+ * console.log(KUMIMOJI_STRINGS);
+ * ```
+ */
 export const KUMIMOJI_STRINGS: Readonly<Record<KumimojiLocale, KumimojiStrings>> = { en: EN, ja: JA };
 
-/** A line from a table of strings with its braces filled in: `kumimojiSay(strings.left, { n: 12, time: "1:05" })`. A brace with no value is left as it is. */
+/** A line from a table of strings with its braces filled in: `kumimojiSay(strings.left, { n: 12, time: "1:05" })`. A brace with no value is left as it is.
+ *
+ * @param line - Text containing named replacement braces.
+ * @param values - Replacement text or numbers keyed by brace name.
+ * @returns A line from a table of strings with its braces filled in: `kumimojiSay(strings.left, { n: 12, time: "1:05" })`. A brace with no value is left as it is.
+ * @example
+ * ```ts
+ * import { kumimojiSay } from "@johnmorrisdotca/kumimoji/ui";
+ *
+ * console.log(kumimojiSay("Tile {n}",{n:3}));
+ * ```
+ */
 export function kumimojiSay(line: string, values: Readonly<Record<string, string | number>> = {}): string {
   return line.replace(/\{(\w+)\}/g, (whole, name: string) => (name in values ? String(values[name]) : whole));
 }
 
-/** The table of strings for a locale with a page's own words laid over it. An unknown locale is English. */
+/** The table of strings for a locale with a page's own words laid over it. An unknown locale is English.
+ *
+ * @param locale - The requested display language tag.
+ * @param own - Optional overrides for built-in display words.
+ * @returns The table of strings for a locale with a page's own words laid over it. An unknown locale is English.
+ * @example
+ * ```ts
+ * import { kumimojiStrings } from "@johnmorrisdotca/kumimoji/ui";
+ *
+ * console.log(Object.keys(kumimojiStrings("ja")).length);
+ * ```
+ */
 export function kumimojiStrings(locale: KumimojiLocale | string | undefined, own: Partial<KumimojiStrings> = {}): KumimojiStrings {
   const base = typeof locale === "string" && locale.toLowerCase().startsWith("ja") ? JA : EN;
   return { ...base, ...own };

@@ -20,17 +20,50 @@ import { KUMIMOJI_PARTY, kumimojiTileCount } from "./tiles.constants.ts";
  * resigning and who won. Pure, like every rule here: each returns a new game.
  */
 
-/** The tiles a bag must hold for this many players: a hand each and one round of draws. */
+/** The tiles a bag must hold for this many players: a hand each and one round of draws.
+ *
+ * @param players - The requested player count or current player rows.
+ * @param hand - The hand size or tile codes, as declared by the function signature.
+ * @returns The tiles a bag must hold for this many players: a hand each and one round of draws.
+ * @example
+ * ```ts
+ * import { partyTilesNeeded } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(partyTilesNeeded(2,3));
+ * ```
+ */
 export function partyTilesNeeded(players: number, hand: number): number {
   return players * hand + players;
 }
 
-/** Whether a bag of this many tiles can be played by this many: one player can play any bag. */
+/** Whether a bag of this many tiles can be played by this many: one player can play any bag.
+ *
+ * @param players - The requested player count or current player rows.
+ * @param hand - The hand size or tile codes, as declared by the function signature.
+ * @param tiles - The map from row,column square names to internal tile codes.
+ * @returns Whether a bag of this many tiles can be played by this many: one player can play any bag.
+ * @example
+ * ```ts
+ * import { partyFits } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(partyFits(2,3,12));
+ * ```
+ */
 export function partyFits(players: number, hand: number, tiles: number): boolean {
   return players < KUMIMOJI_PARTY.least || tiles >= partyTilesNeeded(players, hand);
 }
 
-/** A players count from the address, or 1 (the solo game) for anything that is not two to eight. */
+/** A players count from the address, or 1 (the solo game) for anything that is not two to eight.
+ *
+ * @param value - The unknown setup value to interpret.
+ * @returns A players count from the address, or 1 (the solo game) for anything that is not two to eight.
+ * @example
+ * ```ts
+ * import { partyPlayersAsked } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(partyPlayersAsked("3"));
+ * ```
+ */
 export function partyPlayersAsked(value: unknown): number {
   const count = Number(value);
   return Number.isInteger(count) && count >= KUMIMOJI_PARTY.least && count <= KUMIMOJI_PARTY.most ? count : 1;
@@ -44,6 +77,18 @@ const LENGTHS: readonly KumimojiLength[] = ["short", "medium", "full"];
  * players comes back when there are fewer again. A Full bag of one set is 144
  * tiles, and eight Classic hands with a round of draws are 96, so there is
  * always one.
+ *
+ * @param players - The requested player count or current player rows.
+ * @param hand - The hand size or tile codes, as declared by the function signature.
+ * @param chosen - The selected game length.
+ * @param doubleSet - Whether to use two English tile sets.
+ * @returns The game length a set-up plays at: the one chosen where the bag holds this many players, else the shortest that does, so a choice made for fewer players comes back when there are fewer again. A Full bag of one set is 144 tiles, and eight Classic hands with a round of draws are 96, so there is always one.
+ * @example
+ * ```ts
+ * import { partyLength } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(partyLength(8,11,"short",false));
+ * ```
  */
 export function partyLength(players: number, hand: number, chosen: KumimojiLength, doubleSet: boolean): KumimojiLength {
   // One player plays any length, and asks nothing of the size: the set-up screen asks this of every puzzle's.
@@ -57,6 +102,19 @@ export function partyLength(players: number, hand: number, chosen: KumimojiLengt
  * The deal: each player the next hand from the bag in turn, player one first,
  * and every table empty. A seat is a name, or a name and whether a computer
  * plays it; a computer is named "Computer 1", "Computer 2"… in seat order.
+ *
+ * @param settings - The native party setup settings.
+ * @param bag - The original bag in draw order.
+ * @param seats - Local player names and optional computer flags.
+ * @returns The deal: each player the next hand from the bag in turn, player one first, and every table empty. A seat is a name, or a name and whether a computer plays it; a computer is named "Computer 1", "Computer 2"… in seat order.
+ * @example
+ * ```ts
+ * import { startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * console.log(startParty(settings,bag,["Seat 1","Seat 2"]).players.length);
+ * ```
  */
 export function startParty(settings: PartySettings, bag: string, seats: readonly (string | PartySeat)[]): PartyGame {
   const count = Math.min(Math.max(seats.length, KUMIMOJI_PARTY.least), KUMIMOJI_PARTY.most);
@@ -72,34 +130,109 @@ export function startParty(settings: PartySettings, bag: string, seats: readonly
   return { settings, bag, returned: "", taken: count * hand, players, dealt: count, turn: 0, turns: 0, out: [], lastTurns: null, resigned: [], resignRun: [], ending: null, startTable: "", traded: false, passedBy: null };
 }
 
-/** The name a new computer takes: "Computer" and the lowest number no player at the table already goes by. */
+/** The name a new computer takes: "Computer" and the lowest number no player at the table already goes by.
+ *
+ * @param players - The requested player count or current player rows.
+ * @returns The name a new computer takes: "Computer" and the lowest number no player at the table already goes by.
+ * @example
+ * ```ts
+ * import { computerName, startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(computerName(game.players));
+ * ```
+ */
 export function computerName(players: readonly PartyPlayer[]): string {
   const taken = new Set(players.map((player) => player.name));
   for (let number = 1; ; number += 1) if (!taken.has(`Computer ${number}`)) return `Computer ${number}`;
 }
 
-/** Whether a computer plays this seat. */
+/** Whether a computer plays this seat.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @param at - The word offset, seat index or date specified by this signature.
+ * @returns Whether a computer plays this seat.
+ * @example
+ * ```ts
+ * import { isComputer, startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(isComputer(game,0));
+ * ```
+ */
 export function isComputer(game: PartyGame, at: number): boolean {
   return game.players[at]?.computer === true;
 }
 
-/** A table's tiles as one string in order, wherever they stand: what a turn compares to see whether anything was laid or lifted. */
+/** A table's tiles as one string in order, wherever they stand: what a turn compares to see whether anything was laid or lifted.
+ *
+ * @param tiles - The map from row,column square names to internal tile codes.
+ * @returns A table's tiles as one string in order, wherever they stand: what a turn compares to see whether anything was laid or lifted.
+ * @example
+ * ```ts
+ * import { tableTally } from "@johnmorrisdotca/kumimoji";
+ *
+ * const tiles = new Map([["0,0","c"],["0,1","a"],["0,2","t"]]);
+ * console.log(tableTally(tiles));
+ * ```
+ */
 export function tableTally(tiles: Tiles): string {
   return [...tiles.values()].sort().join("");
 }
 
-/** A name as kept: trimmed, one line, and no longer than a line holds. */
+/** A name as kept: trimmed, one line, and no longer than a line holds.
+ *
+ * @param name - The local player name to tidy.
+ * @returns A name as kept: trimmed, one line, and no longer than a line holds.
+ * @example
+ * ```ts
+ * import { tidyName } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(tidyName("  Seat  1  "));
+ * ```
+ */
 export function tidyName(name: string): string {
   return name.replace(/\s+/g, " ").trim().slice(0, KUMIMOJI_PARTY.nameMost);
 }
 
-/** What a player is called: their name, or "Player 2". */
+/** What a player is called: their name, or "Player 2".
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @param at - The word offset, seat index or date specified by this signature.
+ * @returns What a player is called: their name, or "Player 2".
+ * @example
+ * ```ts
+ * import { nameOf, startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(nameOf(game,0));
+ * ```
+ */
 export function nameOf(game: PartyGame, at: number): string {
   const name = game.players[at]?.name ?? "";
   return name === "" ? `Player ${at + 1}` : name;
 }
 
-/** The player whose turn it is, as the solo game's moves take a game: the shared bag, and their own hand and table. */
+/** The player whose turn it is, as the solo game's moves take a game: the shared bag, and their own hand and table.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @returns The player whose turn it is, as the solo game's moves take a game: the shared bag, and their own hand and table.
+ * @example
+ * ```ts
+ * import { seatPlay, startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(seatPlay(game));
+ * ```
+ */
 export function seatPlay(game: PartyGame): TilePlay {
   const player = game.players[game.turn]!;
   return { bag: game.bag, returned: game.returned, taken: game.taken, tiles: player.tiles, hand: player.hand };
@@ -112,12 +245,38 @@ export function seatPlay(game: PartyGame): TilePlay {
  * takes three, so trading without end lets one player take the bag from the
  * others. After a trade the player may still lay, lift and draw, and press
  * Done; the next trade is on their next turn.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @returns ONE TRADE A TURN. John, 2026-09-29, after a player traded over and over and built up a hand: "if they swap tiles … give them a chance to lay some tiles but cannot ask for another swap until next turn." A trade gives one tile and takes three, so trading without end lets one player take the bag from the others. After a trade the player may still lay, lift and draw, and press Done; the next trade is on their next turn.
+ * @example
+ * ```ts
+ * import { mayTradeThisTurn, startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(mayTradeThisTurn(game));
+ * ```
  */
 export function mayTradeThisTurn(game: PartyGame): boolean {
   return game.ending === null && !game.traded && mayTrade(seatPlay(game));
 }
 
-/** A move made on `seatPlay` put back: the bag as it left it, and the hand and table to the player whose turn it is. A second trade in one turn is refused, the game given back as it was. */
+/** A move made on `seatPlay` put back: the bag as it left it, and the hand and table to the player whose turn it is. A second trade in one turn is refused, the game given back as it was.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @param play - The current immutable solo-game progress.
+ * @returns A move made on `seatPlay` put back: the bag as it left it, and the hand and table to the player whose turn it is. A second trade in one turn is refused, the game given back as it was.
+ * @example
+ * ```ts
+ * import { seatPlay, startParty, withSeatPlay } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(withSeatPlay(game,seatPlay(game)).taken);
+ * ```
+ */
 export function withSeatPlay(game: PartyGame, play: TilePlay): PartyGame {
   if (game.ending !== null) return game;
   if (game.traded && play.returned.length > game.returned.length) return game;
@@ -126,17 +285,57 @@ export function withSeatPlay(game: PartyGame, play: TilePlay): PartyGame {
   return { ...game, returned: play.returned, taken: play.taken, players, traded };
 }
 
-/** Tiles still in the shared bag. */
+/** Tiles still in the shared bag.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @returns Tiles still in the shared bag.
+ * @example
+ * ```ts
+ * import { partyTilesLeft, startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(partyTilesLeft(game));
+ * ```
+ */
 export function partyTilesLeft(game: PartyGame): number {
   return tilesLeft(seatPlay(game));
 }
 
-/** The players still in — not resigned — by place, in turn order. Somebody who went out is still in until the game ends. */
+/** The players still in — not resigned — by place, in turn order. Somebody who went out is still in until the game ends.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @returns The players still in — not resigned — by place, in turn order. Somebody who went out is still in until the game ends.
+ * @example
+ * ```ts
+ * import { startParty, stillIn } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(stillIn(game));
+ * ```
+ */
 export function stillIn(game: PartyGame): number[] {
   return game.players.flatMap((_, at) => (game.resigned.includes(at) ? [] : [at]));
 }
 
-/** The next player still in after `from`, round the table; `from` itself when nobody else is. */
+/** The next player still in after `from`, round the table; `from` itself when nobody else is.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @param from - The source square or seat index.
+ * @returns The next player still in after `from`, round the table; `from` itself when nobody else is.
+ * @example
+ * ```ts
+ * import { nextIn, startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(nextIn(game,0));
+ * ```
+ */
 export function nextIn(game: PartyGame, from: number): number {
   const count = game.players.length;
   for (let step = 1; step <= count; step += 1) {
@@ -150,6 +349,22 @@ export function nextIn(game: PartyGame, from: number): number {
  * Whether Draw may be pressed: the hand of the player whose turn it is used,
  * their grid sound, and a tile in the bag for every player still in. Never in
  * the last round, when the bag already holds fewer than that.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @param verdict - The native word and connectivity verdict for this grid.
+ * @returns Whether Draw may be pressed: the hand of the player whose turn it is used, their grid sound, and a tile in the bag for every player still in. Never in the last round, when the bag already holds fewer than that.
+ * @example
+ * ```ts
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ * import { judgeWithWords, mayDrawAll, startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const words = await loadTileWordsFromModule("english");
+ * const verdict = judgeWithWords(new Map([["0,0","c"],["0,1","a"],["0,2","t"]]),words);
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(mayDrawAll(game,verdict));
+ * ```
  */
 export function mayDrawAll(game: PartyGame, verdict: GridVerdict): boolean {
   return game.ending === null && game.lastTurns === null && game.players[game.turn]!.hand.length === 0 && verdict.sound && partyTilesLeft(game) >= stillIn(game).length;
@@ -159,6 +374,18 @@ export function mayDrawAll(game: PartyGame, verdict: GridVerdict): boolean {
  * DRAW: every player still in takes one tile, in turn order from the one who
  * pressed it — the race game's rule that when one player uses their hand,
  * everybody draws.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @returns DRAW: every player still in takes one tile, in turn order from the one who pressed it — the race game's rule that when one player uses their hand, everybody draws.
+ * @example
+ * ```ts
+ * import { drawAll, startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(drawAll(game));
+ * ```
  */
 export function drawAll(game: PartyGame): PartyGame {
   const count = game.players.length;
@@ -176,12 +403,39 @@ export function drawAll(game: PartyGame): PartyGame {
  * screen opens on the table of whoever has just played (the first player's,
  * before anybody has), and a swipe steps round every player in seat order,
  * resigned ones included.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @returns WHOSE TABLE IS SHOWN. Nothing in a pass-and-play game is secret — John, 2026-09-28: "there are no secrets because they are face up" — so every table and every hand can be looked at by anybody, read-only. The pass screen opens on the table of whoever has just played (the first player's, before anybody has), and a swipe steps round every player in seat order, resigned ones included.
+ * @example
+ * ```ts
+ * import { passViewStart, startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(passViewStart(game));
+ * ```
  */
 export function passViewStart(game: PartyGame): number {
   return game.passedBy ?? game.turn;
 }
 
-/** The player a swipe or an arrow shows next: `by` seats on, round the table. */
+/** The player a swipe or an arrow shows next: `by` seats on, round the table.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @param from - The source square or seat index.
+ * @param by - The direction or distance to step between seats.
+ * @returns The player a swipe or an arrow shows next: `by` seats on, round the table.
+ * @example
+ * ```ts
+ * import { startParty, stepView } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(stepView(game,0,1));
+ * ```
+ */
 export function stepView(game: PartyGame, from: number, by: number): number {
   const count = game.players.length;
   return (((from + by) % count) + count) % count;

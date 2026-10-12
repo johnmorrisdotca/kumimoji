@@ -10,6 +10,15 @@ import { KANA_TILE_START, KANA_WILD_START, tileFace } from "./tileFace.ts";
  * several devices (docs/plans/party-online/README.md, John 2026-09-29: the
  * browser checks the words, the server only that the tiles are real).
  * `tileFamily.test.ts` holds the two to one another.
+ *
+ * @param language - The English or Japanese tile language.
+ * @returns A function returning the physical family of a tile, or null for an invalid code.
+ * @example
+ * ```ts
+ * import { familyKeyOf } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(familyKeyOf("english")("A"));
+ * ```
  */
 export function familyKeyOf(language: KumimojiLanguage): (tile: string) => string | null {
   if (language === "english") {

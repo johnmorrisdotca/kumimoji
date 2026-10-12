@@ -15,6 +15,16 @@ import type { KumimojiLanguage } from "./kumimoji.types.ts";
  * `loadTileWords` fetches and reads it once; `tileWords` hands back the list
  * already loaded, and refuses rather than answering for a list it does not
  * have — a check that could not read the list must not say a word is fine.
+ *
+ * @example
+ * ```ts
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ * import type { TileWords } from "@johnmorrisdotca/kumimoji";
+ *
+ * const words = await loadTileWordsFromModule("english");
+ * const value: TileWords = words;
+ * console.log(value);
+ * ```
  */
 export type TileWords = {
   language: KumimojiLanguage;
@@ -50,7 +60,18 @@ export type TileWords = {
 
 const loaded = new Map<KumimojiLanguage, TileWords>();
 
-/** Front-coded words of one length read back (see `scripts/tile-words.mjs`): a shared-prefix character, then the rest. */
+/** Front-coded words of one length read back (see `scripts/tile-words.mjs`): a shared-prefix character, then the rest.
+ *
+ * @param packed - The front-coded words of one fixed length.
+ * @param length - The game length or decoded word length, as declared.
+ * @returns Front-coded words of one length read back (see `scripts/tile-words.mjs`): a shared-prefix character, then the rest.
+ * @example
+ * ```ts
+ * import { unpackLength } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(unpackLength("0cat2r",3));
+ * ```
+ */
 export function unpackLength(packed: string, length: number): string[] {
   const words: string[] = [];
   const text = packed.replace(/\s+/g, "");
@@ -67,7 +88,17 @@ export function unpackLength(packed: string, length: number): string[] {
   return words;
 }
 
-/** The English list read from its packed data: every word, the words by length, the set's mix, and the functions that turn tiles into words. */
+/** The English list read from its packed data: every word, the words by length, the set's mix, and the functions that turn tiles into words.
+ *
+ * @param data - The packed language-list data to decode.
+ * @returns The English list read from its packed data: every word, the words by length, the set's mix, and the functions that turn tiles into words.
+ * @example
+ * ```ts
+ * import { unpackTileWords } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(unpackTileWords({3:"0cat2r"}).allowed.has("cat"));
+ * ```
+ */
 export function unpackTileWords(data: Readonly<Record<number, string>>): TileWords {
   const byLength = new Map<number, string[]>();
   const allowed = new Set<string>();
@@ -168,12 +199,35 @@ function unpackJapaneseWords(data: JapaneseWordsData): TileWords {
  */
 let fromModule: ((language: KumimojiLanguage) => Promise<TileWords>) | null = null;
 
-/** Used by `tileWordsModule.ts` only: how to read a list where there is no browser. */
+/** Used by `tileWordsModule.ts` only: how to read a list where there is no browser.
+ *
+ * @param source - The asynchronous loader that supplies the language word list.
+ * @returns Used by `tileWordsModule.ts` only: how to read a list where there is no browser.
+ * @example
+ * ```ts
+ * import { loadTileWords, readTileWordsWith, tileWordsFrom } from "@johnmorrisdotca/kumimoji";
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ *
+ * readTileWordsWith(async language => tileWordsFrom(language,{3:"0cat2r"}));
+ * console.log((await loadTileWords("english")).allowed.has("cat"));
+ * ```
+ */
 export function readTileWordsWith(source: (language: KumimojiLanguage) => Promise<TileWords>): void {
   fromModule = source;
 }
 
-/** A list read from its module, for `tileWordsModule.ts`. */
+/** A list read from its module, for `tileWordsModule.ts`.
+ *
+ * @param language - The English or Japanese tile language.
+ * @param data - The packed language-list data to decode.
+ * @returns A list read from its module, for `tileWordsModule.ts`.
+ * @example
+ * ```ts
+ * import { tileWordsFrom } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(tileWordsFrom("english",{3:"0cat2r"}).allowed.size);
+ * ```
+ */
 export function tileWordsFrom(language: KumimojiLanguage, data: unknown): TileWords {
   return language === "english"
     ? unpackTileWords(data as Readonly<Record<number, string>>)
@@ -193,6 +247,17 @@ export function tileWordsFrom(language: KumimojiLanguage, data: unknown): TileWo
  * branch, and the import with it, is gone before anything is traced. The
  * server reads the list through `tileWordsModule.ts` instead, which only the
  * server's own checks and the tests import.
+ *
+ * @param language - The English or Japanese tile language.
+ * @returns THE LIST, ONCE. In a browser (or its worker) it arrives as its own script, fetched by the dynamic import below the first time a Kumimoji needs it.
+ * @example
+ * ```ts
+ * import { loadTileWords } from "@johnmorrisdotca/kumimoji";
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ *
+ * await loadTileWordsFromModule("english");
+ * console.log((await loadTileWords("english")).allowed.size);
+ * ```
  */
 export async function loadTileWords(language: KumimojiLanguage = "english"): Promise<TileWords> {
   const already = loaded.get(language);
@@ -210,14 +275,36 @@ export async function loadTileWords(language: KumimojiLanguage = "english"): Pro
   return words;
 }
 
-/** The list already loaded, for judging and dealing. Throws where `loadTileWords` has not yet fetched it: a check that cannot read the list must not answer. */
+/** The list already loaded, for judging and dealing. Throws where `loadTileWords` has not yet fetched it: a check that cannot read the list must not answer.
+ *
+ * @param language - The English or Japanese tile language.
+ * @returns The list already loaded, for judging and dealing. Throws where `loadTileWords` has not yet fetched it: a check that cannot read the list must not answer.
+ * @example
+ * ```ts
+ * import { tileWords } from "@johnmorrisdotca/kumimoji";
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ *
+ * await loadTileWordsFromModule("english");
+ * console.log(tileWords("english").allowed.has("cat"));
+ * ```
+ */
 export function tileWords(language: KumimojiLanguage = "english"): TileWords {
   const words = loaded.get(language);
   if (words === undefined) throw new Error(`The ${language} Kumimoji words have not been loaded (loadTileWords).`);
   return words;
 }
 
-/** Whether the list has been fetched yet, for a page to say "loading" rather than throw. */
+/** Whether the list has been fetched yet, for a page to say "loading" rather than throw.
+ *
+ * @param language - The English or Japanese tile language.
+ * @returns Whether the list has been fetched yet, for a page to say "loading" rather than throw.
+ * @example
+ * ```ts
+ * import { tileWordsReady } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(tileWordsReady("english"));
+ * ```
+ */
 export function tileWordsReady(language: KumimojiLanguage = "english"): boolean {
   return loaded.has(language);
 }

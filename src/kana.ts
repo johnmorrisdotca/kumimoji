@@ -12,6 +12,12 @@
  * form: は then ん is はん, ばん and ぱん at once. The word list is stored
  * already read this way (`scripts/word-lists-ja.mjs` folds it with the same
  * table), so checking a line is one lookup.
+ *
+ * @example
+ * ```ts
+ * import { BASE_KANA } from "@johnmorrisdotca/kumimoji";
+ * console.log(BASE_KANA);
+ * ```
  */
 export const BASE_KANA = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわん";
 
@@ -19,7 +25,17 @@ const SMALL_AND_OLD: Readonly<Record<string, string>> = {
   ぁ: "あ", ぃ: "い", ぅ: "う", ぇ: "え", ぉ: "お", っ: "つ", ゃ: "や", ゅ: "ゆ", ょ: "よ", ゎ: "わ", ゕ: "か", ゖ: "け", を: "お", ゐ: "い", ゑ: "え",
 };
 
-/** The tile a kana is played with, or null for anything that is not hiragana (ー, katakana, a letter). */
+/** The tile a kana is played with, or null for anything that is not hiragana (ー, katakana, a letter).
+ *
+ * @param kana - The hiragana reading to map to a base tile.
+ * @returns The tile a kana is played with, or null for anything that is not hiragana (ー, katakana, a letter).
+ * @example
+ * ```ts
+ * import { tileKana } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(tileKana("が"));
+ * ```
+ */
 export function tileKana(kana: string): string | null {
   const bare = kana.normalize("NFD").replace(/[゙゚]/gu, "").normalize("NFC");
   const base = SMALL_AND_OLD[bare] ?? bare;
@@ -31,6 +47,12 @@ export function tileKana(kana: string): string | null {
  * (John, 2026-09-28: "the tiles like Yu can show the regular and small version
  * in that tile to show its versatility"). Only the forms a player reaches for;
  * the rare ones (ぁ, ゎ, ゔ) still play, and the rules say so.
+ *
+ * @example
+ * ```ts
+ * import { CORNER_FORMS } from "@johnmorrisdotca/kumimoji";
+ * console.log(CORNER_FORMS);
+ * ```
  */
 export const CORNER_FORMS: Readonly<Record<string, string>> = {
   か: "が", き: "ぎ", く: "ぐ", け: "げ", こ: "ご",

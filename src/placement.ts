@@ -22,10 +22,28 @@
  */
 import { DIAGONAL_RUN_LEAST } from "./grid.ts";
 
-/** A square by its row and column. */
+/** A square by its row and column.
+ *
+ * @example
+ * ```ts
+ * import type { Square } from "@johnmorrisdotca/kumimoji";
+ *
+ * const value: Square = {row:0,col:0};
+ * console.log(value);
+ * ```
+ */
 export type Square = { row: number; col: number };
 
-/** A word's place: its first square, and the squares it lays a new tile on, in the word's order. */
+/** A word's place: its first square, and the squares it lays a new tile on, in the word's order.
+ *
+ * @example
+ * ```ts
+ * import type { CrossingFit } from "@johnmorrisdotca/kumimoji";
+ *
+ * const value: CrossingFit = {first:{row:0,col:0},fresh:[{row:0,col:1},{row:0,col:2}]};
+ * console.log(value);
+ * ```
+ */
 export type CrossingFit = { first: Square; fresh: Square[] };
 
 /**
@@ -35,6 +53,21 @@ export type CrossingFit = { first: Square; fresh: Square[] };
  * neighbour at its side, or no new tile at all — and, given `diagonalWord`
  * (a game with Diagonals), a new tile standing in a diagonal run of three or
  * more that `diagonalWord` does not take (`diagonalsRead`).
+ *
+ * @param letterAt - The tile at a coordinate, or an empty string for no tile.
+ * @param inside - Whether a coordinate is within the caller’s working grid.
+ * @param word - The encoded word to lay or spell.
+ * @param anchor - The existing tile that the word crosses.
+ * @param at - The word offset, seat index or date specified by this signature.
+ * @param across - Whether to lay or type horizontally rather than vertically.
+ * @param diagonalWord - Optional diagonal-word predicate; null disables diagonal checking.
+ * @returns Where `word` stands with its letter `at` on the tile at `anchor`, running across or down, or null where it cannot: a square outside what may be used, a tile at either end, a different letter in its way, a new tile with a neighbour at its side, or no new tile at all — and, given `diagonalWord` (a game with Diagonals), a new tile standing in a diagonal run of three or more that `diagonalWord` does not take (`diagonalsRead`).
+ * @example
+ * ```ts
+ * import { crossingFit } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(crossingFit((r,c)=>r===0&&c===0?"c":"",()=>true,"cat",{row:0,col:0},0,true));
+ * ```
  */
 export function crossingFit(
   letterAt: (row: number, col: number) => string,
@@ -77,6 +110,21 @@ export function crossingFit(
  * its new squares. Only a run through a new tile can change, and two new
  * tiles of one word never share a diagonal (they share a row or a column), so
  * each is read on its own. A run of two, a corner touch, is never read.
+ *
+ * @param letterAt - The tile at a coordinate, or an empty string for no tile.
+ * @param inside - Whether a coordinate is within the caller’s working grid.
+ * @param word - The encoded word to lay or spell.
+ * @param fit - The first coordinate and fresh tile coordinates of the proposed laying.
+ * @param isWord - The predicate that accepts a readable word.
+ * @returns Whether every diagonal run a laying's new tiles would stand in is taken by `isWord`: each walked from its top end down, with the word's own letters on its new squares. Only a run through a new tile can change, and two new tiles of one word never share a diagonal (they share a row or a column), so each is read on its own. A run of two, a corner touch, is never read.
+ * @example
+ * ```ts
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ * import { diagonalsRead } from "@johnmorrisdotca/kumimoji";
+ *
+ * const words = await loadTileWordsFromModule("english");
+ * console.log(diagonalsRead(()=>"",()=>true,"cat",{first:{row:0,col:0},fresh:[{row:0,col:0},{row:0,col:1},{row:0,col:2}]},word=>words.allowed.has(word)));
+ * ```
  */
 export function diagonalsRead(
   letterAt: (row: number, col: number) => string,

@@ -11,10 +11,31 @@ import type { KumimojiLanguage, KumimojiLength } from "./kumimoji.types.ts";
  * and the tests hold it to the constants.
  */
 
-/** One kind of tile in a set: the code the game deals, what is printed on it, what shows in its corner, and how many the set holds. */
+/** One kind of tile in a set: the code the game deals, what is printed on it, what shows in its corner, and how many the set holds.
+ *
+ * @example
+ * ```ts
+ * import type { MixTile } from "@johnmorrisdotca/kumimoji";
+ *
+ * const value: MixTile = {code:"c",glyph:"c",forms:"",count:2};
+ * console.log(value);
+ * ```
+ */
 export type MixTile = { code: string; glyph: string; forms: string; count: number };
 
-/** A whole set, in its own order (a to z, あ to ん), with what a reader needs to see how uneven it is. */
+/** A whole set, in its own order (a to z, あ to ん), with what a reader needs to see how uneven it is.
+ *
+ * @example
+ * ```ts
+ * import type { MixShown } from "@johnmorrisdotca/kumimoji";
+ * import { mixShown } from "@johnmorrisdotca/kumimoji";
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ *
+ * await loadTileWordsFromModule("english");
+ * const value: MixShown = mixShown("english");
+ * console.log(value);
+ * ```
+ */
 export type MixShown = {
   tiles: MixTile[];
   total: number;
@@ -27,7 +48,19 @@ export type MixShown = {
   commonest: string[];
 };
 
-/** A language's set as a page shows it: every tile with its count, the total, and which are the rarest and the commonest. */
+/** A language's set as a page shows it: every tile with its count, the total, and which are the rarest and the commonest.
+ *
+ * @param language - The English or Japanese tile language.
+ * @returns A language's set as a page shows it: every tile with its count, the total, and which are the rarest and the commonest.
+ * @example
+ * ```ts
+ * import { mixShown } from "@johnmorrisdotca/kumimoji";
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ *
+ * await loadTileWordsFromModule("english");
+ * console.log(mixShown("english").total);
+ * ```
+ */
 export function mixShown(language: KumimojiLanguage): MixShown {
   const tiles: MixTile[] =
     language === "english"
@@ -55,7 +88,17 @@ export function mixShown(language: KumimojiLanguage): MixShown {
 const HIRAGANA_FIRST = 0x3041;
 const HIRAGANA_LAST = 0x3096;
 
-/** Every hiragana a tile plays as, itself first: は is は, ば and ぱ. None for a kana that is not a tile's own. */
+/** Every hiragana a tile plays as, itself first: は is は, ば and ぱ. None for a kana that is not a tile's own.
+ *
+ * @param kana - The hiragana reading to map to a base tile.
+ * @returns Every hiragana a tile plays as, itself first: は is は, ば and ぱ. None for a kana that is not a tile's own.
+ * @example
+ * ```ts
+ * import { formsOfTile } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(formsOfTile("は"));
+ * ```
+ */
 export function formsOfTile(kana: string): string[] {
   if (tileKana(kana) !== kana) return [];
   const forms = [kana];
@@ -66,7 +109,17 @@ export function formsOfTile(kana: string): string[] {
   return forms;
 }
 
-/** One length of game at one opening hand: how many tiles it deals from one set and from two, and how many of them are wild at each level. */
+/** One length of game at one opening hand: how many tiles it deals from one set and from two, and how many of them are wild at each level.
+ *
+ * @example
+ * ```ts
+ * import type { LengthRow } from "@johnmorrisdotca/kumimoji";
+ * import { lengthRows } from "@johnmorrisdotca/kumimoji";
+ *
+ * const value: LengthRow = lengthRows(7)[0];
+ * console.log(value);
+ * ```
+ */
 export type LengthRow = {
   length: KumimojiLength;
   tiles: number;
@@ -75,10 +128,27 @@ export type LengthRow = {
   wilds: Record<"easy" | "medium" | "hard", number>;
 };
 
-/** The lengths of game, shortest first. */
+/** The lengths of game, shortest first.
+ *
+ * @example
+ * ```ts
+ * import { LENGTHS } from "@johnmorrisdotca/kumimoji";
+ * console.log(LENGTHS);
+ * ```
+ */
 export const LENGTHS: readonly KumimojiLength[] = ["short", "medium", "full"];
 
-/** For one opening hand, each length of game: how many tiles it deals, from one set and from two, and how many are wild at each level. */
+/** For one opening hand, each length of game: how many tiles it deals, from one set and from two, and how many are wild at each level.
+ *
+ * @param hand - The hand size or tile codes, as declared by the function signature.
+ * @returns For one opening hand, each length of game: how many tiles it deals, from one set and from two, and how many are wild at each level.
+ * @example
+ * ```ts
+ * import { lengthRows } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(lengthRows(7));
+ * ```
+ */
 export function lengthRows(hand: number = KUMIMOJI_HANDS.classic): LengthRow[] {
   return LENGTHS.map((length) => {
     const tiles = kumimojiTileCount(hand, length);
@@ -98,5 +168,11 @@ export function lengthRows(hand: number = KUMIMOJI_HANDS.classic): LengthRow[] {
  * fixed rather than dealt, so the page is the same for everybody and needs no
  * generator; `showcase.test.ts` proves it can be finished, with a crossword
  * checked against the real list.
+ *
+ * @example
+ * ```ts
+ * import { TRY_IT } from "@johnmorrisdotca/kumimoji";
+ * console.log(TRY_IT);
+ * ```
  */
 export const TRY_IT = { bag: "rotenasdi*", hand: 7 } as const;

@@ -11,13 +11,33 @@
 
 const pad = (value: number, width: number): string => String(value).padStart(width, "0");
 
-/** The day a moment falls on, in UTC, written `YYYY-MM-DD`. Throws a `RangeError` for an invalid `Date`. */
+/** The day a moment falls on, in UTC, written `YYYY-MM-DD`. Throws a `RangeError` for an invalid `Date`.
+ *
+ * @param at - The word offset, seat index or date specified by this signature.
+ * @returns The day a moment falls on, in UTC, written `YYYY-MM-DD`. Throws a `RangeError` for an invalid `Date`.
+ * @example
+ * ```ts
+ * import { kumimojiDay } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(kumimojiDay(new Date("2026-10-12T12:00:00Z")));
+ * ```
+ */
 export function kumimojiDay(at: Date): string {
   if (Number.isNaN(at.getTime())) throw new RangeError("kumimoji: an invalid Date has no day");
   return `${pad(at.getUTCFullYear(), 4)}-${pad(at.getUTCMonth() + 1, 2)}-${pad(at.getUTCDate(), 2)}`;
 }
 
-/** Today's seed, the date as a number: 2026-10-01 is 20261001. The day is UTC, so it is one seed worldwide. */
+/** Today's seed, the date as a number: 2026-10-01 is 20261001. The day is UTC, so it is one seed worldwide.
+ *
+ * @param at - The word offset, seat index or date specified by this signature.
+ * @returns Today's seed, the date as a number: 2026-10-01 is 20261001. The day is UTC, so it is one seed worldwide.
+ * @example
+ * ```ts
+ * import { kumimojiDailySeed } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(kumimojiDailySeed(new Date("2026-10-12T12:00:00Z")));
+ * ```
+ */
 export function kumimojiDailySeed(at: Date): number {
   const [year, month, day] = kumimojiDay(at).split("-").map(Number) as [number, number, number];
   return year * 10_000 + month * 100 + day;

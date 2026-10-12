@@ -31,6 +31,20 @@ import { tileWords, type TileWords } from "./tileWords.ts";
  *
  * Deterministic in the seed, like every generator here: two browsers in a
  * race, or one tomorrow, deal the same bag in the same order.
+ *
+ * @param size - The supported initial hand size.
+ * @param level - The difficulty that determines the wildcard allowance.
+ * @param seed - The numeric seed for deterministic deals or random draws.
+ * @param options - Native game, component or presentation options.
+ * @returns MAKING A KUMIMOJI, in the browser, from a seed: the bag the game is played from, in the order its tiles come out.
+ * @example
+ * ```ts
+ * import { generateKumimoji } from "@johnmorrisdotca/kumimoji";
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ *
+ * await loadTileWordsFromModule("english");
+ * console.log(generateKumimoji(3,"hard",44).givens);
+ * ```
  */
 export function generateKumimoji(size: number, level: KumimojiLevel, seed: number, options: KumimojiOptions = {}): KumimojiDeal {
   const gameLength = options.gameLength ?? "short";

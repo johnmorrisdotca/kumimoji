@@ -14,10 +14,30 @@ import type { TileWords } from "./tileWords.ts";
  * — and nothing on the table is moved.
  */
 
-/** How many words one hand offers before the presses go round again: the longest first. */
+/** How many words one hand offers before the presses go round again: the longest first.
+ *
+ * @example
+ * ```ts
+ * import { HELP_WORDS_MOST } from "@johnmorrisdotca/kumimoji";
+ * console.log(HELP_WORDS_MOST);
+ * ```
+ */
 export const HELP_WORDS_MOST = 40;
 
-/** The words the hand's own tiles spell, longest first and then in the list's order; wilds are not used. */
+/** The words the hand's own tiles spell, longest first and then in the list's order; wilds are not used.
+ *
+ * @param hand - The hand size or tile codes, as declared by the function signature.
+ * @param words - The loaded native language word list and tile mappings.
+ * @returns The words the hand's own tiles spell, longest first and then in the list's order; wilds are not used.
+ * @example
+ * ```ts
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ * import { wordsInHand } from "@johnmorrisdotca/kumimoji";
+ *
+ * const words = await loadTileWordsFromModule("english");
+ * console.log(wordsInHand(["c","a","t"],words));
+ * ```
+ */
 export function wordsInHand(hand: readonly string[], words: TileWords): string[] {
   const have = new Map<string, number>();
   for (const tile of hand) if (!words.isWild(tile)) have.set(tile, (have.get(tile) ?? 0) + 1);
@@ -44,7 +64,20 @@ export function wordsInHand(hand: readonly string[], words: TileWords): string[]
   return found;
 }
 
-/** The hand with `word`'s tiles first, in its order, and the rest after them as they were. */
+/** The hand with `word`'s tiles first, in its order, and the rest after them as they were.
+ *
+ * @param play - The current immutable solo-game progress.
+ * @param word - The encoded word to lay or spell.
+ * @returns The hand with `word`'s tiles first, in its order, and the rest after them as they were.
+ * @example
+ * ```ts
+ * import { deal, handSpelling } from "@johnmorrisdotca/kumimoji";
+ *
+ * const tiles = new Map([["0,0","c"],["0,1","a"],["0,2","t"]]);
+ * const play = deal("catdog",3);
+ * console.log(handSpelling(play,"cat").tiles);
+ * ```
+ */
 export function handSpelling(play: TilePlay, word: string): TilePlay {
   const rest = [...play.hand];
   const front: string[] = [];

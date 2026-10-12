@@ -22,10 +22,32 @@ import { KUMIMOJI_VERSION } from "./version.ts";
  * out of that bag and was not given back.
  */
 
-/** The shape of the JSON this package writes. It goes up only when a reader of the old shape would be wrong about the new one. */
+/** The shape of the JSON this package writes. It goes up only when a reader of the old shape would be wrong about the new one.
+ *
+ * @example
+ * ```ts
+ * import { KUMIMOJI_EXPORT_FORMAT } from "@johnmorrisdotca/kumimoji";
+ * console.log(KUMIMOJI_EXPORT_FORMAT);
+ * ```
+ */
 export const KUMIMOJI_EXPORT_FORMAT = 1;
 
-/** A game alone as it is kept: the deal, where the player has got to, and the time spent so far. */
+/** A game alone as it is kept: the deal, where the player has got to, and the time spent so far.
+ *
+ * @example
+ * ```ts
+ * import { deal, generateKumimoji } from "@johnmorrisdotca/kumimoji";
+ * import type { KumimojiSaved } from "@johnmorrisdotca/kumimoji";
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ *
+ * await loadTileWordsFromModule("english");
+ * const play = deal("catdog",3);
+ * const dealt = generateKumimoji(3,"hard",44);
+ * const saved = {deal:dealt,play:deal(dealt.givens,dealt.size),elapsedMs:0};
+ * const value: KumimojiSaved = saved;
+ * console.log(value);
+ * ```
+ */
 export type KumimojiSaved = {
   /** The game as dealt: `generateKumimoji`'s. */
   deal: KumimojiDeal;
@@ -35,7 +57,22 @@ export type KumimojiSaved = {
   elapsedMs: number;
 };
 
-/** A whole JSON export of one game: what `kumimojiToJSON` writes and `kumimojiFromJSON` reads. */
+/** A whole JSON export of one game: what `kumimojiToJSON` writes and `kumimojiFromJSON` reads.
+ *
+ * @example
+ * ```ts
+ * import { deal, generateKumimoji, kumimojiExported } from "@johnmorrisdotca/kumimoji";
+ * import type { KumimojiExported } from "@johnmorrisdotca/kumimoji";
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ *
+ * await loadTileWordsFromModule("english");
+ * const play = deal("catdog",3);
+ * const dealt = generateKumimoji(3,"hard",44);
+ * const saved = {deal:dealt,play:deal(dealt.givens,dealt.size),elapsedMs:0};
+ * const value: KumimojiExported = kumimojiExported(saved);
+ * console.log(value);
+ * ```
+ */
 export type KumimojiExported = {
   /** The shape's number: `KUMIMOJI_EXPORT_FORMAT`. */
   format: typeof KUMIMOJI_EXPORT_FORMAT;
@@ -63,7 +100,22 @@ export type KumimojiExported = {
   elapsedMs: number;
 };
 
-/** A game as the JSON export's object. */
+/** A game as the JSON export's object.
+ *
+ * @param saved - The original deal, current progress and elapsed time.
+ * @returns A game as the JSON export's object.
+ * @example
+ * ```ts
+ * import { deal, generateKumimoji, kumimojiExported } from "@johnmorrisdotca/kumimoji";
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ *
+ * await loadTileWordsFromModule("english");
+ * const play = deal("catdog",3);
+ * const dealt = generateKumimoji(3,"hard",44);
+ * const saved = {deal:dealt,play:deal(dealt.givens,dealt.size),elapsedMs:0};
+ * console.log(kumimojiExported(saved).format);
+ * ```
+ */
 export function kumimojiExported(saved: KumimojiSaved): KumimojiExported {
   const { deal, play } = saved;
   return {
@@ -82,7 +134,22 @@ export function kumimojiExported(saved: KumimojiSaved): KumimojiExported {
   };
 }
 
-/** A game as JSON, two spaces deep, with the format's number first. `kumimojiFromJSON` reads it back. */
+/** A game as JSON, two spaces deep, with the format's number first. `kumimojiFromJSON` reads it back.
+ *
+ * @param saved - The original deal, current progress and elapsed time.
+ * @returns A game as JSON, two spaces deep, with the format's number first. `kumimojiFromJSON` reads it back.
+ * @example
+ * ```ts
+ * import { deal, generateKumimoji, kumimojiToJSON } from "@johnmorrisdotca/kumimoji";
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ *
+ * await loadTileWordsFromModule("english");
+ * const play = deal("catdog",3);
+ * const dealt = generateKumimoji(3,"hard",44);
+ * const saved = {deal:dealt,play:deal(dealt.givens,dealt.size),elapsedMs:0};
+ * console.log(kumimojiToJSON(saved));
+ * ```
+ */
 export function kumimojiToJSON(saved: KumimojiSaved): string {
   return `${JSON.stringify(kumimojiExported(saved), null, 2)}\n`;
 }
@@ -102,6 +169,20 @@ const PROGRESS_MOST = 4000;
  * The word list of the game's language is loaded first, since dealing needs
  * it; where there is no browser, import `@johnmorrisdotca/kumimoji/words`
  * once, or the promise is rejected as `loadTileWords` rejects it.
+ *
+ * @param text - The saved JSON text to validate.
+ * @returns A game from JSON that `kumimojiToJSON` wrote. Nothing in it is trusted: the bag is dealt again from the seed, and the game opens only if every tile held is one that came out of that bag. Resolves to null when the text is not JSON, is of a later format than this version reads, is another game's, or holds a hand or a grid that this bag never dealt.
+ * @example
+ * ```ts
+ * import { deal, generateKumimoji, kumimojiFromJSON, kumimojiToJSON } from "@johnmorrisdotca/kumimoji";
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ *
+ * await loadTileWordsFromModule("english");
+ * const play = deal("catdog",3);
+ * const dealt = generateKumimoji(3,"hard",44);
+ * const saved = {deal:dealt,play:deal(dealt.givens,dealt.size),elapsedMs:0};
+ * console.log((await kumimojiFromJSON(kumimojiToJSON(saved)))?.deal.seed);
+ * ```
  */
 export async function kumimojiFromJSON(text: string): Promise<KumimojiSaved | null> {
   let data: unknown;
@@ -135,7 +216,17 @@ export async function kumimojiFromJSON(text: string): Promise<KumimojiSaved | nu
   return play === null ? null : { deal, play, elapsedMs: spent };
 }
 
-/** A time as minutes and seconds: `1:05`. */
+/** A time as minutes and seconds: `1:05`.
+ *
+ * @param ms - The duration in milliseconds.
+ * @returns A time as minutes and seconds: `1:05`.
+ * @example
+ * ```ts
+ * import { kumimojiClock } from "@johnmorrisdotca/kumimoji";
+ *
+ * console.log(kumimojiClock(65000));
+ * ```
+ */
 export function kumimojiClock(ms: number): string {
   const seconds = Math.max(0, Math.floor(ms / 1000));
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
@@ -146,6 +237,17 @@ export function kumimojiClock(ms: number): string {
  * capitals with a space between squares and a dot for an empty one, kana side
  * by side with a full-width dot for an empty one, so that either lines up in a
  * fixed-width face, every row as wide as the crossword. A wild that has been given nothing is `*`. No tiles is "".
+ *
+ * @param tiles - The map from row,column square names to internal tile codes.
+ * @param language - The English or Japanese tile language.
+ * @returns A grid as lines of text, the way it lies on the table: English letters in capitals with a space between squares and a dot for an empty one, kana side by side with a full-width dot for an empty one, so that either lines up in a fixed-width face, every row as wide as the crossword. A wild that has been given nothing is `*`. No tiles is "".
+ * @example
+ * ```ts
+ * import { gridToText } from "@johnmorrisdotca/kumimoji";
+ *
+ * const tiles = new Map([["0,0","c"],["0,1","a"],["0,2","t"]]);
+ * console.log(gridToText(tiles));
+ * ```
  */
 export function gridToText(tiles: Tiles, language: KumimojiLanguage = "english"): string {
   const bounds = boundsOf(tiles);
@@ -173,6 +275,21 @@ export function gridToText(tiles: Tiles, language: KumimojiLanguage = "english")
  * English unless given another table of strings (`KUMIMOJI_STRINGS.ja`). The
  * word list of the game's language must have been loaded, as for any judging.
  * Lines end with a line feed.
+ *
+ * @param saved - The original deal, current progress and elapsed time.
+ * @param strings - The localized words for readable export.
+ * @returns A game as plain text, for a chat or a note: how it was set up, the crossword as it lies, the hand, how many tiles are left, and the time. In English unless given another table of strings (`KUMIMOJI_STRINGS.ja`). The word list of the game's language must have been loaded, as for any judging. Lines end with a line feed.
+ * @example
+ * ```ts
+ * import { deal, generateKumimoji, kumimojiToText } from "@johnmorrisdotca/kumimoji";
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ *
+ * await loadTileWordsFromModule("english");
+ * const play = deal("catdog",3);
+ * const dealt = generateKumimoji(3,"hard",44);
+ * const saved = {deal:dealt,play:deal(dealt.givens,dealt.size),elapsedMs:0};
+ * console.log(kumimojiToText(saved));
+ * ```
  */
 export function kumimojiToText(saved: KumimojiSaved, strings: KumimojiStrings = KUMIMOJI_STRINGS.en): string {
   const { deal, play } = saved;

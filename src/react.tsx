@@ -14,7 +14,21 @@ const TILE: CSSProperties = {
   boxShadow: "0 2px 0 rgba(0,0,0,.35)",
 };
 
-/** What `KumimojiBoard` takes: a grid to draw, and any attribute of its `<div>`. */
+/** What `KumimojiBoard` takes: a grid to draw, and any attribute of its `<div>`.
+ *
+ * @example
+ * ```ts
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ * import { judgeWithWords } from "@johnmorrisdotca/kumimoji";
+ * import type { KumimojiBoardProps } from "@johnmorrisdotca/kumimoji/react";
+ *
+ * const words = await loadTileWordsFromModule("english");
+ * const tiles = new Map([["0,0","c"],["0,1","a"],["0,2","t"]]);
+ * const verdict = judgeWithWords(new Map([["0,0","c"],["0,1","a"],["0,2","t"]]),words);
+ * const value: KumimojiBoardProps = {tiles,verdict:null};
+ * console.log(value);
+ * ```
+ */
 export type KumimojiBoardProps = {
   /** The tiles on the table, by square: `play.tiles`. */
   tiles: Tiles;
@@ -36,6 +50,15 @@ export type KumimojiBoardProps = {
  * apart from the crossword faded, and a press on any square reported by its
  * key (`squareAt(row, col)`). It draws; what a press does is yours to decide
  * with `placeFromHand`, `moveOnTable` and the rest.
+ *
+ * @param options - Native game, component or presentation options.
+ * @returns The React grid element.
+ * @example
+ * ```ts no-run
+ * import {createElement} from "react";
+ * import { KumimojiBoard } from "@johnmorrisdotca/kumimoji/react";
+ * console.log(createElement(KumimojiBoard,{tiles:new Map([["0,0","c"]])}));
+ * ```
  */
 export function KumimojiBoard({ tiles, verdict = null, glyphOf, onSquare, held = null, square = 36, style, ...element }: KumimojiBoardProps) {
   const model = boardModel(tiles, verdict, glyphOf);

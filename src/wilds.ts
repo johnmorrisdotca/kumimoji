@@ -22,10 +22,31 @@ import type { TileWords } from "./tileWords.ts";
  * table names the run as the player spelled it. It gives up, answering null,
  * past `WILD_SEARCH_MOST` steps: a grid it could not settle is not called
  * sound.
+ *
+ * @example
+ * ```ts
+ * import { WILD_SEARCH_MOST } from "@johnmorrisdotca/kumimoji";
+ * console.log(WILD_SEARCH_MOST);
+ * ```
  */
 export const WILD_SEARCH_MOST = 20_000;
 
-/** The grid with every blank wild read as a letter that makes all its runs words, or null for none; the grid itself when it holds no blank. */
+/** The grid with every blank wild read as a letter that makes all its runs words, or null for none; the grid itself when it holds no blank.
+ *
+ * @param tiles - The map from row,column square names to internal tile codes.
+ * @param words - The loaded native language word list and tile mappings.
+ * @param rules - Whether diagonal runs are also judged.
+ * @returns The grid with every blank wild read as a letter that makes all its runs words, or null for none; the grid itself when it holds no blank.
+ * @example
+ * ```ts
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ * import { readWilds } from "@johnmorrisdotca/kumimoji";
+ *
+ * const words = await loadTileWordsFromModule("english");
+ * const tiles = new Map([["0,0","c"],["0,1","a"],["0,2","t"]]);
+ * console.log(readWilds(tiles,words));
+ * ```
+ */
 export function readWilds(tiles: Tiles, words: TileWords, rules: GridRules = {}): Tiles | null {
   const blanks = [...tiles].filter(([, tile]) => tile === "*").map(([square]) => square);
   if (blanks.length === 0) return tiles;

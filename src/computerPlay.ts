@@ -32,7 +32,22 @@ function plainOf(tile: string, words: TileWords): string {
   return sound === null ? "" : (words.codeOf(sound) ?? "");
 }
 
-/** Whether a grid is sound, read against the loaded word list by the game's rules: the same judgement the desk shows. */
+/** Whether a grid is sound, read against the loaded word list by the game's rules: the same judgement the desk shows.
+ *
+ * @param tiles - The map from row,column square names to internal tile codes.
+ * @param words - The loaded native language word list and tile mappings.
+ * @param rules - Whether diagonal runs are also judged.
+ * @returns Whether a grid is sound, read against the loaded word list by the game's rules: the same judgement the desk shows.
+ * @example
+ * ```ts
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ * import { judgeTiles } from "@johnmorrisdotca/kumimoji";
+ *
+ * const words = await loadTileWordsFromModule("english");
+ * const tiles = new Map([["0,0","c"],["0,1","a"],["0,2","t"]]);
+ * console.log(judgeTiles(tiles,words));
+ * ```
+ */
 export function judgeTiles(tiles: Tiles, words: TileWords, rules: GridRules = {}): GridVerdict {
   return judgeWithWords(tiles, words, rules);
 }
@@ -184,6 +199,20 @@ const JUDGED_MOST = 12;
  * lay on its table, and the word, or null when there is none. The grid after
  * it is judged against the list, by the game's rules (`rules`), and is
  * always sound.
+ *
+ * @param play - The current immutable solo-game progress.
+ * @param words - The loaded native language word list and tile mappings.
+ * @param rules - Whether diagonal runs are also judged.
+ * @returns THE COMPUTER'S NEXT WORD: its play after laying the best word its hand can lay on its table, and the word, or null when there is none. The grid after it is judged against the list, by the game's rules (`rules`), and is always sound.
+ * @example
+ * ```ts
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ * import { bestLaying, deal } from "@johnmorrisdotca/kumimoji";
+ *
+ * const words = await loadTileWordsFromModule("english");
+ * const play = deal("catdog",3);
+ * console.log(bestLaying(play,words)?.word);
+ * ```
  */
 export function bestLaying(play: TilePlay, words: TileWords, rules: GridRules = {}): { play: TilePlay; word: string } | null {
   if (play.hand.length === 0) return null;
@@ -195,7 +224,21 @@ export function bestLaying(play: TilePlay, words: TileWords, rules: GridRules = 
   return null;
 }
 
-/** The tile a computer trades: its rarest letter in the set, the first of those in its hand; never a wild. Null for a hand of wilds. */
+/** The tile a computer trades: its rarest letter in the set, the first of those in its hand; never a wild. Null for a hand of wilds.
+ *
+ * @param hand - The hand size or tile codes, as declared by the function signature.
+ * @param words - The loaded native language word list and tile mappings.
+ * @returns The tile a computer trades: its rarest letter in the set, the first of those in its hand; never a wild. null for a hand of wilds.
+ * @example
+ * ```ts
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ * import { deal, tradeChoice } from "@johnmorrisdotca/kumimoji";
+ *
+ * const words = await loadTileWordsFromModule("english");
+ * const play = deal("catdog",3);
+ * console.log(tradeChoice(play.hand,words));
+ * ```
+ */
 export function tradeChoice(hand: readonly string[], words: TileWords): number | null {
   let chosen: number | null = null;
   let fewest = Infinity;

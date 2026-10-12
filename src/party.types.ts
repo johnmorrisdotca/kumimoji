@@ -1,7 +1,17 @@
 import type { Tiles } from "./grid.ts";
 import type { KumimojiLanguage, KumimojiLength, KumimojiLevel } from "./kumimoji.types.ts";
 
-/** What a pass-and-play game was set up as: the address's own choices, which a kept game is matched to. */
+/** What a pass-and-play game was set up as: the address's own choices, which a kept game is matched to.
+ *
+ * @example
+ * ```ts
+ * import type { PartySettings } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const value: PartySettings = settings;
+ * console.log(value);
+ * ```
+ */
 export type PartySettings = {
   /** The hand each player is dealt: 7 Quick or 11 Classic (3 in the browser tests alone). */
   size: number;
@@ -22,6 +32,15 @@ export type PartySettings = {
  * their own table, and whether the seat is a computer's (`computerTurn.ts`),
  * whose turns play themselves in the browser. A computer's name is always
  * written out ("Computer 1"), never left for its number.
+ *
+ * @example
+ * ```ts
+ * import type { PartyPlayer } from "@johnmorrisdotca/kumimoji";
+ *
+ * const tiles = new Map([["0,0","c"],["0,1","a"],["0,2","t"]]);
+ * const value: PartyPlayer = {name:"Seat 1",hand:["c","a","t"],tiles:new Map()};
+ * console.log(value);
+ * ```
  */
 export type PartyPlayer = {
   name: string;
@@ -30,12 +49,33 @@ export type PartyPlayer = {
   computer?: boolean;
 };
 
-/** A seat asked for before the deal or at a join: a name (empty for its number) and whether a computer plays it. */
+/** A seat asked for before the deal or at a join: a name (empty for its number) and whether a computer plays it.
+ *
+ * @example
+ * ```ts
+ * import type { PartySeat } from "@johnmorrisdotca/kumimoji";
+ *
+ * const value: PartySeat = {name:"Computer",computer:true};
+ * console.log(value);
+ * ```
+ */
 export type PartySeat = { name: string; computer?: boolean };
 
 /**
  * A PASS-AND-PLAY KUMIMOJI: one bag, read as a line the way the solo game
  * reads it (`TilePlay`), and a hand and a table for each player.
+ *
+ * @example
+ * ```ts
+ * import { startParty } from "@johnmorrisdotca/kumimoji";
+ * import type { PartyGame } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * const value: PartyGame = game;
+ * console.log(value);
+ * ```
  */
 export type PartyGame = {
   settings: PartySettings;
@@ -84,5 +124,13 @@ export type PartyGame = {
  * had a last turn; the winners are everybody who went out. `standing`: every
  * other player resigned and the last one in laid a tile. `tied`: nobody was
  * left standing, and the players who resigned in that final run are tied.
+ *
+ * @example
+ * ```ts
+ * import type { PartyEnding } from "@johnmorrisdotca/kumimoji";
+ *
+ * const value: PartyEnding = "out";
+ * console.log(value);
+ * ```
  */
 export type PartyEnding = "out" | "standing" | "tied";

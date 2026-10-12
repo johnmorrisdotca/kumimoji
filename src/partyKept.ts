@@ -42,7 +42,20 @@ type Kept = {
   players: { name: string; hand: string; grid: string; computer?: true }[];
 };
 
-/** A table of players as text to keep. `decodeParty` reads it back, and given the word list's `familyKey` checks every tile held against the bag. */
+/** A table of players as text to keep. `decodeParty` reads it back, and given the word list's `familyKey` checks every tile held against the bag.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @returns A table of players as text to keep. `decodeParty` reads it back, and given the word list's `familyKey` checks every tile held against the bag.
+ * @example
+ * ```ts
+ * import { encodeParty, startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(encodeParty(game));
+ * ```
+ */
 export function encodeParty(game: PartyGame): string {
   const kept: Kept = {
     v: VERSION,
@@ -69,7 +82,18 @@ export function encodeParty(game: PartyGame): string {
 const isCount = (value: unknown, most: number): value is number => Number.isInteger(value) && (value as number) >= 0 && (value as number) <= most;
 const isTiles = (value: unknown): value is string => typeof value === "string" && /^[a-zA-Z*-]*$/.test(value);
 
-/** A game's settings as something outside this browser sent them — a table on several devices, a kept game — checked, or null. */
+/** A game's settings as something outside this browser sent them — a table on several devices, a kept game — checked, or null.
+ *
+ * @param value - The unknown setup value to interpret.
+ * @returns A game's settings as something outside this browser sent them — a table on several devices, a kept game — checked, or null.
+ * @example
+ * ```ts
+ * import { readSettings } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * console.log(readSettings(settings));
+ * ```
+ */
 export function readSettings(value: unknown): PartySettings | null {
   if (typeof value !== "object" || value === null) return null;
   const s = value as Record<string, unknown>;
@@ -92,6 +116,21 @@ export function readSettings(value: unknown): PartySettings | null {
  * it and not given back, as the solo game checks a kept run
  * (`decodeTileProgress`). Without, its shape alone, which is enough to offer
  * it on the set-up screen.
+ *
+ * @param code - The encoded grid or progress text.
+ * @param familyKey - The function identifying physical tile families, or null for invalid codes.
+ * @returns A kept game read back, or null for anything that is not one. With `familyKey` (the loaded word list's), it is also checked against its own bag: every tile held by anybody — hand and table — must be one taken out of it and not given back, as the solo game checks a kept run (`decodeTileProgress`). Without, its shape alone, which is enough to offer it on the set-up screen.
+ * @example
+ * ```ts
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ * import { decodeParty, encodeParty, startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const words = await loadTileWordsFromModule("english");
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(decodeParty(encodeParty(game),words.familyKey)?.players.length);
+ * ```
  */
 export function decodeParty(code: string | null, familyKey?: (tile: string) => string | null): PartyGame | null {
   if (code === null) return null;
@@ -127,7 +166,23 @@ export function decodeParty(code: string | null, familyKey?: (tile: string) => s
   return game;
 }
 
-/** Whether what everybody holds is exactly what was taken from the bag, less what was given back. */
+/** Whether what everybody holds is exactly what was taken from the bag, less what was given back.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @param familyKey - The function identifying physical tile families, or null for invalid codes.
+ * @returns Whether what everybody holds is exactly what was taken from the bag, less what was given back.
+ * @example
+ * ```ts
+ * import { loadTileWordsFromModule } from "@johnmorrisdotca/kumimoji/words";
+ * import { holdsItsBag, startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const words = await loadTileWordsFromModule("english");
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(holdsItsBag(game,words.familyKey));
+ * ```
+ */
 export function holdsItsBag(game: PartyGame, familyKey: (tile: string) => string | null): boolean {
   const taken = [...(game.bag + game.returned).slice(0, game.taken)].map(familyKey);
   const back = [...game.returned].map(familyKey);
@@ -139,7 +194,22 @@ export function holdsItsBag(game: PartyGame, familyKey: (tile: string) => string
   return sameLetters(tally, lettersOf(held as string[]));
 }
 
-/** Whether a kept game is the one an address asks for: the same settings, and dealt to as many players, whoever has joined or left since. */
+/** Whether a kept game is the one an address asks for: the same settings, and dealt to as many players, whoever has joined or left since.
+ *
+ * @param game - The current immutable shared-bag party game.
+ * @param settings - The native party setup settings.
+ * @param players - The requested player count or current player rows.
+ * @returns Whether a kept game is the one an address asks for: the same settings, and dealt to as many players, whoever has joined or left since.
+ * @example
+ * ```ts
+ * import { isPartyFor, startParty } from "@johnmorrisdotca/kumimoji";
+ *
+ * const settings = {size:3,level:"hard",seed:44,gameLength:"short",language:"english",doubleSet:false,diagonals:false,hints:false} as const;
+ * const bag = "catdogsun";
+ * const game = startParty(settings,bag,["Seat 1","Seat 2"]);
+ * console.log(isPartyFor(game,settings,2));
+ * ```
+ */
 export function isPartyFor(game: PartyGame, settings: PartySettings, players: number): boolean {
   const a = game.settings;
   return (
