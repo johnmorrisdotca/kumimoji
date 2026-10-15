@@ -2,7 +2,7 @@
 title: Kana, tile faces and wilds
 section: how-to
 order: 4
-description: Learn kana, tile faces and wilds.
+description: Tell displayed kana from internal tile codes, and assign readings to wild tiles.
 ---
 
 ## Visible readings differ from internal codes

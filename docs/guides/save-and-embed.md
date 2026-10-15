@@ -2,7 +2,7 @@
 title: Save progress and embed a table
 section: how-to
 order: 6
-description: Learn save progress and embed a table.
+description: Save and restore progress against the same bag, and mount an asynchronous table.
 ---
 
 ## Restore against the same bag

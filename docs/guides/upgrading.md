@@ -2,12 +2,12 @@
 title: Upgrading and other word games
 section: upgrading
 order: 10
-description: Learn upgrading and other word games.
+description: Keep 1.x records working and move from score-based tile games.
 ---
 
 ## Preserve the 1.x records
 
-The current solo JSON export is format 1; changes added options and native table access without changing existing seeded deals. Keep language, hand, level, length, double set, diagonals and seed with progress. This documentation rollout changes comments, examples and navigation without changing emitted SDK behavior or dictionaries.
+The current solo JSON export is format 1; changes added options and native table access without changing existing seeded deals. Keep language, hand, level, length, double set, diagonals and seed with progress.
 
 ## Moving from score-based tile boards
 

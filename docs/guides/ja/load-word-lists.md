@@ -2,7 +2,7 @@
 title: 語彙の読み込みと判定
 section: how-to
 order: 2
-description: 語彙の読み込みと判定の使い方と注意点。
+description: ブラウザーとサーバーで語彙を読み込み、配置を判定し、出典の通知を保ちます。
 ---
 
 ## ブラウザーとサーバーを分ける
@@ -23,4 +23,4 @@ TileWordsは単語、長さ別のコード、物理的な枚数、表示と読�
 
 ## 出典の表示を保つ
 
-英語と日本語のデータにはMITのコードとは別の通知があります。[NOTICE.md](../../../NOTICE.md)と[既存の表](../../../README.md#the-word-lists-and-their-licences)を保ちます。この更新は一覧、件数、条件を変えません。生成された辞書は手で編集しません。
+英語と日本語のデータにはMITのコードとは別の通知があります。[NOTICE.md](../../../NOTICE.md)と[既存の表](../../../README.md#the-word-lists-and-their-licences)を保ちます。生成された辞書は手で編集しません。

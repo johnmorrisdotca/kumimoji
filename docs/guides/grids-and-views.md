@@ -2,7 +2,7 @@
 title: Grids, runs and views
 section: explanation
 order: 7
-description: Learn grids, runs and views.
+description: Read connected word layouts, rotate and zoom the view, and keep saved forms intact.
 ---
 
 ## Read a connected crossword

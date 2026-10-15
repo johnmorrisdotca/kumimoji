@@ -2,7 +2,7 @@
 title: 1つの袋で複数人が遊ぶ
 section: how-to
 order: 5
-description: 1つの袋で複数人が遊ぶの使い方と注意点。
+description: 2〜8人が1つの袋から引き、ひとり用の操作を席に適用し、コンピューターの手番を扱います。
 ---
 
 ## 袋を共有し盤面を分ける
@@ -18,7 +18,7 @@ console.log(game.players.length,seatPlay(game).hand,partyTilesLeft(game));
 
 ## ひとり用の操作を席へ適用する
 
-seatPlayで今の人のTilePlayを読み、操作後にwithSeatPlayで卓へ戻します。endTurnには盤面の判定と手札で単語を作れるかの関数が必要です。拒否の理由、パス、辞退、最後の手番、勝者も本来の関数を使います。
+seatPlayで今の人のTilePlayを読み、操作後にwithSeatPlayで卓へ戻します。endTurnには盤面の判定と手札で単語を作れるかの関数が必要です。拒否の理由、パス、辞退、最後の手番、勝者もパッケージの関数を使います。
 
 ## コンピューターの手番を扱う
 

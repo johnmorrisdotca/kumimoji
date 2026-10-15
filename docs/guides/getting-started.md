@@ -2,7 +2,7 @@
 title: Getting started
 section: tutorial
 order: 1
-description: Learn getting started.
+description: Install Kumimoji, read a word list before dealing, and deal a seeded hand.
 ---
 
 Build a crossword from a seeded English or Japanese tile bag. The pure rules need no DOM or clock; the optional table entry handles presentation and elapsed time.

@@ -2,7 +2,7 @@
 title: Use one bag at a shared table
 section: how-to
 order: 5
-description: Learn use one bag at a shared table.
+description: Let two to eight players draw from one bag, apply solo moves to a seat, and handle computer turns.
 ---
 
 ## Share the bag, keep separate boards

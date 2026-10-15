@@ -3,27 +3,27 @@
   "entries": {
     ".": {
       "minified": 1369820,
-      "gzip": 689460
+      "gzip": 679054
     },
     "./words": {
       "minified": 1329664,
-      "gzip": 674577
+      "gzip": 664180
     },
     "./ui": {
       "minified": 1362012,
-      "gzip": 686622
+      "gzip": 676171
     },
     "./react": {
       "minified": 1400673,
-      "gzip": 700866
+      "gzip": 690253
     },
     "./element": {
       "minified": 1370269,
-      "gzip": 689343
+      "gzip": 678931
     },
     "./element/define": {
       "minified": 1370274,
-      "gzip": 689347
+      "gzip": 678934
     }
   }
 }

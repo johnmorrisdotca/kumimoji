@@ -2,7 +2,7 @@
 title: Seeded generation and proof
 section: explanation
 order: 8
-description: Learn seeded generation and proof.
+description: Deal from a generated solution, keep every setting to reproduce it, and handle generation failures.
 ---
 
 ## Build a solution before dealing

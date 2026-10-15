@@ -2,7 +2,7 @@
 title: Build and judge solo progress
 section: how-to
 order: 3
-description: Learn build and judge solo progress.
+description: Hold solo progress as a new value, place and move tiles, and check before drawing or finishing.
 ---
 
 ## Keep immutable progress

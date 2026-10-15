@@ -2,7 +2,7 @@
 title: シード付き生成と証明
 section: explanation
 order: 8
-description: シード付き生成と証明の使い方と注意点。
+description: 生成した解答から配り、再現に必要な設定をすべて残し、生成の失敗を扱います。
 ---
 
 ## 配る前に解答を作る

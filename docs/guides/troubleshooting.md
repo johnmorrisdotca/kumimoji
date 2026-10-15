@@ -2,7 +2,7 @@
 title: Troubleshooting and FAQ
 section: troubleshooting
 order: 9
-description: Learn troubleshooting and faq.
+description: Find out why words are not loaded, a grid or table move is refused, or progress will not restore.
 ---
 
 ## Words have not loaded

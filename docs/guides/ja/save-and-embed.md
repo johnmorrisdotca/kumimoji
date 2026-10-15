@@ -2,7 +2,7 @@
 title: 保存と卓の埋め込み
 section: how-to
 order: 6
-description: 保存と卓の埋め込みの使い方と注意点。
+description: 同じ袋に対して進行を保存・復元し、非同期の卓を配置します。
 ---
 
 ## 同じ袋に対して復元する

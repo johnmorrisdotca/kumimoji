@@ -2,7 +2,7 @@
 title: はじめに
 section: tutorial
 order: 1
-description: はじめにの使い方と注意点。
+description: Kumimojiを入れ、配る前に語彙を読み、シードで手札を配ります。
 ---
 
 シードから配った英字やかなのタイルで単語を組み合わせます。基本ルールにDOMや時計は不要で、卓用の機能が表示や経過時間を扱います。

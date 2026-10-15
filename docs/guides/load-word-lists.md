@@ -2,7 +2,7 @@
 title: Load and judge with word lists
 section: how-to
 order: 2
-description: Learn load and judge with word lists.
+description: Load word lists in the browser or on the server, judge a layout with them, and keep their notices.
 ---
 
 ## Separate browser and server loading
@@ -23,4 +23,4 @@ TileWords has allowed words, encoded words by length, physical mix, glyph/readin
 
 ## Preserve the data notices
 
-The English and Japanese data have their own notices, distinct from MIT code. [NOTICE.md](../../NOTICE.md) and [the existing licence table](../../README.md#the-word-lists-and-their-licences) preserve the terms and attribution. This rollout does not change lists, their counts or licence terms. Generated dictionaries are changed through their source workflow, not edited by hand.
+The English and Japanese data have their own notices, distinct from MIT code. [NOTICE.md](../../NOTICE.md) and [the existing licence table](../../README.md#the-word-lists-and-their-licences) preserve the terms and attribution. Generated dictionaries are changed through their source workflow, not edited by hand.
