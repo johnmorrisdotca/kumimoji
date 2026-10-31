@@ -1,29 +1,12 @@
-import { type KumimojiSaved, kumimojiClock, kumimojiFromJSON, kumimojiToJSON, kumimojiToText } from "../export.ts";
+import { type KumimojiSaved, kumimojiFromJSON, kumimojiToJSON, kumimojiToText } from "../export.ts";
 import { generateKumimoji } from "../generate.ts";
 import { judgeWithWords } from "../judge.ts";
 import type { KumimojiDeal, KumimojiLanguage, KumimojiLength, KumimojiLevel } from "../kumimoji.types.ts";
-import {
-  assignHandTile,
-  deal,
-  draw,
-  isFinished,
-  liftAll,
-  liftToHand,
-  mayDraw,
-  mayTrade,
-  moveOnTable,
-  placeFromHand,
-  sortHand,
-  swapWithHand,
-  type TilePlay,
-  tilesLeft,
-  trade,
-} from "../play.ts";
-import { type KumimojiLocale, type KumimojiStrings, kumimojiSay, kumimojiStrings } from "../strings.ts";
-import { tileFace } from "../tileFace.ts";
+import { deal, isFinished, liftToHand, moveOnTable, placeFromHand, swapWithHand, type TilePlay } from "../play.ts";
+import { type KumimojiLocale, type KumimojiStrings, kumimojiStrings } from "../strings.ts";
 import { KUMIMOJI_HANDS } from "../tiles.constants.ts";
-import { loadTileWords, type TileWords } from "../tileWords.ts";
-import { boardModel } from "./board.ts";
+import { loadTileWords } from "../tileWords.ts";
+import { button, type Held, node, type TableSession, tableDrawing } from "./draw.ts";
 import { KUMIMOJI_STYLE } from "./style.ts";
 
 /**
@@ -100,31 +83,6 @@ export type KumimojiTableHandle = {
   destroy: () => void;
 };
 
-/** What a wild nobody has given a letter yet shows in the hand. */
-const WILD_MARK = "★";
-
-/** What is picked up: a tile in the hand, or one on the table. */
-type Held = { from: "hand"; at: number } | { from: "table"; square: string } | null;
-
-function node<K extends keyof HTMLElementTagNameMap>(
-  name: K,
-  className?: string,
-  text?: string,
-): HTMLElementTagNameMap[K] {
-  const made = document.createElement(name);
-  if (className !== undefined) made.className = className;
-  if (text !== undefined) made.textContent = text;
-  return made;
-}
-
-function button(text: string, onClick: () => void, primary = false, testId?: string): HTMLButtonElement {
-  const made = node("button", primary ? "km-button km-primary" : "km-button", text);
-  made.type = "button";
-  if (testId !== undefined) made.dataset.testid = testId;
-  made.addEventListener("click", onClick);
-  return made;
-}
-
 /** Hand a string to the person as a file of that name. */
 function save(name: string, type: string, text: string): void {
   const url = URL.createObjectURL(new Blob([text], { type }));
@@ -171,22 +129,32 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
   };
   const pageLocale = (): KumimojiLocale =>
     typeof document !== "undefined" && document.documentElement.lang.toLowerCase().startsWith("ja") ? "ja" : "en";
-  let locale: KumimojiLocale = current.locale ?? pageLocale();
   let own = current.strings ?? {};
-  let say = kumimojiStrings(locale, own);
-  let note = "";
-  let words: TileWords | null = null;
-  let dealt: KumimojiDeal | null = null;
-  let play: TilePlay | null = null;
-  let held: Held = null;
+  const openingLocale = current.locale ?? pageLocale();
   // Where a keyboard is: the square and the hand tile that Tab lands on, and the one the arrow keys move from.
-  let onSquare: string | null = null;
-  let onHand = 0;
-  let started = 0;
-  let finishedAt: number | null = null;
-  let destroyed = false;
+  const session: TableSession = {
+    play: null,
+    finishedAt: null,
+    started: 0,
+    words: null,
+    held: null,
+    onSquare: null,
+    onHand: 0,
+    say: kumimojiStrings(openingLocale, own),
+    locale: openingLocale,
+    note: "",
+    destroyed: false,
+  };
+  let dealt: KumimojiDeal | null = null;
   // Each deal and each game put on the table takes a number; one that is overtaken while its list loads gives way.
   let asked = 0;
+  // The drawing is built once the elements exist. Until then nothing calls these.
+  const bridge: { render: () => void; renderStatus: () => void; newGame: () => void } = {
+    render: () => {},
+    renderStatus: () => {},
+    newGame: () => {},
+  };
+  const render = (): void => bridge.render();
 
   const root = node("div", "km-root");
   root.dataset.testid = "km-root";
@@ -216,8 +184,11 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
   if (current.keep !== false) root.append(keep);
   target.append(root);
 
-  const savedNow = (): KumimojiSaved | null =>
-    play === null || dealt === null ? null : { deal: dealt, play, elapsedMs: (finishedAt ?? Date.now()) - started };
+  const savedNow = (): KumimojiSaved | null => {
+    const now = session.play;
+    if (now === null || dealt === null) return null;
+    return { deal: dealt, play: now, elapsedMs: (session.finishedAt ?? Date.now()) - session.started };
+  };
 
   // The saving and loading are made once, so the fold stays open or shut as the person left it; only their words change.
   const keepTitle = node("summary", "km-keep-title");
@@ -231,14 +202,14 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
   file.dataset.testid = "km-file";
   const read = async (text: string) => {
     const loaded = await kumimojiFromJSON(text).catch(() => null);
-    if (destroyed) return;
+    if (session.destroyed) return;
     if (loaded === null) {
-      note = say.loadBad;
+      session.note = session.say.loadBad;
       render();
       return;
     }
     await handle.setGame(loaded);
-    note = say.loaded;
+    session.note = session.say.loaded;
     render();
   };
   file.addEventListener("change", () => {
@@ -260,7 +231,7 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
     "",
     () => {
       const now = savedNow();
-      if (now !== null) save(`kumimoji-${now.deal.seed}.txt`, "text/plain", kumimojiToText(now, say));
+      if (now !== null) save(`kumimoji-${now.deal.seed}.txt`, "text/plain", kumimojiToText(now, session.say));
     },
     false,
     "km-save-text",
@@ -270,51 +241,51 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
   keepButtons.append(saveJson, saveText, load);
   keep.append(keepTitle, keepButtons, keepNote, file);
 
-  const tick = setInterval(() => {
-    if (play !== null && finishedAt === null) renderStatus();
-  }, 1000);
-
-  const verdictOf = (now: TilePlay) => judgeWithWords(now.tiles, words!, { diagonals: settings.diagonals === true });
+  const verdictOf = (now: TilePlay) =>
+    judgeWithWords(now.tiles, session.words!, { diagonals: settings.diagonals === true });
 
   const change = (next: TilePlay) => {
-    play = next;
+    session.play = next;
     const verdict = verdictOf(next);
-    if (finishedAt === null && isFinished(next, verdict)) {
-      finishedAt = Date.now();
-      current.onFinish?.({ deal: dealt!, play: next, elapsedMs: finishedAt - started });
+    if (session.finishedAt === null && isFinished(next, verdict)) {
+      session.finishedAt = Date.now();
+      current.onFinish?.({ deal: dealt!, play: next, elapsedMs: session.finishedAt - session.started });
     }
-    note = "";
+    session.note = "";
     const now = savedNow();
     if (now !== null) current.onChange?.(now);
     render();
   };
 
   const tapSquare = (square: string) => {
-    if (play === null || finishedAt !== null) return;
-    const there = play.tiles.get(square);
+    const now = session.play;
+    if (now === null || session.finishedAt !== null) return;
+    const there = now.tiles.get(square);
+    const held: Held = session.held;
     if (held === null) {
-      if (there !== undefined) held = { from: "table", square };
+      if (there !== undefined) session.held = { from: "table", square };
       render();
       return;
     }
     if (held.from === "hand") {
       const at = held.at;
-      const tile = play.hand[at];
+      const tile = now.hand[at];
       if (tile === undefined) return;
       // A wild is given a letter before it is laid.
       if (tile === "*") return;
-      held = null;
-      change(there === undefined ? placeFromHand(play, at, square) : swapWithHand(play, at, square));
+      session.held = null;
+      change(there === undefined ? placeFromHand(now, at, square) : swapWithHand(now, at, square));
       return;
     }
     const from = held.square;
-    held = null;
-    change(from === square ? liftToHand(play, square) : moveOnTable(play, from, square));
+    session.held = null;
+    change(from === square ? liftToHand(now, square) : moveOnTable(now, from, square));
   };
 
   const tapHand = (at: number) => {
-    if (play === null || finishedAt !== null) return;
-    held = held?.from === "hand" && held.at === at ? null : { from: "hand", at };
+    if (session.play === null || session.finishedAt !== null) return;
+    const held = session.held;
+    session.held = held?.from === "hand" && held.at === at ? null : { from: "hand", at };
     render();
   };
 
@@ -360,16 +331,16 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
     if (step === 0 || next === undefined) return;
     cell.tabIndex = -1;
     next.tabIndex = 0;
-    onSquare = next.dataset.square ?? null;
+    session.onSquare = next.dataset.square ?? null;
     next.focus();
   });
   board.addEventListener("focusin", (event) => {
     const square = (event.target as Element).closest("[data-square]")?.getAttribute("data-square");
-    if (square !== null && square !== undefined) onSquare = square;
+    if (square !== null && square !== undefined) session.onSquare = square;
   });
   hand.addEventListener("focusin", (event) => {
     const at = (event.target as Element).closest("[data-hand]")?.getAttribute("data-hand");
-    if (at !== null && at !== undefined) onHand = Number(at);
+    if (at !== null && at !== undefined) session.onHand = Number(at);
   });
   hand.addEventListener("keydown", (event) => {
     const tile = (event.target as Element).closest<HTMLElement>("[data-hand]");
@@ -392,221 +363,26 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
     if (next === undefined) return;
     tile.tabIndex = -1;
     next.tabIndex = 0;
-    onHand = to;
+    session.onHand = to;
     next.focus();
   });
   root.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape" || held === null) return;
-    held = null;
+    if (event.key !== "Escape" || session.held === null) return;
+    session.held = null;
     render();
   });
 
-  function renderStatus() {
-    root.dataset.state = play === null ? "dealing" : finishedAt !== null ? "finished" : "playing";
-    if (play === null) {
-      status.textContent = say.dealing;
-      return;
-    }
-    const left = tilesLeft(play);
-    root.dataset.left = String(left);
-    const time = kumimojiClock((finishedAt ?? Date.now()) - started);
-    status.textContent =
-      finishedAt !== null
-        ? kumimojiSay(say.finished, { time })
-        : kumimojiSay(left === 1 ? say.leftOne : say.left, { n: left, time });
-  }
+  const drawing = tableDrawing(
+    session,
+    { root, status, board, notes, hand, picker, controls, keepTitle, saveJson, saveText, load, keepNote },
+    { verdictOf, change, newGame: () => bridge.newGame() },
+  );
+  bridge.render = () => drawing.render();
+  bridge.renderStatus = () => drawing.renderStatus();
 
-  function renderBoard(verdict: ReturnType<typeof verdictOf>) {
-    const model = boardModel(play!.tiles, play!.tiles.size === 0 ? null : verdict, words!.glyphOf);
-    const grid = node("div", "km-grid");
-    grid.style.gridTemplateColumns = `repeat(${model.cols}, var(--km-square))`;
-    grid.setAttribute("role", "group");
-    grid.setAttribute("aria-label", say.tableLabel);
-    grid.setAttribute("aria-description", say.tableKeys);
-    grid.dataset.cols = String(model.cols);
-    const cells: HTMLButtonElement[] = [];
-    for (const square of model.squares) {
-      const cell = node("button", "km-square");
-      cell.type = "button";
-      cell.dataset.square = square.square;
-      if (square.tile !== null) {
-        cell.classList.add("km-tile");
-        if (square.wild) cell.classList.add("km-wild");
-        if (square.mark !== null) cell.classList.add(`km-${square.mark}`);
-        cell.textContent = square.glyph;
-        cell.dataset.tile = square.glyph;
-        cell.setAttribute("aria-label", square.wild ? kumimojiSay(say.wildTile, { tile: square.glyph }) : square.glyph);
-      } else {
-        cell.setAttribute("aria-label", say.emptySquare);
-      }
-      if (held?.from === "table" && held.square === square.square) cell.classList.add("km-held");
-      cell.tabIndex = -1;
-      cells.push(cell);
-      grid.append(cell);
-    }
-    // The one Tab lands on: where the keyboard was, else a tile, else the middle.
-    const stop =
-      cells.find((cell) => cell.dataset.square === onSquare) ??
-      cells.find((cell) => cell.classList.contains("km-tile")) ??
-      cells[Math.floor(cells.length / 2)];
-    if (stop !== undefined) {
-      stop.tabIndex = 0;
-      onSquare = stop.dataset.square ?? null;
-    }
-    board.replaceChildren(grid);
-    notes.textContent =
-      verdict.notWords.length > 0
-        ? kumimojiSay(say.notWords, { words: verdict.notWords.join(", ") })
-        : verdict.apart.size > 0
-          ? say.apart
-          : "";
-  }
-
-  function renderHand() {
-    hand.replaceChildren();
-    hand.setAttribute("aria-label", say.handLabel);
-    play!.hand.forEach((tile, at) => {
-      const face = tileFace(tile);
-      const made = node("button", "km-tile km-in-hand");
-      made.type = "button";
-      made.dataset.hand = String(at);
-      made.textContent = face.blank ? WILD_MARK : words!.glyphOf(tile);
-      if (face.wild) made.classList.add("km-wild");
-      if (held?.from === "hand" && held.at === at) made.classList.add("km-held");
-      made.dataset.tile = face.blank ? "*" : words!.glyphOf(tile);
-      made.setAttribute(
-        "aria-label",
-        face.blank
-          ? say.wildBlank
-          : face.wild
-            ? kumimojiSay(say.wildTile, { tile: words!.glyphOf(tile) })
-            : words!.glyphOf(tile),
-      );
-      made.tabIndex = at === Math.min(onHand, play!.hand.length - 1) ? 0 : -1;
-      hand.append(made);
-    });
-    if (play!.hand.length === 0 && finishedAt === null) hand.append(node("span", "km-empty", say.noTiles));
-  }
-
-  function renderPicker() {
-    picker.replaceChildren();
-    if (held?.from !== "hand" || play === null) return;
-    const at = held.at;
-    const tile = play.hand[at];
-    if (tile === undefined || !tileFace(tile).wild) return;
-    picker.append(node("span", "km-picker-title", tile === "*" ? say.giveWild : say.changeWild));
-    for (const sound of words!.wildOptions) {
-      const code = words!.wildFor(sound);
-      if (code === null) continue;
-      picker.append(
-        button(sound, () => {
-          held = { from: "hand", at };
-          change(assignHandTile(play!, at, code));
-        }),
-      );
-    }
-  }
-
-  function renderControls(verdict: ReturnType<typeof verdictOf>) {
-    controls.replaceChildren();
-    if (finishedAt !== null) {
-      controls.append(button(say.newGame, () => void handle.newGame(), true, "km-new"));
-      return;
-    }
-    const now = play!;
-    const drawButton = button(
-      say.draw,
-      () => {
-        held = null;
-        change(draw(now));
-      },
-      true,
-      "km-draw",
-    );
-    drawButton.disabled = !mayDraw(now, verdict);
-    const tradeButton = button(
-      say.trade,
-      () => {
-        if (held?.from !== "hand") return;
-        const at = held.at;
-        held = null;
-        change(trade(now, at));
-      },
-      false,
-      "km-trade",
-    );
-    tradeButton.disabled = held?.from !== "hand" || !mayTrade(now);
-    controls.append(
-      drawButton,
-      tradeButton,
-      button(say.sort, () => change(sortHand(now)), false, "km-sort"),
-      button(
-        say.liftAll,
-        () => {
-          held = null;
-          change(liftAll(now));
-        },
-        false,
-        "km-lift",
-      ),
-      button(say.newGame, () => void handle.newGame(), false, "km-new"),
-    );
-  }
-
-  function renderKeep() {
-    keepTitle.textContent = say.keep;
-    saveJson.textContent = say.saveJson;
-    saveText.textContent = say.saveText;
-    load.textContent = say.load;
-    saveJson.disabled = play === null;
-    saveText.disabled = play === null;
-    keepNote.textContent = note;
-  }
-
-  /** Where the keyboard is, so that it can be put back after everything is drawn again: the zone, and which of it. */
-  function keyboardAt(): { zone: "board" | "hand" | "controls" | "picker"; id: string } | null {
-    const on = document.activeElement;
-    if (on === null || !root.contains(on)) return null;
-    const mark = (zone: "board" | "hand" | "controls" | "picker", id: string | undefined) =>
-      id === undefined ? null : { zone, id };
-    if (board.contains(on)) return mark("board", (on as HTMLElement).dataset.square);
-    if (hand.contains(on)) return mark("hand", (on as HTMLElement).dataset.hand);
-    if (controls.contains(on)) return mark("controls", (on as HTMLElement).dataset.testid);
-    if (picker.contains(on))
-      return mark("picker", String([...picker.querySelectorAll("button")].indexOf(on as HTMLButtonElement)));
-    return null;
-  }
-
-  function keyboardBack(at: ReturnType<typeof keyboardAt>) {
-    if (at === null) return;
-    const zone = { board, hand, controls, picker }[at.zone];
-    const found =
-      at.zone === "board"
-        ? zone.querySelector<HTMLElement>(`[data-square="${at.id}"]`)
-        : at.zone === "hand"
-          ? zone.querySelector<HTMLElement>(`[data-hand="${at.id}"]`)
-          : at.zone === "controls"
-            ? zone.querySelector<HTMLElement>(`[data-testid="${at.id}"]`)
-            : zone.querySelectorAll<HTMLElement>("button")[Number(at.id)];
-    // A button that has become disabled cannot hold the focus; the table keeps it rather than dropping it on the page.
-    if (found !== undefined && found !== null && !(found as HTMLButtonElement).disabled)
-      found.focus({ preventScroll: true });
-  }
-
-  function render() {
-    if (destroyed) return;
-    const where = keyboardAt();
-    root.lang = locale;
-    renderStatus();
-    renderKeep();
-    if (play === null || words === null) return;
-    const verdict = verdictOf(play);
-    renderBoard(verdict);
-    renderPicker();
-    renderHand();
-    renderControls(verdict);
-    keyboardBack(where);
-  }
+  const tick = setInterval(() => {
+    if (session.play !== null && session.finishedAt === null) bridge.renderStatus();
+  }, 1000);
 
   let initialReady: Promise<void> = Promise.resolve();
   const handle: KumimojiTableHandle = {
@@ -619,15 +395,15 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
       if (changes.theme !== undefined)
         for (const [name, value] of Object.entries(changes.theme)) root.style.setProperty(name, value);
       current = { ...current, ...changes };
-      if (changes.locale !== undefined) locale = changes.locale;
+      if (changes.locale !== undefined) session.locale = changes.locale;
       if (changes.strings !== undefined) own = changes.strings;
-      say = kumimojiStrings(locale, own);
+      session.say = kumimojiStrings(session.locale, own);
       if (current.keep === false) keep.remove();
       else if (keep.parentNode !== root) root.append(keep);
       controls.hidden = current.controls === false;
       render();
     },
-    play: () => play,
+    play: () => session.play,
     saved: savedNow,
     setGame: async (saved) => {
       const mine = ++asked;
@@ -641,26 +417,26 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
         seed: undefined,
       };
       const list = await loadTileWords(language);
-      if (destroyed || mine !== asked) return;
-      words = list;
+      if (session.destroyed || mine !== asked) return;
+      session.words = list;
       root.classList.toggle("km-japanese", language === "japanese");
       dealt = saved.deal;
       root.dataset.seed = String(saved.deal.seed);
-      held = null;
-      finishedAt = null;
-      started = Date.now() - saved.elapsedMs;
+      session.held = null;
+      session.finishedAt = null;
+      session.started = Date.now() - saved.elapsedMs;
       // A game loaded already finished stays finished, at the time it took, and is not announced again.
-      if (isFinished(saved.play, judgeWithWords(saved.play.tiles, words, { diagonals: settings.diagonals === true })))
-        finishedAt = Date.now();
-      play = saved.play;
-      note = "";
+      if (isFinished(saved.play, judgeWithWords(saved.play.tiles, list, { diagonals: settings.diagonals === true })))
+        session.finishedAt = Date.now();
+      session.play = saved.play;
+      session.note = "";
       current.onChange?.(saved);
       render();
     },
     setLocale: (next, strings) => {
-      locale = next;
+      session.locale = next;
       if (strings !== undefined) own = strings;
-      say = kumimojiStrings(locale, own);
+      session.say = kumimojiStrings(session.locale, own);
       render();
     },
     newGame: async (changed = {}) => {
@@ -668,14 +444,14 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
       settings = { ...settings, ...changed, seed: undefined };
       const language = settings.language ?? "english";
       const size = settings.hand ?? KUMIMOJI_HANDS.quick;
-      play = null;
-      held = null;
-      finishedAt = null;
-      note = "";
+      session.play = null;
+      session.held = null;
+      session.finishedAt = null;
+      session.note = "";
       render();
       const list = await loadTileWords(language);
-      if (destroyed || mine !== asked) return;
-      words = list;
+      if (session.destroyed || mine !== asked) return;
+      session.words = list;
       // A seed deals one game: the next is dealt from a new one unless asked for by seed again.
       const seed = changed.seed ?? Math.floor(Math.random() * 2 ** 31);
       root.classList.toggle("km-japanese", language === "japanese");
@@ -685,21 +461,24 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
         gameLength: settings.gameLength,
         diagonals: settings.diagonals,
       });
-      started = Date.now();
+      session.started = Date.now();
       change(deal(dealt.givens, size));
     },
     destroy: () => {
-      destroyed = true;
+      session.destroyed = true;
       clearInterval(tick);
       root.remove();
     },
   };
+  bridge.newGame = () => {
+    void handle.newGame();
+  };
 
   initialReady = current.saved === undefined ? handle.newGame(settings) : handle.setGame(current.saved);
   void initialReady.catch((error: unknown) => {
-    if (destroyed) return;
+    if (session.destroyed) return;
     const problem = error instanceof Error ? error : new Error(String(error));
-    status.textContent = say.loadError;
+    status.textContent = session.say.loadError;
     current.onError?.(problem);
   });
   return handle;
