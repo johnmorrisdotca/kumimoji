@@ -1,4 +1,4 @@
-import { runsOf, type GridRules, type Run, type Tiles } from "./grid.ts";
+import { type GridRules, type Run, runsOf, type Tiles } from "./grid.ts";
 import type { TileWords } from "./tileWords.ts";
 
 /**

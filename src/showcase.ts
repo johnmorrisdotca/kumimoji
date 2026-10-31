@@ -1,13 +1,13 @@
 import { BASE_KANA, CORNER_FORMS, tileKana } from "./kana.ts";
+import type { KumimojiLanguage, KumimojiLength } from "./kumimoji.types.ts";
 import { kanaTileCode } from "./tileFace.ts";
 import {
   JAPANESE_TILE_MIX,
   KUMIMOJI_HANDS,
-  TILE_MIX,
   kumimojiTileCount,
   kumimojiWildCount,
+  TILE_MIX,
 } from "./tiles.constants.ts";
-import type { KumimojiLanguage, KumimojiLength } from "./kumimoji.types.ts";
 
 /**
  * WHAT THE KUMIMOJI PAGES SHOW OF THE GAME, worked out from the tables the

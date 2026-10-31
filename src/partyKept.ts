@@ -1,6 +1,6 @@
 import { decodeGrid, encodeGrid, lettersOf, sameLetters } from "./grid.ts";
 import type { PartyEnding, PartyGame, PartySettings } from "./party.types.ts";
-import { KUMIMOJI_PARTY, KUMIMOJI_HANDS } from "./tiles.constants.ts";
+import { KUMIMOJI_HANDS, KUMIMOJI_PARTY } from "./tiles.constants.ts";
 
 /**
  * A PASS-AND-PLAY GAME KEPT IN THE BROWSER, as one string of JSON: the

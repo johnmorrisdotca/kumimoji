@@ -16,33 +16,34 @@
  * a test through `@johnmorrisdotca/kumimoji/words`, which reads them from
  * disk.
  */
-export * from "./kumimoji.types.ts";
-export * from "./tiles.constants.ts";
-export * from "./kana.ts";
-export * from "./tileFace.ts";
-export * from "./tileFamily.ts";
-export * from "./tileWords.ts";
-export * from "./grid.ts";
-export * from "./placement.ts";
-export * from "./wilds.ts";
-export * from "./judge.ts";
+
 export * from "./check.ts";
-export * from "./generate.ts";
-export * from "./play.ts";
-export * from "./help.ts";
-export * from "./turn.ts";
-export * from "./tableView.ts";
-export * from "./showcase.ts";
-export * from "./party.types.ts";
-export * from "./party.ts";
-export * from "./partyTurns.ts";
-export * from "./partySeats.ts";
-export * from "./partyKept.ts";
 export * from "./computer.types.ts";
 export * from "./computerPlay.ts";
 export * from "./computerTurn.ts";
-export * from "./random.ts";
 export * from "./daily.ts";
 export * from "./export.ts";
+export * from "./generate.ts";
+export * from "./grid.ts";
+export * from "./help.ts";
+export * from "./judge.ts";
+export * from "./kana.ts";
+export * from "./kumimoji.types.ts";
+export * from "./party.ts";
+export * from "./party.types.ts";
+export * from "./partyKept.ts";
+export * from "./partySeats.ts";
+export * from "./partyTurns.ts";
+export * from "./placement.ts";
+export * from "./play.ts";
+export * from "./random.ts";
+export * from "./showcase.ts";
 export * from "./strings.ts";
+export * from "./tableView.ts";
+export * from "./tileFace.ts";
+export * from "./tileFamily.ts";
+export * from "./tiles.constants.ts";
+export * from "./tileWords.ts";
+export * from "./turn.ts";
 export { KUMIMOJI_VERSION } from "./version.ts";
+export * from "./wilds.ts";

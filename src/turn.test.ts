@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
-
-import type { Turn } from "./kumimoji.types.ts";
 import { squareAt } from "./grid.ts";
+import type { Turn } from "./kumimoji.types.ts";
 import { tableArea } from "./tableView.ts";
 import { arrowStep, nextTurn, turnArea, turnPlace, turnView, typingWay, unturnPlace } from "./turn.ts";
 

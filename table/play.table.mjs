@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 
 import "../dist/words.js";
 import { generateKumimoji, loadTileWords } from "../dist/index.js";
-import { PLAYING, ROOT, lay, open, sound, state, tap } from "./table.mjs";
+import { lay, open, PLAYING, ROOT, sound, state, tap } from "./table.mjs";
 
 test("the table comes up with a hand dealt from the seed", async ({ page }) => {
   const errors = await open(page);

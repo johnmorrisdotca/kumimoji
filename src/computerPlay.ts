@@ -1,4 +1,4 @@
-import { boundsOf, placeOf, squareAt, type GridRules, type GridVerdict, type Tiles } from "./grid.ts";
+import { boundsOf, type GridRules, type GridVerdict, placeOf, squareAt, type Tiles } from "./grid.ts";
 import { judgeWithWords } from "./judge.ts";
 import { crossingFit, type Square } from "./placement.ts";
 import { assignHandTile, placeFromHand, type TilePlay } from "./play.ts";

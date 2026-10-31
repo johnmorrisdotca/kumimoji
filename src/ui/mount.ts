@@ -1,4 +1,4 @@
-import { kumimojiClock, kumimojiFromJSON, kumimojiToJSON, kumimojiToText, type KumimojiSaved } from "../export.ts";
+import { type KumimojiSaved, kumimojiClock, kumimojiFromJSON, kumimojiToJSON, kumimojiToText } from "../export.ts";
 import { generateKumimoji } from "../generate.ts";
 import { judgeWithWords } from "../judge.ts";
 import type { KumimojiDeal, KumimojiLanguage, KumimojiLength, KumimojiLevel } from "../kumimoji.types.ts";
@@ -15,13 +15,13 @@ import {
   placeFromHand,
   sortHand,
   swapWithHand,
+  type TilePlay,
   tilesLeft,
   trade,
-  type TilePlay,
 } from "../play.ts";
-import { kumimojiSay, kumimojiStrings, type KumimojiLocale, type KumimojiStrings } from "../strings.ts";
-import { KUMIMOJI_HANDS } from "../tiles.constants.ts";
+import { type KumimojiLocale, type KumimojiStrings, kumimojiSay, kumimojiStrings } from "../strings.ts";
 import { tileFace } from "../tileFace.ts";
+import { KUMIMOJI_HANDS } from "../tiles.constants.ts";
 import { loadTileWords, type TileWords } from "../tileWords.ts";
 import { boardModel } from "./board.ts";
 import { KUMIMOJI_STYLE } from "./style.ts";
@@ -160,18 +160,19 @@ function save(name: string, type: string, text: string): void {
  * ```
  */
 export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions = {}): KumimojiTableHandle {
+  let current = options;
   let settings: GameOptions = {
-    language: options.language,
-    hand: options.hand,
-    level: options.level,
-    gameLength: options.gameLength,
-    diagonals: options.diagonals,
-    seed: options.seed,
+    language: current.language,
+    hand: current.hand,
+    level: current.level,
+    gameLength: current.gameLength,
+    diagonals: current.diagonals,
+    seed: current.seed,
   };
   const pageLocale = (): KumimojiLocale =>
     typeof document !== "undefined" && document.documentElement.lang.toLowerCase().startsWith("ja") ? "ja" : "en";
-  let locale: KumimojiLocale = options.locale ?? pageLocale();
-  let own = options.strings ?? {};
+  let locale: KumimojiLocale = current.locale ?? pageLocale();
+  let own = current.strings ?? {};
   let say = kumimojiStrings(locale, own);
   let note = "";
   let words: TileWords | null = null;
@@ -190,7 +191,7 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
   const root = node("div", "km-root");
   root.dataset.testid = "km-root";
   root.dataset.state = "dealing";
-  for (const [name, value] of Object.entries(options.theme ?? {})) root.style.setProperty(name, value);
+  for (const [name, value] of Object.entries(current.theme ?? {})) root.style.setProperty(name, value);
   const style = node("style");
   style.textContent = KUMIMOJI_STYLE;
   const status = node("p", "km-status");
@@ -207,12 +208,12 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
   const picker = node("div", "km-picker");
   picker.dataset.testid = "km-picker";
   const controls = node("div", "km-controls");
-  controls.hidden = options.controls === false;
+  controls.hidden = current.controls === false;
   controls.dataset.testid = "km-controls";
   const keep = node("details", "km-keep");
   keep.dataset.testid = "km-keep";
   root.append(style, status, board, notes, picker, hand, controls);
-  if (options.keep !== false) root.append(keep);
+  if (current.keep !== false) root.append(keep);
   target.append(root);
 
   const savedNow = (): KumimojiSaved | null =>
@@ -280,11 +281,11 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
     const verdict = verdictOf(next);
     if (finishedAt === null && isFinished(next, verdict)) {
       finishedAt = Date.now();
-      options.onFinish?.({ deal: dealt!, play: next, elapsedMs: finishedAt - started });
+      current.onFinish?.({ deal: dealt!, play: next, elapsedMs: finishedAt - started });
     }
     note = "";
     const now = savedNow();
-    if (now !== null) options.onChange?.(now);
+    if (now !== null) current.onChange?.(now);
     render();
   };
 
@@ -613,17 +614,17 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
       return initialReady;
     },
     set: (changes) => {
-      for (const name of Object.keys(options.theme ?? {}))
+      for (const name of Object.keys(current.theme ?? {}))
         if (changes.theme !== undefined && !(name in changes.theme)) root.style.removeProperty(name);
       if (changes.theme !== undefined)
         for (const [name, value] of Object.entries(changes.theme)) root.style.setProperty(name, value);
-      options = { ...options, ...changes };
+      current = { ...current, ...changes };
       if (changes.locale !== undefined) locale = changes.locale;
       if (changes.strings !== undefined) own = changes.strings;
       say = kumimojiStrings(locale, own);
-      if (options.keep === false) keep.remove();
+      if (current.keep === false) keep.remove();
       else if (keep.parentNode !== root) root.append(keep);
-      controls.hidden = options.controls === false;
+      controls.hidden = current.controls === false;
       render();
     },
     play: () => play,
@@ -653,7 +654,7 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
         finishedAt = Date.now();
       play = saved.play;
       note = "";
-      options.onChange?.(saved);
+      current.onChange?.(saved);
       render();
     },
     setLocale: (next, strings) => {
@@ -694,12 +695,12 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
     },
   };
 
-  initialReady = options.saved === undefined ? handle.newGame(settings) : handle.setGame(options.saved);
+  initialReady = current.saved === undefined ? handle.newGame(settings) : handle.setGame(current.saved);
   void initialReady.catch((error: unknown) => {
     if (destroyed) return;
     const problem = error instanceof Error ? error : new Error(String(error));
     status.textContent = say.loadError;
-    options.onError?.(problem);
+    current.onError?.(problem);
   });
   return handle;
 }

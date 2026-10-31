@@ -2,14 +2,14 @@ import { describe, expect, it } from "vitest";
 
 import { squareAt } from "./grid.ts";
 import {
-  TABLE,
   edgePan,
-  fitView,
   fittedMost,
+  fitView,
   keepInReach,
   overflows,
   panView,
   squareUnder,
+  TABLE,
   tableArea,
   zoomView,
 } from "./tableView.ts";

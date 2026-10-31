@@ -1,7 +1,7 @@
 import { decodeGrid, lettersOf, sameLetters } from "./grid.ts";
 import { judgeWithWords } from "./judge.ts";
-import { kumimojiTileCount, kumimojiWildCount, KUMIMOJI_SCORE, TILE_MIX_TOTAL } from "./tiles.constants.ts";
 import type { KumimojiCheck, KumimojiLevel, KumimojiOptions } from "./kumimoji.types.ts";
+import { KUMIMOJI_SCORE, kumimojiTileCount, kumimojiWildCount, TILE_MIX_TOTAL } from "./tiles.constants.ts";
 import { tileWords } from "./tileWords.ts";
 
 /**

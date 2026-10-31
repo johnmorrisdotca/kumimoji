@@ -1,4 +1,4 @@
-import { judgeGrid, type GridRules, type GridVerdict, type Tiles } from "./grid.ts";
+import { type GridRules, type GridVerdict, judgeGrid, type Tiles } from "./grid.ts";
 import type { TileWords } from "./tileWords.ts";
 import { readWilds } from "./wilds.ts";
 

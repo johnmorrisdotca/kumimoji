@@ -1,9 +1,9 @@
-import { boundsOf, squareAt, type Tiles } from "./grid.ts";
 import { generateKumimoji } from "./generate.ts";
+import { boundsOf, squareAt, type Tiles } from "./grid.ts";
 import { judgeWithWords } from "./judge.ts";
 import type { KumimojiDeal, KumimojiLanguage, KumimojiLength, KumimojiLevel } from "./kumimoji.types.ts";
-import { decodeTileProgress, encodeTileProgress, isFinished, tilesLeft, type TilePlay } from "./play.ts";
-import { KUMIMOJI_STRINGS, kumimojiSay, type KumimojiStrings } from "./strings.ts";
+import { decodeTileProgress, encodeTileProgress, isFinished, type TilePlay, tilesLeft } from "./play.ts";
+import { KUMIMOJI_STRINGS, type KumimojiStrings, kumimojiSay } from "./strings.ts";
 import { tileFace } from "./tileFace.ts";
 import { KUMIMOJI_BAG } from "./tiles.constants.ts";
 import { loadTileWords, tileWords } from "./tileWords.ts";

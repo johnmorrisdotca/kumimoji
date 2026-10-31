@@ -1,7 +1,7 @@
 import type { GridVerdict, Tiles } from "./grid.ts";
 import type { KumimojiLength } from "./kumimoji.types.ts";
 import type { PartyGame, PartyPlayer, PartySeat, PartySettings } from "./party.types.ts";
-import { mayTrade, tilesLeft, type TilePlay } from "./play.ts";
+import { mayTrade, type TilePlay, tilesLeft } from "./play.ts";
 import { KUMIMOJI_PARTY, kumimojiTileCount } from "./tiles.constants.ts";
 
 /**

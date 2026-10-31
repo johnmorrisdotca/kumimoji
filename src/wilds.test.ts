@@ -20,9 +20,11 @@ beforeAll(async () => {
 /** A grid from rows of text, "." for an empty square, its first row and column at 0. */
 function gridOf(...rows: string[]): Map<string, string> {
   const tiles = new Map<string, string>();
-  rows.forEach((line, row) =>
-    [...line].forEach((letter, col) => letter !== "." && tiles.set(squareAt(row, col), letter)),
-  );
+  rows.forEach((line, row) => {
+    [...line].forEach((letter, col) => {
+      letter !== "." && tiles.set(squareAt(row, col), letter);
+    });
+  });
   return tiles;
 }
 

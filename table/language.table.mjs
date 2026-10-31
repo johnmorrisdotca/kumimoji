@@ -2,7 +2,7 @@
 // header, the address, and what a device remembers.
 import { expect, test } from "@playwright/test";
 
-import { PLAYING, SMALL, open, sound, state, tap } from "./table.mjs";
+import { open, PLAYING, SMALL, sound, state, tap } from "./table.mjs";
 
 test("the chooser turns the page and the table's words to Japanese, and the tiles stay as they were", async ({
   page,

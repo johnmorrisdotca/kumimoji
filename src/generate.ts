@@ -1,9 +1,9 @@
-import { seededRandom, shuffled, type Random } from "./random.ts";
 import { encodeGrid, squareAt } from "./grid.ts";
-import { crossingFit } from "./placement.ts";
-import { kumimojiTileCount, kumimojiWildCount, TILE_MIX_TOTAL } from "./tiles.constants.ts";
 import type { KumimojiDeal, KumimojiLevel, KumimojiOptions } from "./kumimoji.types.ts";
-import { tileWords, type TileWords } from "./tileWords.ts";
+import { crossingFit } from "./placement.ts";
+import { type Random, seededRandom, shuffled } from "./random.ts";
+import { kumimojiTileCount, kumimojiWildCount, TILE_MIX_TOTAL } from "./tiles.constants.ts";
+import { type TileWords, tileWords } from "./tileWords.ts";
 
 /**
  * MAKING A KUMIMOJI, in the browser, from a seed: the bag the game is played

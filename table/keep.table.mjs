@@ -6,7 +6,7 @@ import { expect, test } from "@playwright/test";
 
 import "../dist/words.js";
 import { deal, generateKumimoji, kumimojiToJSON, loadTileWords } from "../dist/index.js";
-import { PLAYING, lay, open, sound, state, tap } from "./table.mjs";
+import { lay, open, PLAYING, sound, state, tap } from "./table.mjs";
 
 /** Tap a button that saves a file, and hand back the file's text. */
 async function saved(page, selector) {

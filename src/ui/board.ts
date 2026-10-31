@@ -1,4 +1,4 @@
-import { boundsOf, squareAt, type GridVerdict, type Tiles } from "../grid.ts";
+import { boundsOf, type GridVerdict, squareAt, type Tiles } from "../grid.ts";
 import { tileFace } from "../tileFace.ts";
 
 /** How a tile on the table stands: part of a sound crossword, in a run that is not a word, or apart from the rest.

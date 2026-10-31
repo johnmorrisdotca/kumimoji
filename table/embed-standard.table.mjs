@@ -2,11 +2,12 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, test } from "@playwright/test";
+
 const site = join(dirname(fileURLToPath(import.meta.url)), "..", "site");
 async function serve(page) {
   await page.route("http://kumimoji.test/**", (route) => {
-    const { pathname } = new URL(route.request().url()),
-      file = join(site, pathname.endsWith("/") ? `${pathname}index.html` : pathname);
+    const { pathname } = new URL(route.request().url());
+    const file = join(site, pathname.endsWith("/") ? `${pathname}index.html` : pathname);
     if (!existsSync(file)) return route.fulfill({ status: 404, body: "" });
     return route.fulfill({
       body: readFileSync(file),
@@ -37,8 +38,8 @@ test("locale, palette, keep and controls preserve the same native game", async (
   await expect(table.locator("[data-hand]")).toHaveCount(3);
   const result = await table.evaluate(async (element) => {
     await element.table.ready;
-    const handle = element.table,
-      play = handle.play();
+    const handle = element.table;
+    const play = handle.play();
     element.options = { onChange: () => {} };
     element.theme = "dark";
     element.lang = "ja";
@@ -80,8 +81,8 @@ test("native saved state restores and change events keep their shape across a sh
     defineTable("article-crossword");
     defineTable("article-crossword");
     const saved = document.querySelector("kumimoji-table").saved;
-    const host = document.createElement("div"),
-      shadow = host.attachShadow({ mode: "open" });
+    const host = document.createElement("div");
+    const shadow = host.attachShadow({ mode: "open" });
     document.body.append(host);
     const table = document.createElement("article-crossword");
     table.options = { saved, keep: false };

@@ -3,7 +3,7 @@
 // when the table is drawn again.
 import { expect, test } from "@playwright/test";
 
-import { ROOT, open, sound, state } from "./table.mjs";
+import { open, ROOT, sound, state } from "./table.mjs";
 
 const SQUARES = "#table .km-square";
 const HAND = "#table [data-hand]";

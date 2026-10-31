@@ -1,10 +1,10 @@
-import { embedDay } from "./embed-day.ts";
-import { KUMIMOJI_STYLE } from "./ui/style.ts";
 import { kumimojiDailySeed } from "./daily.ts";
+import { embedDay } from "./embed-day.ts";
+import type { KumimojiSaved } from "./export.ts";
 import type { KumimojiLanguage, KumimojiLength, KumimojiLevel } from "./kumimoji.types.ts";
 import { KUMIMOJI_HANDS } from "./tiles.constants.ts";
-import { mountKumimoji, type KumimojiTableHandle, type KumimojiTableOptions } from "./ui/mount.ts";
-import type { KumimojiSaved } from "./export.ts";
+import { type KumimojiTableHandle, type KumimojiTableOptions, mountKumimoji } from "./ui/mount.ts";
+import { KUMIMOJI_STYLE } from "./ui/style.ts";
 
 const ElementBase: typeof HTMLElement =
   typeof HTMLElement === "undefined" ? (class {} as unknown as typeof HTMLElement) : HTMLElement;
@@ -257,8 +257,8 @@ export class KumimojiTable extends ElementBase {
   #frame(): void {
     this.style.display = "block";
     this.style.maxWidth = "100%";
-    const width = Number(this.getAttribute("width")),
-      size = this.getAttribute("size");
+    const width = Number(this.getAttribute("width"));
+    const size = this.getAttribute("size");
     const pixels =
       this.hasAttribute("width") && width > 0 && Number.isFinite(width)
         ? Math.min(width, 2000)
@@ -280,9 +280,9 @@ export class KumimojiTable extends ElementBase {
     const theme = this.getAttribute("theme");
     this.style.colorScheme = theme === "light" || theme === "dark" ? theme : "light dark";
     this.setAttribute("data-kumimoji-embed", "");
-    const root = this.getRootNode(),
-      target: ParentNode =
-        typeof ShadowRoot !== "undefined" && root instanceof ShadowRoot ? root : this.ownerDocument.head;
+    const root = this.getRootNode();
+    const target: ParentNode =
+      typeof ShadowRoot !== "undefined" && root instanceof ShadowRoot ? root : this.ownerDocument.head;
     if (target.querySelector("style[data-kumimoji-embed-style]") === null) {
       const style = this.ownerDocument.createElement("style");
       style.setAttribute("data-kumimoji-embed-style", "");
@@ -317,25 +317,31 @@ export class KumimojiTable extends ElementBase {
       const gameLength: KumimojiLength | undefined =
         oneOf(this.getAttribute("length"), ["short", "medium", "full"] as const) ?? this.#options.gameLength;
       const diagonals = isOn(this.getAttribute("diagonals"), this.#options.diagonals ?? false);
-      const seedAttribute = this.getAttribute("seed"),
-        asked = Number(seedAttribute);
+      const seedAttribute = this.getAttribute("seed");
+      const asked = Number(seedAttribute);
       const day = embedDay(
         this.hasAttribute("daily") ? this.getAttribute("daily") : seedAttribute === "daily" ? "today" : null,
       );
-      const seed =
-        day !== null
-          ? kumimojiDailySeed(new Date(`${day}T00:00:00Z`))
-          : seedAttribute !== null && Number.isInteger(asked) && asked >= 0 && asked <= 0xffffffff
-            ? asked
-            : (this.#options.seed ?? (this.#seed ??= Math.floor(Math.random() * 2 ** 31)));
-      const lang = this.getAttribute("lang"),
-        locale =
-          lang === "en" || lang === "ja"
-            ? lang
-            : (this.#options.locale ??
-              (this.ownerDocument.documentElement.lang.toLowerCase().startsWith("ja") ? "ja" : "en"));
-      const keep = isOn(this.getAttribute("keep"), this.#options.keep ?? true),
-        controls = isOn(this.getAttribute("controls"), this.#options.controls ?? true);
+      let seed: number;
+      if (day !== null) seed = kumimojiDailySeed(new Date(`${day}T00:00:00Z`));
+      else if (seedAttribute !== null && Number.isInteger(asked) && asked >= 0 && asked <= 0xffffffff) seed = asked;
+      else if (this.#options.seed !== undefined && this.#options.seed !== null) seed = this.#options.seed;
+      else {
+        let held = this.#seed;
+        if (held === null) {
+          held = Math.floor(Math.random() * 2 ** 31);
+          this.#seed = held;
+        }
+        seed = held;
+      }
+      const lang = this.getAttribute("lang");
+      const locale =
+        lang === "en" || lang === "ja"
+          ? lang
+          : (this.#options.locale ??
+            (this.ownerDocument.documentElement.lang.toLowerCase().startsWith("ja") ? "ja" : "en"));
+      const keep = isOn(this.getAttribute("keep"), this.#options.keep ?? true);
+      const controls = isOn(this.getAttribute("controls"), this.#options.controls ?? true);
       const key = JSON.stringify([language, hand, level, gameLength, diagonals, seed, day, this.#options.saved]);
       if (key === this.#key && this.#table !== null) {
         this.#table.set({ locale, strings: this.#options.strings, theme: this.#options.theme ?? {}, keep, controls });
@@ -405,8 +411,8 @@ export class KumimojiTable extends ElementBase {
       this.#table?.destroy();
       this.#table = null;
       this.#key = "";
-      const message = error instanceof Error ? error.message : String(error),
-        status = this.ownerDocument.createElement("p");
+      const message = error instanceof Error ? error.message : String(error);
+      const status = this.ownerDocument.createElement("p");
       status.setAttribute("role", "status");
       status.textContent = message;
       this.replaceChildren(status);

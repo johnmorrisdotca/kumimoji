@@ -4,7 +4,7 @@ import { judgeGrid, squareAt } from "./grid.ts";
 import { BASE_KANA, CORNER_FORMS } from "./kana.ts";
 import { assignTableTile, deal, draw, isFinished, mayDraw, placeFromHand, type TilePlay } from "./play.ts";
 import { formsOfTile, lengthRows, mixShown, TRY_IT } from "./showcase.ts";
-import { JAPANESE_TILE_MIX, KUMIMOJI_HANDS, TILE_MIX, TILE_MIX_TOTAL, kumimojiTileCount } from "./tiles.constants.ts";
+import { JAPANESE_TILE_MIX, KUMIMOJI_HANDS, kumimojiTileCount, TILE_MIX, TILE_MIX_TOTAL } from "./tiles.constants.ts";
 import { loadTileWords, tileWords } from "./tileWords.ts";
 
 beforeAll(async () => {
@@ -34,7 +34,7 @@ describe("the Kumimoji pages' data", () => {
     expect(japanese.total).toBe(Object.values(JAPANESE_TILE_MIX).reduce((sum, count) => sum + count, 0));
     expect(japanese.fewest).toBe(1);
     expect(japanese.rarest).toEqual(expect.arrayContaining(["ぬ", "へ", "ね", "ろ", "れ"]));
-    expect(japanese.tiles.find((tile) => tile.glyph === "は")!.forms).toBe(CORNER_FORMS["は"]);
+    expect(japanese.tiles.find((tile) => tile.glyph === "は")!.forms).toBe(CORNER_FORMS.は);
   });
 
   it("lists every form a kana tile plays as, the corner's and the rare ones, and nothing that is not its own", () => {

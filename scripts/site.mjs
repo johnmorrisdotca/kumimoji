@@ -1,12 +1,12 @@
 // Builds the static demo for GitHub Pages into ./site: the page, written here from the family's
 // shared header and footer, with the family's stylesheet, Kumimoji's own, the page's script and the
 // compiled library beside it, word lists, notices and all.
-import { cpSync, readFileSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 
 import { API_CSS, apiPage } from "./api.mjs";
 import {
-  FAMILY_SCRIPT,
   FAMILY_EMBED_BUILDER_WORDS,
+  FAMILY_SCRIPT,
   familyEmbedBuilder,
   familyFooter,
   familyHead,

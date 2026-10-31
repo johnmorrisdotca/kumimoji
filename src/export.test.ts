@@ -1,14 +1,14 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import {
-  KUMIMOJI_EXPORT_FORMAT,
   gridToText,
+  KUMIMOJI_EXPORT_FORMAT,
+  type KumimojiSaved,
   kumimojiClock,
   kumimojiExported,
   kumimojiFromJSON,
   kumimojiToJSON,
   kumimojiToText,
-  type KumimojiSaved,
 } from "./export.ts";
 import { generateKumimoji } from "./generate.ts";
 import { decodeGrid, squareAt } from "./grid.ts";

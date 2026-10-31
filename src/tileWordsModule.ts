@@ -1,5 +1,5 @@
-import { loadTileWords, readTileWordsWith, tileWordsFrom, type TileWords } from "./tileWords.ts";
 import type { KumimojiLanguage } from "./kumimoji.types.ts";
+import { loadTileWords, readTileWordsWith, type TileWords, tileWordsFrom } from "./tileWords.ts";
 
 /**
  * KUMIMOJI'S LISTS WHERE THERE IS NO BROWSER: a server checking a handed-in

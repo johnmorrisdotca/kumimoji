@@ -1,8 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
-
+import { KANA_TILE_START, KANA_WILD_START } from "./tileFace.ts";
 import { familyKeyOf } from "./tileFamily.ts";
 import { loadTileWords, tileWords } from "./tileWords.ts";
-import { KANA_TILE_START, KANA_WILD_START } from "./tileFace.ts";
 
 /** The dictionary-free family key answers every tile exactly as the loaded list's does. */
 describe("a tile's family, without the word lists", () => {

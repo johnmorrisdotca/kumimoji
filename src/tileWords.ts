@@ -1,7 +1,7 @@
 import { tileKana } from "./kana.ts";
+import type { KumimojiLanguage } from "./kumimoji.types.ts";
 import { KANA_TILE_START, KANA_WILD_START, kanaTileCode, tileFace } from "./tileFace.ts";
 import { JAPANESE_TILE_MIX, TILE_MIX } from "./tiles.constants.ts";
-import type { KumimojiLanguage } from "./kumimoji.types.ts";
 
 /**
  * KUMIMOJI'S WORD LIST, loaded once, when a game opens.

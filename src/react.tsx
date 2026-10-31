@@ -1,8 +1,8 @@
-import { useEffect, useRef, type CSSProperties, type HTMLAttributes } from "react";
+import { type CSSProperties, type HTMLAttributes, useEffect, useRef } from "react";
 
 import type { GridVerdict, Tiles } from "./grid.ts";
 import { boardModel } from "./ui/board.ts";
-import { mountKumimoji, type KumimojiTableOptions } from "./ui/mount.ts";
+import { type KumimojiTableOptions, mountKumimoji } from "./ui/mount.ts";
 
 const TILE: CSSProperties = {
   display: "grid",

@@ -1,6 +1,6 @@
-import { seededRandom, shuffled } from "./random.ts";
 import { computerName, isComputer, nextIn, partyTilesLeft, stillIn, tableTally, tidyName } from "./party.ts";
 import type { PartyGame, PartyPlayer, PartySeat } from "./party.types.ts";
+import { seededRandom, shuffled } from "./random.ts";
 import { tileFace } from "./tileFace.ts";
 import { KUMIMOJI_PARTY } from "./tiles.constants.ts";
 

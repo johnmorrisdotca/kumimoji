@@ -2,7 +2,7 @@
 import { expect, test } from "@playwright/test";
 
 import { kumimojiDailySeed } from "../dist/index.js";
-import { ROOT, open, sound, tap } from "./table.mjs";
+import { open, ROOT, sound, tap } from "./table.mjs";
 
 const TAG = '[data-testid="tag"] [data-testid="km-root"]';
 
@@ -40,7 +40,11 @@ test("Copy link copies a link that deals the same game, and the address is read 
   // The page is served over http, where a browser keeps no clipboard; this one is a stand-in that remembers what was written.
   await page.addInitScript(() => {
     Object.defineProperty(navigator, "clipboard", {
-      value: { writeText: async (text) => void (window.__copied = text) },
+      value: {
+        writeText: async (text) => {
+          window.__copied = text;
+        },
+      },
     });
   });
   const errors = await open(page, "?seed=2026&hand=11&level=easy&words=japanese&diagonals=1&length=medium&lang=en");

@@ -2,12 +2,12 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { checkKumimoji, kumimojiPoints } from "./check.ts";
 import { generateKumimoji } from "./generate.ts";
-import { BASE_KANA } from "./kana.ts";
-import { handSpelling, HELP_WORDS_MOST, wordsInHand } from "./help.ts";
 import { decodeGrid, encodeGrid, judgeGrid, lettersOf, runsOf, squareAt } from "./grid.ts";
+import { HELP_WORDS_MOST, handSpelling, wordsInHand } from "./help.ts";
+import { BASE_KANA } from "./kana.ts";
 import {
-  deal,
   assignHandTile,
+  deal,
   decodeTileProgress,
   draw,
   encodeTileProgress,
@@ -43,9 +43,11 @@ const isWord = (word: string) => tileWords().allowed.has(word);
 /** A grid from rows of text, "." for an empty square, its first row and column at 0. */
 function gridOf(...rows: string[]): Map<string, string> {
   const tiles = new Map<string, string>();
-  rows.forEach((line, row) =>
-    [...line].forEach((letter, col) => letter !== "." && tiles.set(squareAt(row, col), letter)),
-  );
+  rows.forEach((line, row) => {
+    [...line].forEach((letter, col) => {
+      letter !== "." && tiles.set(squareAt(row, col), letter);
+    });
+  });
   return tiles;
 }
 

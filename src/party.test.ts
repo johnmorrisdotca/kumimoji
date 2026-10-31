@@ -7,19 +7,21 @@ import {
   mayDrawAll,
   mayTradeThisTurn,
   nameOf,
-  passViewStart,
-  stepView,
   partyFits,
   partyLength,
   partyPlayersAsked,
   partyTilesLeft,
   partyTilesNeeded,
+  passViewStart,
   seatPlay,
   startParty,
+  stepView,
   stillIn,
   tidyName,
   withSeatPlay,
 } from "./party.ts";
+import type { PartyGame, PartySettings } from "./party.types.ts";
+import { decodeParty, encodeParty, holdsItsBag, isPartyFor } from "./partyKept.ts";
 import {
   doneRefused,
   endTurn,
@@ -32,9 +34,8 @@ import {
   resign,
   winnersOf,
 } from "./partyTurns.ts";
-import type { PartyGame, PartySettings } from "./party.types.ts";
-import { decodeParty, encodeParty, holdsItsBag, isPartyFor } from "./partyKept.ts";
 import { placeFromHand, trade } from "./play.ts";
+import { familyKeyOf } from "./tileFamily.ts";
 import {
   JAPANESE_TILE_MIX,
   KUMIMOJI_HANDS,
@@ -42,7 +43,6 @@ import {
   kumimojiTileCount,
   TILE_MIX_TOTAL,
 } from "./tiles.constants.ts";
-import { familyKeyOf } from "./tileFamily.ts";
 import { loadTileWords } from "./tileWords.ts";
 
 const SETTINGS: PartySettings = {

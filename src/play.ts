@@ -1,4 +1,4 @@
-import { decodeGrid, encodeGrid, lettersOf, sameLetters, type GridVerdict, type Tiles } from "./grid.ts";
+import { decodeGrid, encodeGrid, type GridVerdict, lettersOf, sameLetters, type Tiles } from "./grid.ts";
 import { tileFace } from "./tileFace.ts";
 import { KUMIMOJI_DRAW, KUMIMOJI_TRADE } from "./tiles.constants.ts";
 import { tileWords } from "./tileWords.ts";
