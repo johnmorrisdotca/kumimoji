@@ -768,7 +768,7 @@ The JSON, as `kumimojiToJSON` writes it:
 {
   "format": 1,
   "game": "kumimoji",
-  "generator": "kumimoji 1.3.0",
+  "generator": "kumimoji 1.3.1",
   "size": 3,
   "level": "hard",
   "seed": 44,
@@ -1201,7 +1201,7 @@ Please follow the [code of conduct](./CODE_OF_CONDUCT.md). A way to make a check
 
 See [CHANGELOG.md](./CHANGELOG.md).
 
-The latest release is 1.3.0: the table's standard embed attributes, the shared embed builder, and the documentation site with a checked example for every export.
+The latest release, 1.3.1, changes nothing a player sees.
 
 ## Licence
 

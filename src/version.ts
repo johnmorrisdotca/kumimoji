@@ -6,4 +6,4 @@
  * console.log(KUMIMOJI_VERSION);
  * ```
  */
-export const KUMIMOJI_VERSION = "1.3.0";
+export const KUMIMOJI_VERSION = "1.3.1";
