@@ -100,7 +100,8 @@ export function crossingFit(
     fresh.push({ row: r, col: c });
   }
   if (fresh.length === 0) return null;
-  if (diagonalWord !== null && !diagonalsRead(letterAt, inside, word, { first: { row, col }, fresh }, diagonalWord)) return null;
+  if (diagonalWord !== null && !diagonalsRead(letterAt, inside, word, { first: { row, col }, fresh }, diagonalWord))
+    return null;
   return { first: { row, col }, fresh };
 }
 
@@ -133,14 +134,21 @@ export function diagonalsRead(
   fit: CrossingFit,
   isWord: (run: string) => boolean,
 ): boolean {
-  const freshAt = new Map(fit.fresh.map((square) => [`${square.row},${square.col}`, word[(square.row - fit.first.row) + (square.col - fit.first.col)]!]));
-  const at = (row: number, col: number): string => (inside(row, col) ? letterAt(row, col) || (freshAt.get(`${row},${col}`) ?? "") : "");
+  const freshAt = new Map(
+    fit.fresh.map((square) => [
+      `${square.row},${square.col}`,
+      word[square.row - fit.first.row + (square.col - fit.first.col)]!,
+    ]),
+  );
+  const at = (row: number, col: number): string =>
+    inside(row, col) ? letterAt(row, col) || (freshAt.get(`${row},${col}`) ?? "") : "";
   for (const { row, col } of fit.fresh) {
     for (const lean of [1, -1]) {
       let top = 0;
       while (at(row - top - 1, col - (top + 1) * lean) !== "") top += 1;
       let run = "";
-      for (let step = -top; at(row + step, col + step * lean) !== ""; step += 1) run += at(row + step, col + step * lean);
+      for (let step = -top; at(row + step, col + step * lean) !== ""; step += 1)
+        run += at(row + step, col + step * lean);
       if (run.length >= DIAGONAL_RUN_LEAST && !isWord(run)) return false;
     }
   }

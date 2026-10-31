@@ -7,7 +7,12 @@ import { ROOT, open, sound, state } from "./table.mjs";
 
 const SQUARES = "#table .km-square";
 const HAND = "#table [data-hand]";
-const on = (page) => page.evaluate(() => ({ square: document.activeElement?.getAttribute("data-square") ?? null, hand: document.activeElement?.getAttribute("data-hand") ?? null, id: document.activeElement?.getAttribute("data-testid") ?? null }));
+const on = (page) =>
+  page.evaluate(() => ({
+    square: document.activeElement?.getAttribute("data-square") ?? null,
+    hand: document.activeElement?.getAttribute("data-hand") ?? null,
+    id: document.activeElement?.getAttribute("data-testid") ?? null,
+  }));
 
 test("Tab lands on one square and one tile, which are named, and arrows move between them", async ({ page }) => {
   const errors = await open(page);
@@ -42,7 +47,9 @@ test("Tab lands on one square and one tile, which are named, and arrows move bet
   await sound(page, errors);
 });
 
-test("Enter picks up a tile and lays it, Escape lets go, and the keyboard stays where it was after each draw of the table", async ({ page }) => {
+test("Enter picks up a tile and lays it, Escape lets go, and the keyboard stays where it was after each draw of the table", async ({
+  page,
+}) => {
   const errors = await open(page);
   const tile = page.locator('#table [data-hand="0"]');
   await tile.focus();

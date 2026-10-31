@@ -1,13 +1,42 @@
 /* What is Kumimoji's own on its demo page. The family's look is family.css, which this never repeats. */
-:root { --intro-room: 10.5rem; --intro-room-wide: 5.5rem; }
-.setup { margin: 0 0 16px; }
-.setup .fam-seg button { padding: 0 14px; }
-#table { min-height: 420px; }
-.credits { margin: 28px 0 0; }
-.more li > button code { overflow-wrap: anywhere; }
-.tag kumimoji-table { display: block; margin-top: 10px; }
-.tag .km-root { --km-ink: var(--ink); --km-panel: var(--surface); --km-font: var(--font); --km-felt: var(--felt); --km-accent: var(--felt); --km-accent-ink: var(--felt-ink); }
-.fam-button[data-said="true"] { opacity: .8; }
+:root {
+  --intro-room: 10.5rem;
+  --intro-room-wide: 5.5rem;
+}
+.setup {
+  margin: 0 0 16px;
+}
+.setup .fam-seg button {
+  padding: 0 14px;
+}
+#table {
+  min-height: 420px;
+}
+.credits {
+  margin: 28px 0 0;
+}
+.more li > button code {
+  overflow-wrap: anywhere;
+}
+.tag kumimoji-table {
+  display: block;
+  margin-top: 10px;
+}
+.tag .km-root {
+  --km-ink: var(--ink);
+  --km-panel: var(--surface);
+  --km-font: var(--font);
+  --km-felt: var(--felt);
+  --km-accent: var(--felt);
+  --km-accent-ink: var(--felt-ink);
+}
+.fam-button[data-said="true"] {
+  opacity: 0.8;
+}
 
 /* Keep navigation width stable across languages. */
-header nav a[data-say="pageDocs"] { inline-size: 8rem; justify-content: center; flex: none; }
+header nav a[data-say="pageDocs"] {
+  inline-size: 8rem;
+  justify-content: center;
+  flex: none;
+}

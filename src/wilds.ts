@@ -51,7 +51,9 @@ export function readWilds(tiles: Tiles, words: TileWords, rules: GridRules = {})
   const blanks = [...tiles].filter(([, tile]) => tile === "*").map(([square]) => square);
   if (blanks.length === 0) return tiles;
   const runs = runsOf(tiles, rules);
-  const through = new Map<string, Run[]>(blanks.map((square) => [square, runs.filter((run) => run.squares.includes(square))]));
+  const through = new Map<string, Run[]>(
+    blanks.map((square) => [square, runs.filter((run) => run.squares.includes(square))]),
+  );
   const choices = words.wildOptions.flatMap((face) => {
     const code = words.wildFor(face);
     const sound = code === null ? null : words.soundOf(code);
@@ -124,7 +126,10 @@ function patternFits(words: TileWords): (sounds: readonly (string | null)[]) => 
     if (already !== undefined) return already;
     const found = (words.byLength.get(sounds.length) ?? []).some((word) => {
       const letters = [...word];
-      return letters.length === sounds.length && sounds.every((sound, at) => sound === null || words.soundOf(letters[at]!) === sound);
+      return (
+        letters.length === sounds.length &&
+        sounds.every((sound, at) => sound === null || words.soundOf(letters[at]!) === sound)
+      );
     });
     known.set(key, found);
     return found;

@@ -21,10 +21,26 @@ describe("turning the kumimoji table", () => {
   it("draws a word across running right, down, left and up at the four turns", () => {
     // CAT across from (0, 0): its C, A and T, drawn at each turn.
     const cat = (turn: Turn) => [0, 1, 2].map((col) => turnPlace(0, col, turn));
-    expect(cat(0)).toEqual([{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }]);
-    expect(cat(1)).toEqual([{ row: 0, col: 0 }, { row: 1, col: 0 }, { row: 2, col: 0 }]);
-    expect(cat(2)).toEqual([{ row: 0, col: 0 }, { row: 0, col: -1 }, { row: 0, col: -2 }]);
-    expect(cat(3)).toEqual([{ row: 0, col: 0 }, { row: -1, col: 0 }, { row: -2, col: 0 }]);
+    expect(cat(0)).toEqual([
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+      { row: 0, col: 2 },
+    ]);
+    expect(cat(1)).toEqual([
+      { row: 0, col: 0 },
+      { row: 1, col: 0 },
+      { row: 2, col: 0 },
+    ]);
+    expect(cat(2)).toEqual([
+      { row: 0, col: 0 },
+      { row: 0, col: -1 },
+      { row: 0, col: -2 },
+    ]);
+    expect(cat(3)).toEqual([
+      { row: 0, col: 0 },
+      { row: -1, col: 0 },
+      { row: -2, col: 0 },
+    ]);
     // A word down turns to one running left at a quarter.
     expect(turnPlace(2, 0, 1)).toEqual({ row: 0, col: -2 });
     // Never a "-0" square.
@@ -33,7 +49,12 @@ describe("turning the kumimoji table", () => {
 
   it("gives back the square it was given, turned and un-turned, at every turn", () => {
     for (const turn of TURNS) {
-      for (const [row, col] of [[0, 0], [3, -2], [-5, 7], [1, 1]] as const) {
+      for (const [row, col] of [
+        [0, 0],
+        [3, -2],
+        [-5, 7],
+        [1, 1],
+      ] as const) {
         const there = turnPlace(row, col, turn);
         expect(unturnPlace(there.row, there.col, turn)).toEqual({ row, col });
         const back = unturnPlace(row, col, turn);
@@ -50,7 +71,12 @@ describe("turning the kumimoji table", () => {
   });
 
   it("shows the grid's area turned: rows and columns swap at a quarter, and every tile is still inside it", () => {
-    const tiles = new Map([[squareAt(0, 0), "c"], [squareAt(0, 1), "a"], [squareAt(0, 2), "t"], [squareAt(1, 0), "o"]]);
+    const tiles = new Map([
+      [squareAt(0, 0), "c"],
+      [squareAt(0, 1), "a"],
+      [squareAt(0, 2), "t"],
+      [squareAt(1, 0), "o"],
+    ]);
     const area = tableArea(tiles);
     for (const turn of TURNS) {
       const shown = turnArea(area, turn);

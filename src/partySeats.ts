@@ -84,7 +84,9 @@ export function joinParty(game: PartyGame, seat: PartySeat): PartyGame {
   const hand = [...(game.bag + game.returned).slice(game.taken, game.taken + game.settings.size)];
   const tiles = new Map<string, string>();
   const player: PartyPlayer =
-    seat.computer === true ? { name: computerName(game.players), computer: true, hand, tiles } : { name: tidyName(seat.name) || freePlayerName(game.players), hand, tiles };
+    seat.computer === true
+      ? { name: computerName(game.players), computer: true, hand, tiles }
+      : { name: tidyName(seat.name) || freePlayerName(game.players), hand, tiles };
   return { ...game, players: [...game.players, player], taken: game.taken + hand.length };
 }
 
@@ -126,7 +128,8 @@ export type LeaveRefusal = "over" | "out" | "lastPerson";
 export function leaveRefused(game: PartyGame, at: number): LeaveRefusal | null {
   if (game.ending !== null || game.players[at] === undefined) return "over";
   if (game.out.includes(at)) return "out";
-  if (!isComputer(game, at) && game.players.filter((player) => player.computer !== true).length <= 1) return "lastPerson";
+  if (!isComputer(game, at) && game.players.filter((player) => player.computer !== true).length <= 1)
+    return "lastPerson";
   return null;
 }
 
@@ -183,7 +186,9 @@ export function leaveParty(game: PartyGame, at: number): PartyGame {
   if (leaveRefused(game, at) !== null) return game;
   const leaver = game.players[at]!;
   const back = [...leaver.hand, ...leaver.tiles.values()].map((tile) => (tileFace(tile).wild ? "*" : tile));
-  const players = game.players.flatMap((player, seat) => (seat === at ? [] : [{ ...player, name: player.name || `Player ${seat + 1}` }]));
+  const players = game.players.flatMap((player, seat) =>
+    seat === at ? [] : [{ ...player, name: player.name || `Player ${seat + 1}` }],
+  );
   const seatOf = (seat: number) => (seat > at ? seat - 1 : seat);
   const without = (seats: readonly number[]) => seats.filter((seat) => seat !== at).map(seatOf);
 
@@ -225,7 +230,12 @@ export function leaveParty(game: PartyGame, at: number): PartyGame {
   const moved = at === game.turn ? { startTable: tableTally(players[turn]!.tiles), traded: false } : {};
   if (ending === null && lastTurns === null && stillIn(after).length === 0) {
     // Only players who resigned are left: tied, the last run of them, or all of them where that run has left.
-    return { ...after, ...moved, ending: "tied", resignRun: after.resignRun.length > 0 ? after.resignRun : after.resigned };
+    return {
+      ...after,
+      ...moved,
+      ending: "tied",
+      resignRun: after.resignRun.length > 0 ? after.resignRun : after.resigned,
+    };
   }
   return { ...after, ...moved };
 }

@@ -1,6 +1,15 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { KUMIMOJI_EXPORT_FORMAT, gridToText, kumimojiClock, kumimojiExported, kumimojiFromJSON, kumimojiToJSON, kumimojiToText, type KumimojiSaved } from "./export.ts";
+import {
+  KUMIMOJI_EXPORT_FORMAT,
+  gridToText,
+  kumimojiClock,
+  kumimojiExported,
+  kumimojiFromJSON,
+  kumimojiToJSON,
+  kumimojiToText,
+  type KumimojiSaved,
+} from "./export.ts";
 import { generateKumimoji } from "./generate.ts";
 import { decodeGrid, squareAt } from "./grid.ts";
 import { deal, draw, encodeTileProgress, placeFromHand, trade } from "./play.ts";
@@ -40,7 +49,20 @@ describe("a game as JSON", () => {
   it("is the format's number, how the game was set up, and where the player has got to", () => {
     const saved = snowy();
     const data = JSON.parse(kumimojiToJSON(saved));
-    expect(data).toEqual({ format: 1, game: "kumimoji", generator: `kumimoji ${KUMIMOJI_VERSION}`, size: 3, level: "hard", seed: 44, language: "english", gameLength: "short", doubleSet: false, diagonals: false, progress: "5:::snowy", elapsedMs: 65400 });
+    expect(data).toEqual({
+      format: 1,
+      game: "kumimoji",
+      generator: `kumimoji ${KUMIMOJI_VERSION}`,
+      size: 3,
+      level: "hard",
+      seed: 44,
+      language: "english",
+      gameLength: "short",
+      doubleSet: false,
+      diagonals: false,
+      progress: "5:::snowy",
+      elapsedMs: 65400,
+    });
     expect(data.format).toBe(KUMIMOJI_EXPORT_FORMAT);
     expect(Object.keys(data)[0]).toBe("format");
     expect(data).toEqual(kumimojiExported(saved));
@@ -103,8 +125,12 @@ describe("a game as JSON", () => {
 
 describe("a game as text", () => {
   it("is how it was set up, the crossword as it lies, and how it stands", () => {
-    expect(kumimojiToText(snowy())).toBe("Kumimoji: English, a hand of 3, seed 44\nS N O W Y\nFinished: every tile laid, every run a word.\nTime: 1:05\n");
-    expect(kumimojiToText(snowy(), KUMIMOJI_STRINGS.ja)).toBe("組み文字: 英語、手札3枚、シード 44\nS N O W Y\n完成: すべてのタイルを置き、どの並びも単語になっています。\n時間: 1:05\n");
+    expect(kumimojiToText(snowy())).toBe(
+      "Kumimoji: English, a hand of 3, seed 44\nS N O W Y\nFinished: every tile laid, every run a word.\nTime: 1:05\n",
+    );
+    expect(kumimojiToText(snowy(), KUMIMOJI_STRINGS.ja)).toBe(
+      "組み文字: 英語、手札3枚、シード 44\nS N O W Y\n完成: すべてのタイルを置き、どの並びも単語になっています。\n時間: 1:05\n",
+    );
   });
 
   it("a game half way shows the hand and what is left in the bag; a wild with no letter is a star", () => {
@@ -136,7 +162,14 @@ describe("a grid as text", () => {
     expect(gridToText(new Map())).toBe("");
     expect(gridToText(new Map([[squareAt(-3, 9), "a"]]))).toBe("A");
     // A wild given a letter reads as the letter; one given nothing is a star.
-    expect(gridToText(new Map([[squareAt(0, 0), "C"], [squareAt(0, 1), "*"]]))).toBe("C *");
+    expect(
+      gridToText(
+        new Map([
+          [squareAt(0, 0), "C"],
+          [squareAt(0, 1), "*"],
+        ]),
+      ),
+    ).toBe("C *");
   });
 
   it("kana stand side by side, with a full-width dot for an empty square", () => {

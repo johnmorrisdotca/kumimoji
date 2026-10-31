@@ -109,7 +109,8 @@ export function unpackTileWords(data: Readonly<Record<number, string>>): TileWor
   }
   const letters = [...Object.keys(TILE_MIX)];
   const assigned = new Map(letters.map((letter) => [letter.toUpperCase(), letter]));
-  const soundOf = (tile: string) => (tile === "*" ? null : assigned.get(tile) ?? (/^[a-z]$/.test(tile) ? tile : null));
+  const soundOf = (tile: string) =>
+    tile === "*" ? null : (assigned.get(tile) ?? (/^[a-z]$/.test(tile) ? tile : null));
   const isWild = (tile: string) => tile === "*" || assigned.has(tile);
   return {
     language: "english",
@@ -149,18 +150,27 @@ type JapaneseWordsData = {
  */
 function unpackJapaneseWords(data: JapaneseWordsData): TileWords {
   const kana = [...data.kana];
-  if (kana.some((face, at) => kanaTileCode(face) !== String.fromCodePoint(KANA_TILE_START + at))) throw new Error("The Japanese Kumimoji list's kana are not the tiles' own order.");
+  if (kana.some((face, at) => kanaTileCode(face) !== String.fromCodePoint(KANA_TILE_START + at)))
+    throw new Error("The Japanese Kumimoji list's kana are not the tiles' own order.");
   const tileOfPacked = new Map([...data.codes].map((code, at) => [code, kanaTileCode(kana[at]!)!]));
   const byLength = new Map<number, string[]>();
   const allowed = new Set<string>();
   for (const [length, packed] of Object.entries(data.byLength)) {
-    const words = unpackLength(packed, Number(length)).map((word) => [...word].map((code) => tileOfPacked.get(code)!).join(""));
+    const words = unpackLength(packed, Number(length)).map((word) =>
+      [...word].map((code) => tileOfPacked.get(code)!).join(""),
+    );
     byLength.set(Number(length), words);
     for (const word of words) allowed.add([...word].map((tile) => tileFace(tile).glyph).join(""));
   }
   const mix = new Map(Object.entries(JAPANESE_TILE_MIX).map(([face, count]) => [kanaTileCode(face)!, count]));
-  const isTile = (tile: string) => tile.length === 1 && tile.codePointAt(0)! - KANA_TILE_START >= 0 && tile.codePointAt(0)! - KANA_TILE_START < kana.length;
-  const isAssignedWild = (tile: string) => tile.length === 1 && tile.codePointAt(0)! - KANA_WILD_START >= 0 && tile.codePointAt(0)! - KANA_WILD_START < kana.length;
+  const isTile = (tile: string) =>
+    tile.length === 1 &&
+    tile.codePointAt(0)! - KANA_TILE_START >= 0 &&
+    tile.codePointAt(0)! - KANA_TILE_START < kana.length;
+  const isAssignedWild = (tile: string) =>
+    tile.length === 1 &&
+    tile.codePointAt(0)! - KANA_WILD_START >= 0 &&
+    tile.codePointAt(0)! - KANA_WILD_START < kana.length;
   const isWild = (tile: string) => tile === "*" || isAssignedWild(tile);
   const soundOf = (tile: string) => (isTile(tile) || isAssignedWild(tile) ? tileFace(tile).glyph : null);
   const identity = (tile: string) => (isWild(tile) ? "*" : isTile(tile) ? tileFace(tile).glyph : null);
@@ -264,11 +274,15 @@ export async function loadTileWords(language: KumimojiLanguage = "english"): Pro
   if (already !== undefined) return already;
   let words: TileWords;
   if (typeof window !== "undefined") {
-    words = language === "english"
-      ? unpackTileWords((await import("./words.en.data.ts")).TILE_WORDS_EN)
-      : unpackJapaneseWords((await import("./words.ja.data.ts")).TILE_WORDS_JA);
+    words =
+      language === "english"
+        ? unpackTileWords((await import("./words.en.data.ts")).TILE_WORDS_EN)
+        : unpackJapaneseWords((await import("./words.ja.data.ts")).TILE_WORDS_JA);
   } else {
-    if (fromModule === null) throw new Error("Kumimoji's words are read on the server through tileWordsModule.ts (loadTileWordsFromModule), which was not imported.");
+    if (fromModule === null)
+      throw new Error(
+        "Kumimoji's words are read on the server through tileWordsModule.ts (loadTileWordsFromModule), which was not imported.",
+      );
     words = await fromModule(language);
   }
   loaded.set(language, words);

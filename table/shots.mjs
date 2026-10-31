@@ -13,15 +13,27 @@ const browser = await chromium.launch();
 for (const width of [390, 1280]) {
   for (const colorScheme of ["light", "dark"]) {
     for (const lang of ["en", "ja"]) {
-      const context = await browser.newContext({ viewport: { width, height: width === 390 ? 844 : 900 }, colorScheme, deviceScaleFactor: 2, reducedMotion: "reduce" });
+      const context = await browser.newContext({
+        viewport: { width, height: width === 390 ? 844 : 900 },
+        colorScheme,
+        deviceScaleFactor: 2,
+        reducedMotion: "reduce",
+      });
       const page = await context.newPage();
       await page.route("http://kumimoji.test/**", (route) => {
         const { pathname } = new URL(route.request().url());
         const file = join(site, pathname === "/" ? "index.html" : pathname);
-        return existsSync(file) ? route.fulfill({ body: readFileSync(file), contentType: TYPES[file.slice(file.lastIndexOf("."))] ?? "application/octet-stream" }) : route.fulfill({ status: 404, body: "" });
+        return existsSync(file)
+          ? route.fulfill({
+              body: readFileSync(file),
+              contentType: TYPES[file.slice(file.lastIndexOf("."))] ?? "application/octet-stream",
+            })
+          : route.fulfill({ status: 404, body: "" });
       });
       // A game a few tiles in, in the language of the page: a word laid, one that is not, and the fold open.
-      await page.goto(`http://kumimoji.test/?seed=2026&hand=7&level=medium&words=${lang === "ja" ? "japanese" : "english"}&lang=${lang}`);
+      await page.goto(
+        `http://kumimoji.test/?seed=2026&hand=7&level=medium&words=${lang === "ja" ? "japanese" : "english"}&lang=${lang}`,
+      );
       await page.waitForSelector('#table [data-testid="km-root"][data-state="playing"]');
       const lay = async (handAt, row, col) => {
         await page.locator(`#table [data-hand="${handAt}"]`).click();

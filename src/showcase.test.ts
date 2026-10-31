@@ -44,14 +44,17 @@ describe("the Kumimoji pages' data", () => {
     expect(formsOfTile("う")).toEqual(["う", "ぅ", "ゔ"]);
     expect(formsOfTile("ん")).toEqual(["ん"]);
     // Every corner form is in the tile's list: the corner shows a subset, never something else.
-    for (const [kana, corner] of Object.entries(CORNER_FORMS)) for (const form of corner) expect(formsOfTile(kana)).toContain(form);
+    for (const [kana, corner] of Object.entries(CORNER_FORMS))
+      for (const form of corner) expect(formsOfTile(kana)).toContain(form);
     // Not a tile: a voiced kana is played by its base, and says nothing of its own.
     expect(formsOfTile("が")).toEqual([]);
   });
 
   it("counts each length's tiles and wilds from the game's own tables", () => {
     const rows = lengthRows(KUMIMOJI_HANDS.classic);
-    expect(rows.map((row) => row.tiles)).toEqual(["short", "medium", "full"].map((length) => kumimojiTileCount(KUMIMOJI_HANDS.classic, length as "short")));
+    expect(rows.map((row) => row.tiles)).toEqual(
+      ["short", "medium", "full"].map((length) => kumimojiTileCount(KUMIMOJI_HANDS.classic, length as "short")),
+    );
     expect(rows[2]!.tiles).toBe(TILE_MIX_TOTAL);
     expect(rows[2]!.doubleTiles).toBe(TILE_MIX_TOTAL * 2);
     for (const row of rows) {
@@ -70,7 +73,11 @@ describe("the Kumimoji pages' data", () => {
     // SENATOR across; then AD down from its A, IT down onto its T, and the wild made X for OX under its O.
     for (const [col, letter] of [..."senator"].entries()) lay(letter, squareAt(0, col));
     expect(verdictOf(play).sound).toBe(true);
-    for (const [letter, square] of [["d", squareAt(1, 3)], ["i", squareAt(-1, 4)], ["*", squareAt(1, 5)]] as const) {
+    for (const [letter, square] of [
+      ["d", squareAt(1, 3)],
+      ["i", squareAt(-1, 4)],
+      ["*", squareAt(1, 5)],
+    ] as const) {
       expect(mayDraw(play, verdictOf(play)), `the grid is sound before ${letter} is drawn`).toBe(true);
       play = draw(play);
       lay(letter, square);

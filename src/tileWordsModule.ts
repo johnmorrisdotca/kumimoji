@@ -9,7 +9,12 @@ import type { KumimojiLanguage } from "./kumimoji.types.ts";
  * lists for the browser's sake (see `loadTileWords`).
  */
 readTileWordsWith(async (language) =>
-  tileWordsFrom(language, language === "english" ? (await import("./words.en.data.ts")).TILE_WORDS_EN : (await import("./words.ja.data.ts")).TILE_WORDS_JA),
+  tileWordsFrom(
+    language,
+    language === "english"
+      ? (await import("./words.en.data.ts")).TILE_WORDS_EN
+      : (await import("./words.ja.data.ts")).TILE_WORDS_JA,
+  ),
 );
 
 /** The list, read from its module: `loadTileWords` for a caller with no browser.

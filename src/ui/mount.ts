@@ -2,7 +2,23 @@ import { kumimojiClock, kumimojiFromJSON, kumimojiToJSON, kumimojiToText, type K
 import { generateKumimoji } from "../generate.ts";
 import { judgeWithWords } from "../judge.ts";
 import type { KumimojiDeal, KumimojiLanguage, KumimojiLength, KumimojiLevel } from "../kumimoji.types.ts";
-import { assignHandTile, deal, draw, isFinished, liftAll, liftToHand, mayDraw, mayTrade, moveOnTable, placeFromHand, sortHand, swapWithHand, tilesLeft, trade, type TilePlay } from "../play.ts";
+import {
+  assignHandTile,
+  deal,
+  draw,
+  isFinished,
+  liftAll,
+  liftToHand,
+  mayDraw,
+  mayTrade,
+  moveOnTable,
+  placeFromHand,
+  sortHand,
+  swapWithHand,
+  tilesLeft,
+  trade,
+  type TilePlay,
+} from "../play.ts";
 import { kumimojiSay, kumimojiStrings, type KumimojiLocale, type KumimojiStrings } from "../strings.ts";
 import { KUMIMOJI_HANDS } from "../tiles.constants.ts";
 import { tileFace } from "../tileFace.ts";
@@ -90,7 +106,11 @@ const WILD_MARK = "★";
 /** What is picked up: a tile in the hand, or one on the table. */
 type Held = { from: "hand"; at: number } | { from: "table"; square: string } | null;
 
-function node<K extends keyof HTMLElementTagNameMap>(name: K, className?: string, text?: string): HTMLElementTagNameMap[K] {
+function node<K extends keyof HTMLElementTagNameMap>(
+  name: K,
+  className?: string,
+  text?: string,
+): HTMLElementTagNameMap[K] {
   const made = document.createElement(name);
   if (className !== undefined) made.className = className;
   if (text !== undefined) made.textContent = text;
@@ -140,8 +160,16 @@ function save(name: string, type: string, text: string): void {
  * ```
  */
 export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions = {}): KumimojiTableHandle {
-  let settings: GameOptions = { language: options.language, hand: options.hand, level: options.level, gameLength: options.gameLength, diagonals: options.diagonals, seed: options.seed };
-  const pageLocale = (): KumimojiLocale => (typeof document !== "undefined" && document.documentElement.lang.toLowerCase().startsWith("ja") ? "ja" : "en");
+  let settings: GameOptions = {
+    language: options.language,
+    hand: options.hand,
+    level: options.level,
+    gameLength: options.gameLength,
+    diagonals: options.diagonals,
+    seed: options.seed,
+  };
+  const pageLocale = (): KumimojiLocale =>
+    typeof document !== "undefined" && document.documentElement.lang.toLowerCase().startsWith("ja") ? "ja" : "en";
   let locale: KumimojiLocale = options.locale ?? pageLocale();
   let own = options.strings ?? {};
   let say = kumimojiStrings(locale, own);
@@ -187,7 +215,8 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
   if (options.keep !== false) root.append(keep);
   target.append(root);
 
-  const savedNow = (): KumimojiSaved | null => (play === null || dealt === null ? null : { deal: dealt, play, elapsedMs: (finishedAt ?? Date.now()) - started });
+  const savedNow = (): KumimojiSaved | null =>
+    play === null || dealt === null ? null : { deal: dealt, play, elapsedMs: (finishedAt ?? Date.now()) - started };
 
   // The saving and loading are made once, so the fold stays open or shut as the person left it; only their words change.
   const keepTitle = node("summary", "km-keep-title");
@@ -217,14 +246,24 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
     if (chosen === undefined) return;
     void chosen.text().then(read, () => read(""));
   });
-  const saveJson = button("", () => {
-    const now = savedNow();
-    if (now !== null) save(`kumimoji-${now.deal.seed}.json`, "application/json", kumimojiToJSON(now));
-  }, false, "km-save-json");
-  const saveText = button("", () => {
-    const now = savedNow();
-    if (now !== null) save(`kumimoji-${now.deal.seed}.txt`, "text/plain", kumimojiToText(now, say));
-  }, false, "km-save-text");
+  const saveJson = button(
+    "",
+    () => {
+      const now = savedNow();
+      if (now !== null) save(`kumimoji-${now.deal.seed}.json`, "application/json", kumimojiToJSON(now));
+    },
+    false,
+    "km-save-json",
+  );
+  const saveText = button(
+    "",
+    () => {
+      const now = savedNow();
+      if (now !== null) save(`kumimoji-${now.deal.seed}.txt`, "text/plain", kumimojiToText(now, say));
+    },
+    false,
+    "km-save-text",
+  );
   const load = button("", () => file.click(), false, "km-load");
   const keepButtons = node("div", "km-controls");
   keepButtons.append(saveJson, saveText, load);
@@ -296,7 +335,24 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
     const cells = [...grid.children] as HTMLElement[];
     const cols = Number(grid.dataset.cols);
     const at = cells.indexOf(cell);
-    const step = event.key === "ArrowLeft" ? (at % cols > 0 ? -1 : 0) : event.key === "ArrowRight" ? (at % cols < cols - 1 ? 1 : 0) : event.key === "ArrowUp" ? (at - cols >= 0 ? -cols : 0) : event.key === "ArrowDown" ? (at + cols < cells.length ? cols : 0) : null;
+    const step =
+      event.key === "ArrowLeft"
+        ? at % cols > 0
+          ? -1
+          : 0
+        : event.key === "ArrowRight"
+          ? at % cols < cols - 1
+            ? 1
+            : 0
+          : event.key === "ArrowUp"
+            ? at - cols >= 0
+              ? -cols
+              : 0
+            : event.key === "ArrowDown"
+              ? at + cols < cells.length
+                ? cols
+                : 0
+              : null;
     if (step === null) return;
     event.preventDefault();
     const next = cells[at + step];
@@ -319,7 +375,16 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
     if (tile === null || event.altKey || event.ctrlKey || event.metaKey) return;
     const tiles = [...hand.querySelectorAll<HTMLElement>("[data-hand]")];
     const at = tiles.indexOf(tile);
-    const to = event.key === "ArrowLeft" ? at - 1 : event.key === "ArrowRight" ? at + 1 : event.key === "Home" ? 0 : event.key === "End" ? tiles.length - 1 : null;
+    const to =
+      event.key === "ArrowLeft"
+        ? at - 1
+        : event.key === "ArrowRight"
+          ? at + 1
+          : event.key === "Home"
+            ? 0
+            : event.key === "End"
+              ? tiles.length - 1
+              : null;
     if (to === null) return;
     event.preventDefault();
     const next = tiles[to];
@@ -344,7 +409,10 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
     const left = tilesLeft(play);
     root.dataset.left = String(left);
     const time = kumimojiClock((finishedAt ?? Date.now()) - started);
-    status.textContent = finishedAt !== null ? kumimojiSay(say.finished, { time }) : kumimojiSay(left === 1 ? say.leftOne : say.left, { n: left, time });
+    status.textContent =
+      finishedAt !== null
+        ? kumimojiSay(say.finished, { time })
+        : kumimojiSay(left === 1 ? say.leftOne : say.left, { n: left, time });
   }
 
   function renderBoard(verdict: ReturnType<typeof verdictOf>) {
@@ -376,13 +444,21 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
       grid.append(cell);
     }
     // The one Tab lands on: where the keyboard was, else a tile, else the middle.
-    const stop = cells.find((cell) => cell.dataset.square === onSquare) ?? cells.find((cell) => cell.classList.contains("km-tile")) ?? cells[Math.floor(cells.length / 2)];
+    const stop =
+      cells.find((cell) => cell.dataset.square === onSquare) ??
+      cells.find((cell) => cell.classList.contains("km-tile")) ??
+      cells[Math.floor(cells.length / 2)];
     if (stop !== undefined) {
       stop.tabIndex = 0;
       onSquare = stop.dataset.square ?? null;
     }
     board.replaceChildren(grid);
-    notes.textContent = verdict.notWords.length > 0 ? kumimojiSay(say.notWords, { words: verdict.notWords.join(", ") }) : verdict.apart.size > 0 ? say.apart : "";
+    notes.textContent =
+      verdict.notWords.length > 0
+        ? kumimojiSay(say.notWords, { words: verdict.notWords.join(", ") })
+        : verdict.apart.size > 0
+          ? say.apart
+          : "";
   }
 
   function renderHand() {
@@ -397,7 +473,14 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
       if (face.wild) made.classList.add("km-wild");
       if (held?.from === "hand" && held.at === at) made.classList.add("km-held");
       made.dataset.tile = face.blank ? "*" : words!.glyphOf(tile);
-      made.setAttribute("aria-label", face.blank ? say.wildBlank : face.wild ? kumimojiSay(say.wildTile, { tile: words!.glyphOf(tile) }) : words!.glyphOf(tile));
+      made.setAttribute(
+        "aria-label",
+        face.blank
+          ? say.wildBlank
+          : face.wild
+            ? kumimojiSay(say.wildTile, { tile: words!.glyphOf(tile) })
+            : words!.glyphOf(tile),
+      );
       made.tabIndex = at === Math.min(onHand, play!.hand.length - 1) ? 0 : -1;
       hand.append(made);
     });
@@ -430,26 +513,41 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
       return;
     }
     const now = play!;
-    const drawButton = button(say.draw, () => {
-      held = null;
-      change(draw(now));
-    }, true, "km-draw");
+    const drawButton = button(
+      say.draw,
+      () => {
+        held = null;
+        change(draw(now));
+      },
+      true,
+      "km-draw",
+    );
     drawButton.disabled = !mayDraw(now, verdict);
-    const tradeButton = button(say.trade, () => {
-      if (held?.from !== "hand") return;
-      const at = held.at;
-      held = null;
-      change(trade(now, at));
-    }, false, "km-trade");
+    const tradeButton = button(
+      say.trade,
+      () => {
+        if (held?.from !== "hand") return;
+        const at = held.at;
+        held = null;
+        change(trade(now, at));
+      },
+      false,
+      "km-trade",
+    );
     tradeButton.disabled = held?.from !== "hand" || !mayTrade(now);
     controls.append(
       drawButton,
       tradeButton,
       button(say.sort, () => change(sortHand(now)), false, "km-sort"),
-      button(say.liftAll, () => {
-        held = null;
-        change(liftAll(now));
-      }, false, "km-lift"),
+      button(
+        say.liftAll,
+        () => {
+          held = null;
+          change(liftAll(now));
+        },
+        false,
+        "km-lift",
+      ),
       button(say.newGame, () => void handle.newGame(), false, "km-new"),
     );
   }
@@ -468,20 +566,30 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
   function keyboardAt(): { zone: "board" | "hand" | "controls" | "picker"; id: string } | null {
     const on = document.activeElement;
     if (on === null || !root.contains(on)) return null;
-    const mark = (zone: "board" | "hand" | "controls" | "picker", id: string | undefined) => (id === undefined ? null : { zone, id });
+    const mark = (zone: "board" | "hand" | "controls" | "picker", id: string | undefined) =>
+      id === undefined ? null : { zone, id };
     if (board.contains(on)) return mark("board", (on as HTMLElement).dataset.square);
     if (hand.contains(on)) return mark("hand", (on as HTMLElement).dataset.hand);
     if (controls.contains(on)) return mark("controls", (on as HTMLElement).dataset.testid);
-    if (picker.contains(on)) return mark("picker", String([...picker.querySelectorAll("button")].indexOf(on as HTMLButtonElement)));
+    if (picker.contains(on))
+      return mark("picker", String([...picker.querySelectorAll("button")].indexOf(on as HTMLButtonElement)));
     return null;
   }
 
   function keyboardBack(at: ReturnType<typeof keyboardAt>) {
     if (at === null) return;
     const zone = { board, hand, controls, picker }[at.zone];
-    const found = at.zone === "board" ? zone.querySelector<HTMLElement>(`[data-square="${at.id}"]`) : at.zone === "hand" ? zone.querySelector<HTMLElement>(`[data-hand="${at.id}"]`) : at.zone === "controls" ? zone.querySelector<HTMLElement>(`[data-testid="${at.id}"]`) : zone.querySelectorAll<HTMLElement>("button")[Number(at.id)];
+    const found =
+      at.zone === "board"
+        ? zone.querySelector<HTMLElement>(`[data-square="${at.id}"]`)
+        : at.zone === "hand"
+          ? zone.querySelector<HTMLElement>(`[data-hand="${at.id}"]`)
+          : at.zone === "controls"
+            ? zone.querySelector<HTMLElement>(`[data-testid="${at.id}"]`)
+            : zone.querySelectorAll<HTMLElement>("button")[Number(at.id)];
     // A button that has become disabled cannot hold the focus; the table keeps it rather than dropping it on the page.
-    if (found !== undefined && found !== null && !(found as HTMLButtonElement).disabled) found.focus({ preventScroll: true });
+    if (found !== undefined && found !== null && !(found as HTMLButtonElement).disabled)
+      found.focus({ preventScroll: true });
   }
 
   function render() {
@@ -501,23 +609,36 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
 
   let initialReady: Promise<void> = Promise.resolve();
   const handle: KumimojiTableHandle = {
-    get ready() { return initialReady; },
+    get ready() {
+      return initialReady;
+    },
     set: (changes) => {
-      for (const name of Object.keys(options.theme ?? {})) if (changes.theme !== undefined && !(name in changes.theme)) root.style.removeProperty(name);
-      if (changes.theme !== undefined) for (const [name, value] of Object.entries(changes.theme)) root.style.setProperty(name, value);
+      for (const name of Object.keys(options.theme ?? {}))
+        if (changes.theme !== undefined && !(name in changes.theme)) root.style.removeProperty(name);
+      if (changes.theme !== undefined)
+        for (const [name, value] of Object.entries(changes.theme)) root.style.setProperty(name, value);
       options = { ...options, ...changes };
       if (changes.locale !== undefined) locale = changes.locale;
       if (changes.strings !== undefined) own = changes.strings;
       say = kumimojiStrings(locale, own);
-      if (options.keep === false) keep.remove(); else if (keep.parentNode !== root) root.append(keep);
-      controls.hidden = options.controls === false; render();
+      if (options.keep === false) keep.remove();
+      else if (keep.parentNode !== root) root.append(keep);
+      controls.hidden = options.controls === false;
+      render();
     },
     play: () => play,
     saved: savedNow,
     setGame: async (saved) => {
       const mine = ++asked;
       const language = saved.deal.language;
-      settings = { language, hand: saved.deal.size, level: saved.deal.level, gameLength: saved.deal.gameLength, diagonals: saved.deal.diagonals === true, seed: undefined };
+      settings = {
+        language,
+        hand: saved.deal.size,
+        level: saved.deal.level,
+        gameLength: saved.deal.gameLength,
+        diagonals: saved.deal.diagonals === true,
+        seed: undefined,
+      };
       const list = await loadTileWords(language);
       if (destroyed || mine !== asked) return;
       words = list;
@@ -528,7 +649,8 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
       finishedAt = null;
       started = Date.now() - saved.elapsedMs;
       // A game loaded already finished stays finished, at the time it took, and is not announced again.
-      if (isFinished(saved.play, judgeWithWords(saved.play.tiles, words, { diagonals: settings.diagonals === true }))) finishedAt = Date.now();
+      if (isFinished(saved.play, judgeWithWords(saved.play.tiles, words, { diagonals: settings.diagonals === true })))
+        finishedAt = Date.now();
       play = saved.play;
       note = "";
       options.onChange?.(saved);
@@ -557,7 +679,11 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
       const seed = changed.seed ?? Math.floor(Math.random() * 2 ** 31);
       root.classList.toggle("km-japanese", language === "japanese");
       root.dataset.seed = String(seed);
-      dealt = generateKumimoji(size, settings.level ?? "medium", seed, { language, gameLength: settings.gameLength, diagonals: settings.diagonals });
+      dealt = generateKumimoji(size, settings.level ?? "medium", seed, {
+        language,
+        gameLength: settings.gameLength,
+        diagonals: settings.diagonals,
+      });
       started = Date.now();
       change(deal(dealt.givens, size));
     },
@@ -569,6 +695,11 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
   };
 
   initialReady = options.saved === undefined ? handle.newGame(settings) : handle.setGame(options.saved);
-  void initialReady.catch((error: unknown) => { if (destroyed) return; const problem = error instanceof Error ? error : new Error(String(error)); status.textContent = say.loadError; options.onError?.(problem); });
+  void initialReady.catch((error: unknown) => {
+    if (destroyed) return;
+    const problem = error instanceof Error ? error : new Error(String(error));
+    status.textContent = say.loadError;
+    options.onError?.(problem);
+  });
   return handle;
 }

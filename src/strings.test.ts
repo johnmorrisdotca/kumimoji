@@ -13,7 +13,8 @@ describe("the words, in English and Japanese", () => {
   });
 
   it("a Japanese line fills the same braces as its English", () => {
-    for (const name of Object.keys(KUMIMOJI_STRINGS.en) as (keyof typeof KUMIMOJI_STRINGS.en)[]) expect(braces(KUMIMOJI_STRINGS.ja[name]), name).toEqual(braces(KUMIMOJI_STRINGS.en[name]));
+    for (const name of Object.keys(KUMIMOJI_STRINGS.en) as (keyof typeof KUMIMOJI_STRINGS.en)[])
+      expect(braces(KUMIMOJI_STRINGS.ja[name]), name).toEqual(braces(KUMIMOJI_STRINGS.en[name]));
   });
 
   it("braces are filled in, and one with no value is left", () => {

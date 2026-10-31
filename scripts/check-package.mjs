@@ -32,7 +32,9 @@ function fail(message) {
 }
 
 // 1. Pack, with npm.
-const packed = JSON.parse(run("npm", ["pack", "--json", "--ignore-scripts", "--pack-destination", scratch], root, true));
+const packed = JSON.parse(
+  run("npm", ["pack", "--json", "--ignore-scripts", "--pack-destination", scratch], root, true),
+);
 const tarball = join(scratch, packed[0].filename);
 const inTarball = new Set(packed[0].files.map((file) => file.path));
 console.log(`ok   npm pack: ${packed[0].filename}, ${packed[0].files.length} files`);
@@ -45,11 +47,21 @@ if (shipped.length > 0) {
 console.log("ok   no picture and nothing from docs/ is in the tarball");
 
 // 2. Everything package.json points at is in the tarball, and the notices of the word lists travel with them.
-const pointed = [pkg.main, pkg.module, pkg.types, ...Object.values(pkg.bin ?? {}), ...Object.values(pkg.exports).flatMap((entry) => (typeof entry === "string" ? [entry] : Object.values(entry)))];
-for (const file of new Set(pointed)) if (!inTarball.has(file.replace(/^\.\//, ""))) fail(`package.json points at ${file}, which is not in the tarball`);
+const pointed = [
+  pkg.main,
+  pkg.module,
+  pkg.types,
+  ...Object.values(pkg.bin ?? {}),
+  ...Object.values(pkg.exports).flatMap((entry) => (typeof entry === "string" ? [entry] : Object.values(entry))),
+];
+for (const file of new Set(pointed))
+  if (!inTarball.has(file.replace(/^\.\//, ""))) fail(`package.json points at ${file}, which is not in the tarball`);
 console.log(`ok   every file package.json points at is in the tarball (${new Set(pointed).size})`);
-for (const file of ["LICENSE", "NOTICE.md", "dist/words.en.data.js", "dist/words.ja.data.js"]) if (!inTarball.has(file)) fail(`${file} is not in the tarball`);
-for (const file of inTarball) if (/\.test\.|^src\/|^demo\/|^table\//.test(file)) fail(`the tarball carries ${file}, which nobody who installs it needs`);
+for (const file of ["LICENSE", "NOTICE.md", "dist/words.en.data.js", "dist/words.ja.data.js"])
+  if (!inTarball.has(file)) fail(`${file} is not in the tarball`);
+for (const file of inTarball)
+  if (/\.test\.|^src\/|^demo\/|^table\//.test(file))
+    fail(`the tarball carries ${file}, which nobody who installs it needs`);
 
 // 3. Install it into an empty project, with the one optional peer its React entry needs.
 const project = join(scratch, "project");
@@ -63,9 +75,23 @@ const installed = join(project, "node_modules", ...pkg.name.split("/"));
 const notice = readFileSync(join(installed, "NOTICE.md"), "utf8");
 const english = readFileSync(join(installed, "dist", "words.en.data.js"), "utf8").slice(0, 3000);
 const japanese = readFileSync(join(installed, "dist", "words.ja.data.js"), "utf8").slice(0, 3000);
-if (!notice.includes("Copyright 2000-2018 by Kevin Atkinson") || !notice.includes("Creative Commons Attribution-ShareAlike 4.0") || !notice.includes("edrdg.org")) fail("NOTICE.md has lost a word list's notice");
-if (!english.includes("Copyright 2000-2018 by Kevin Atkinson") || !english.includes("Permission to use, copy, modify, distribute and sell")) fail("the English list's file has lost SCOWL's notice");
-if (!japanese.includes("JMdict") || !japanese.includes("CC BY-SA 4.0") || !japanese.includes("edrdg.org/edrdg/licence.html")) fail("the Japanese list's file has lost JMdict's notice");
+if (
+  !notice.includes("Copyright 2000-2018 by Kevin Atkinson") ||
+  !notice.includes("Creative Commons Attribution-ShareAlike 4.0") ||
+  !notice.includes("edrdg.org")
+)
+  fail("NOTICE.md has lost a word list's notice");
+if (
+  !english.includes("Copyright 2000-2018 by Kevin Atkinson") ||
+  !english.includes("Permission to use, copy, modify, distribute and sell")
+)
+  fail("the English list's file has lost SCOWL's notice");
+if (
+  !japanese.includes("JMdict") ||
+  !japanese.includes("CC BY-SA 4.0") ||
+  !japanese.includes("edrdg.org/edrdg/licence.html")
+)
+  fail("the Japanese list's file has lost JMdict's notice");
 console.log("ok   the word lists' notices are in NOTICE.md and in each list's own file");
 
 // 4. Every entry in `exports`, by ESM and by require; both lists read; a seeded game that must come out as it always has.

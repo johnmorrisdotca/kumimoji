@@ -2,7 +2,16 @@ import type { ComputerSaid, ComputerStep } from "./computer.types.ts";
 import { bestLaying, judgeTiles, tradeChoice } from "./computerPlay.ts";
 import { drawAll, isComputer, mayDrawAll, mayTradeThisTurn, seatPlay, withSeatPlay } from "./party.ts";
 import type { PartyGame } from "./party.types.ts";
-import { doneRefused, endTurn, goesOut, handCanSpell, isLastTurn, laidThisTurn, mayResign, resign } from "./partyTurns.ts";
+import {
+  doneRefused,
+  endTurn,
+  goesOut,
+  handCanSpell,
+  isLastTurn,
+  laidThisTurn,
+  mayResign,
+  resign,
+} from "./partyTurns.ts";
 import { liftAll, mayTrade, trade } from "./play.ts";
 import type { TileWords } from "./tileWords.ts";
 
@@ -73,7 +82,8 @@ export function planComputerTurn(game: PartyGame, words: TileWords): ComputerSte
   const handSpells = (hand: readonly string[]) => handCanSpell(hand, words);
 
   // Only its own moves ever reach its table, so this is a guard: a table that is not sound is taken up and built again.
-  if (now.players[now.turn]!.tiles.size > 0 && !verdict().sound) take(withSeatPlay(now, liftAll(seatPlay(now))), { kind: "rebuilt" });
+  if (now.players[now.turn]!.tiles.size > 0 && !verdict().sound)
+    take(withSeatPlay(now, liftAll(seatPlay(now))), { kind: "rebuilt" });
 
   while (steps.length < COMPUTER_STEPS_MOST) {
     const play = seatPlay(now);
@@ -98,12 +108,17 @@ export function planComputerTurn(game: PartyGame, words: TileWords): ComputerSte
     const laid = bestLaying(play, words, rules);
     const worst = tradeChoice(play.hand, words) ?? 0;
     if (laid !== null) take(withSeatPlay(now, laid.play), { kind: "laid", word: laid.word });
-    else if (mayTradeThisTurn(now)) take(withSeatPlay(now, trade(play, worst)), { kind: "traded", tile: play.hand[worst]! });
+    else if (mayTradeThisTurn(now))
+      take(withSeatPlay(now, trade(play, worst)), { kind: "traded", tile: play.hand[worst]! });
     else break;
   }
 
   const hand = now.players[now.turn]!.hand;
-  const stuck = hand.length > 0 && !laidThisTurn(now) && !mayTrade(seatPlay(now)) && bestLaying(seatPlay(now), words, rules) === null;
+  const stuck =
+    hand.length > 0 &&
+    !laidThisTurn(now) &&
+    !mayTrade(seatPlay(now)) &&
+    bestLaying(seatPlay(now), words, rules) === null;
   const refused = doneRefused(now, verdict(), handSpells) !== null;
   if ((refused || (stuck && !isLastTurn(now))) && mayResign(now)) {
     take(resign(now), { kind: "resigned" });

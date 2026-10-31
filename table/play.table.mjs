@@ -58,7 +58,9 @@ test("a whole game by taps: NOW, then SNOW, then SNOWY", async ({ page }) => {
   expect((await state(page)).hand.length).toBe(3);
 });
 
-test("a tile is taken back by tapping it twice, and all of them by Lift all; Sort puts the hand in order", async ({ page }) => {
+test("a tile is taken back by tapping it twice, and all of them by Lift all; Sort puts the hand in order", async ({
+  page,
+}) => {
   const errors = await open(page);
   await lay(page, 0, 0, 0);
   await lay(page, 0, 1, 0);

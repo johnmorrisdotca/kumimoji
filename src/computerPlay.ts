@@ -132,7 +132,8 @@ function layings(play: TilePlay, words: TileWords, rules: GridRules): Laying[] {
   const bounds = boundsOf(play.tiles);
   const fits = (first: Square, last: Square) =>
     bounds === null ||
-    (Math.max(bounds.bottom, last.row) - Math.min(bounds.top, first.row) < KUMIMOJI_GRID_MOST && Math.max(bounds.right, last.col) - Math.min(bounds.left, first.col) < KUMIMOJI_GRID_MOST);
+    (Math.max(bounds.bottom, last.row) - Math.min(bounds.top, first.row) < KUMIMOJI_GRID_MOST &&
+      Math.max(bounds.right, last.col) - Math.min(bounds.left, first.col) < KUMIMOJI_GRID_MOST);
 
   const found: Laying[] = [];
   let tried = 0;
@@ -161,8 +162,17 @@ function layings(play: TilePlay, words: TileWords, rules: GridRules): Laying[] {
             const fit = crossingFit(letterAt, () => true, word, anchor, at, across, diagonalWord);
             if (fit === null) continue;
             const step = across ? { row: 0, col: 1 } : { row: 1, col: 0 };
-            if (!fits(fit.first, { row: fit.first.row + (length - 1) * step.row, col: fit.first.col + (length - 1) * step.col })) continue;
-            const fresh = fit.fresh.map((square) => ({ square: squareAt(square.row, square.col), letter: word[(square.row - fit.first.row) + (square.col - fit.first.col)]! }));
+            if (
+              !fits(fit.first, {
+                row: fit.first.row + (length - 1) * step.row,
+                col: fit.first.col + (length - 1) * step.col,
+              })
+            )
+              continue;
+            const fresh = fit.fresh.map((square) => ({
+              square: squareAt(square.row, square.col),
+              letter: word[square.row - fit.first.row + (square.col - fit.first.col)]!,
+            }));
             const wilds = wildsNeeded(fresh, hand);
             if (wilds !== null) keep({ word, fresh, wilds, score: worth(fresh, wilds, words) });
           }
@@ -214,7 +224,11 @@ const JUDGED_MOST = 12;
  * console.log(bestLaying(play,words)?.word);
  * ```
  */
-export function bestLaying(play: TilePlay, words: TileWords, rules: GridRules = {}): { play: TilePlay; word: string } | null {
+export function bestLaying(
+  play: TilePlay,
+  words: TileWords,
+  rules: GridRules = {},
+): { play: TilePlay; word: string } | null {
   if (play.hand.length === 0) return null;
   if (play.tiles.size > 0 && !judgeTiles(play.tiles, words, rules).sound) return null;
   for (const laying of layings(play, words, rules).slice(0, JUDGED_MOST)) {

@@ -89,7 +89,11 @@ export const BOARD_LEAST = 7;
  * console.log(boardModel(tiles,null).squares.length);
  * ```
  */
-export function boardModel(tiles: Tiles, verdict: GridVerdict | null, glyphOf: (tile: string) => string = (tile) => tileFace(tile).glyph): BoardModel {
+export function boardModel(
+  tiles: Tiles,
+  verdict: GridVerdict | null,
+  glyphOf: (tile: string) => string = (tile) => tileFace(tile).glyph,
+): BoardModel {
   const bounds = boundsOf(tiles) ?? { top: 0, left: 0, bottom: 0, right: 0 };
   let top = bounds.top - BOARD_MARGIN;
   let left = bounds.left - BOARD_MARGIN;
@@ -109,8 +113,22 @@ export function boardModel(tiles: Tiles, verdict: GridVerdict | null, glyphOf: (
       const square = squareAt(row, col);
       const tile = tiles.get(square) ?? null;
       const mark: TileMark | null =
-        tile === null || verdict === null ? null : verdict.misspelt.has(square) ? "misspelt" : verdict.apart.has(square) ? "apart" : "sound";
-      squares.push({ square, row, col, tile, glyph: tile === null ? "" : glyphOf(tile), wild: tile !== null && tileFace(tile).wild, mark });
+        tile === null || verdict === null
+          ? null
+          : verdict.misspelt.has(square)
+            ? "misspelt"
+            : verdict.apart.has(square)
+              ? "apart"
+              : "sound";
+      squares.push({
+        square,
+        row,
+        col,
+        tile,
+        glyph: tile === null ? "" : glyphOf(tile),
+        wild: tile !== null && tileFace(tile).wild,
+        mark,
+      });
     }
   }
   return { rows, cols, squares };

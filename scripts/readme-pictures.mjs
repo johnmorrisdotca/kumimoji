@@ -39,21 +39,32 @@ async function taps({ language, seed, words }) {
   return steps;
 }
 
-
 /** Lay `words` words by taps, then wait for the table to settle. */
-const laid = ({ language, seed, words }) => async (page) => {
-  for (const step of await taps({ language, seed, words })) {
-    if (step.draw) await page.locator('#table [data-testid="km-draw"]').click();
-    else {
-      await page.locator(`#table [data-hand="${step.hand}"]`).click();
-      await page.locator(`#table [data-square="${step.square}"]`).click();
+const laid =
+  ({ language, seed, words }) =>
+  async (page) => {
+    for (const step of await taps({ language, seed, words })) {
+      if (step.draw) await page.locator('#table [data-testid="km-draw"]').click();
+      else {
+        await page.locator(`#table [data-hand="${step.hand}"]`).click();
+        await page.locator(`#table [data-square="${step.square}"]`).click();
+      }
     }
-  }
-};
-const address = ({ seed, hand = 7, level = "hard", words = "english", lang = "en", extra = "" }) => `/?seed=${seed}&hand=${hand}&level=${level}&words=${words}&lang=${lang}${extra}`;
+  };
+const address = ({ seed, hand = 7, level = "hard", words = "english", lang = "en", extra = "" }) =>
+  `/?seed=${seed}&hand=${hand}&level=${level}&words=${words}&lang=${lang}${extra}`;
 
 /** The table alone, cropped. */
-const table = (subject, query, play, shape = {}) => ({ subject, views: ["desk"], scale: 2, url: address(query), ready: `${TABLE}[data-state="playing"]`, target: `${TABLE} [data-testid="km-board"]`, prepare: laid(play), ...shape });
+const table = (subject, query, play, shape = {}) => ({
+  subject,
+  views: ["desk"],
+  scale: 2,
+  url: address(query),
+  ready: `${TABLE}[data-state="playing"]`,
+  target: `${TABLE} [data-testid="km-board"]`,
+  prepare: laid(play),
+  ...shape,
+});
 
 await takePictures({
   shots: [
@@ -70,7 +81,9 @@ await takePictures({
           await page.goto(`http://kumimoji.test${address({ seed: 1, words: "japanese", lang: "ja" })}`);
           await page.waitForSelector(`${TABLE}[data-state="playing"]`);
           await laid({ language: "japanese", seed: 1, words: 5 })(page);
-          await page.locator(TABLE).evaluate((element) => window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY - 16));
+          await page
+            .locator(TABLE)
+            .evaluate((element) => window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY - 16));
         } else {
           await laid({ language: "english", seed: 77, words: 7 })(page);
           await page.evaluate(() => window.scrollTo(0, 0));
@@ -79,17 +92,27 @@ await takePictures({
     },
     table("english", { seed: 77 }, { language: "english", seed: 77, words: 7 }),
     table("kana", { seed: 1, words: "japanese", lang: "ja" }, { language: "japanese", seed: 1, words: 5 }),
-    table("wild-tiles", { seed: 5, level: "easy" }, { language: "english", seed: 5, words: 0 }, { target: `${TABLE} [data-testid="km-hand"]` }),
+    table(
+      "wild-tiles",
+      { seed: 5, level: "easy" },
+      { language: "english", seed: 5, words: 0 },
+      { target: `${TABLE} [data-testid="km-hand"]` },
+    ),
     // The smallest game there is (seed 44, a hand of three): N beside W is not a word, and the table rings both.
-    table("not-a-word", { seed: 44, hand: 3 }, { language: "english", seed: 44, words: 0 }, {
-      async prepare(page) {
-        for (const square of ["0,0", "0,1"]) {
-          await page.locator('#table [data-hand="0"]').click();
-          await page.locator(`#table [data-square="${square}"]`).click();
-        }
-        await page.locator(`${TABLE} .km-misspelt`).first().waitFor();
+    table(
+      "not-a-word",
+      { seed: 44, hand: 3 },
+      { language: "english", seed: 44, words: 0 },
+      {
+        async prepare(page) {
+          for (const square of ["0,0", "0,1"]) {
+            await page.locator('#table [data-hand="0"]').click();
+            await page.locator(`#table [data-square="${square}"]`).click();
+          }
+          await page.locator(`${TABLE} .km-misspelt`).first().waitFor();
+        },
       },
-    }),
+    ),
     table("hand-of-eleven", { seed: 33, hand: 11 }, { language: "english", seed: 33, words: 5 }),
   ],
 });

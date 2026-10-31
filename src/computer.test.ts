@@ -19,7 +19,12 @@ beforeAll(async () => {
   japanese = await loadTileWords("japanese");
 });
 
-const settingsFor = (language: "english" | "japanese", seed: number, size: number = KUMIMOJI_HANDS.quick, diagonals = false): PartySettings => ({
+const settingsFor = (
+  language: "english" | "japanese",
+  seed: number,
+  size: number = KUMIMOJI_HANDS.quick,
+  diagonals = false,
+): PartySettings => ({
   size,
   level: "medium",
   seed,
@@ -34,11 +39,16 @@ const COMPUTER = { name: "", computer: true };
 /** A game of computers only, on the seed's own bag. */
 function computersOnly(language: "english" | "japanese", seed: number, players = 2, diagonals = false): PartyGame {
   const bag = generateKumimoji(KUMIMOJI_HANDS.quick, "medium", seed, { language, diagonals }).givens;
-  return startParty(settingsFor(language, seed, KUMIMOJI_HANDS.quick, diagonals), bag, Array.from({ length: players }, () => COMPUTER));
+  return startParty(
+    settingsFor(language, seed, KUMIMOJI_HANDS.quick, diagonals),
+    bag,
+    Array.from({ length: players }, () => COMPUTER),
+  );
 }
 
 /** Every tile a player holds, as a tally of the set's tiles (a wild being any wild). */
-const holding = (game: PartyGame, at: number, words: TileWords) => lettersOf([...game.players[at]!.hand, ...game.players[at]!.tiles.values()].map((tile) => words.familyKey(tile)!));
+const holding = (game: PartyGame, at: number, words: TileWords) =>
+  lettersOf([...game.players[at]!.hand, ...game.players[at]!.tiles.values()].map((tile) => words.familyKey(tile)!));
 
 /**
  * One whole game of computers, turn by turn, checking after every step of
@@ -117,7 +127,15 @@ describe("what a computer lays", () => {
 
   it("lays nothing it cannot, and nothing on a table that is not sound", () => {
     expect(bestLaying(play("qqx"), english)).toBeNull();
-    expect(bestLaying(play("at", [[0, 0, "q"], [0, 1, "q"]]), english)).toBeNull();
+    expect(
+      bestLaying(
+        play("at", [
+          [0, 0, "q"],
+          [0, 1, "q"],
+        ]),
+        english,
+      ),
+    ).toBeNull();
   });
 
   it("trades its rarest letter, and never a wild", () => {
@@ -138,7 +156,9 @@ describe("what a computer lays", () => {
 describe("a computer's turn", () => {
   it("is the same turn every time it is planned, so a reload replays it exactly", () => {
     const game = computersOnly("english", 3);
-    expect(planComputerTurn(game, english).map((step) => encodeParty(step.game))).toEqual(planComputerTurn(game, english).map((step) => encodeParty(step.game)));
+    expect(planComputerTurn(game, english).map((step) => encodeParty(step.game))).toEqual(
+      planComputerTurn(game, english).map((step) => encodeParty(step.game)),
+    );
   });
 
   it("lays its own tiles on its own table, ends with Done, and passes to the next seat", () => {
@@ -153,7 +173,10 @@ describe("a computer's turn", () => {
     expect(after.passedBy).toBe(0);
     // Aiko's own hand only grew, by the Draws the computer called.
     const draws = steps.filter((step) => step.said.kind === "drew").length;
-    expect(after.players[1]!.hand).toEqual([...game.players[1]!.hand, ...after.players[1]!.hand.slice(KUMIMOJI_HANDS.quick)]);
+    expect(after.players[1]!.hand).toEqual([
+      ...game.players[1]!.hand,
+      ...after.players[1]!.hand.slice(KUMIMOJI_HANDS.quick),
+    ]);
     expect(after.players[1]!.hand).toHaveLength(KUMIMOJI_HANDS.quick + draws);
     expect(after.players[1]!.tiles.size).toBe(0);
   });
@@ -169,7 +192,11 @@ describe("a computer's turn", () => {
   it("trades a hand that lays nothing, and resigns only when the bag cannot give a trade", () => {
     const bag = generateKumimoji(KUMIMOJI_HANDS.quick, "medium", 21).givens;
     const base = startParty(settingsFor("english", 21), bag, [COMPUTER, "Aiko"]);
-    const stuck = (hand: string, taken: number): PartyGame => ({ ...base, taken, players: base.players.map((player, at) => (at === 0 ? { ...player, hand: [...hand] } : player)) });
+    const stuck = (hand: string, taken: number): PartyGame => ({
+      ...base,
+      taken,
+      players: base.players.map((player, at) => (at === 0 ? { ...player, hand: [...hand] } : player)),
+    });
     const trading = planComputerTurn(stuck("qqx", base.taken), english);
     expect(trading[0]!.said.kind).toBe("traded");
     expect(trading.at(-1)!.said.kind).not.toBe("resigned");
@@ -198,7 +225,8 @@ describe("a computer's turn", () => {
   it("goes out first, against itself, in about half of quick English games", () => {
     let outs = 0;
     const games = 12;
-    for (let seed = 101; seed < 101 + games; seed += 1) if (playOut(computersOnly("english", seed), english).game.ending === "out") outs += 1;
+    for (let seed = 101; seed < 101 + games; seed += 1)
+      if (playOut(computersOnly("english", seed), english).game.ending === "out") outs += 1;
     // Measured at 23 of 40 on seeds 1–40; the rest end tied with both stuck on a tile or three.
     expect(outs).toBeGreaterThanOrEqual(3);
   });
@@ -225,7 +253,12 @@ describe("a computer's turn", () => {
         for (const step of planComputerTurn(now, english)) {
           const seat = before.turn;
           const tiles = step.game.players[seat]!.tiles;
-          if (step.said.kind === "laid" && judgeTiles(tiles, english).sound && !judgeTiles(tiles, english, DIAGONALS).sound) tempted.push(seatPlay(before));
+          if (
+            step.said.kind === "laid" &&
+            judgeTiles(tiles, english).sound &&
+            !judgeTiles(tiles, english, DIAGONALS).sound
+          )
+            tempted.push(seatPlay(before));
           before = step.game;
         }
         now = before;

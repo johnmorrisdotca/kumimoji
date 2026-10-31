@@ -23,7 +23,15 @@ import {
   tilesLeft,
   trade,
 } from "./play.ts";
-import { KUMIMOJI_BAG, KUMIMOJI_HANDS, KUMIMOJI_TRADE, KUMIMOJI_WILDS, kumimojiTileCount, TILE_MIX, TILE_MIX_TOTAL } from "./tiles.constants.ts";
+import {
+  KUMIMOJI_BAG,
+  KUMIMOJI_HANDS,
+  KUMIMOJI_TRADE,
+  KUMIMOJI_WILDS,
+  kumimojiTileCount,
+  TILE_MIX,
+  TILE_MIX_TOTAL,
+} from "./tiles.constants.ts";
 import { loadTileWords, tileWords, unpackLength } from "./tileWords.ts";
 
 beforeAll(async () => {
@@ -35,7 +43,9 @@ const isWord = (word: string) => tileWords().allowed.has(word);
 /** A grid from rows of text, "." for an empty square, its first row and column at 0. */
 function gridOf(...rows: string[]): Map<string, string> {
   const tiles = new Map<string, string>();
-  rows.forEach((line, row) => [...line].forEach((letter, col) => letter !== "." && tiles.set(squareAt(row, col), letter)));
+  rows.forEach((line, row) =>
+    [...line].forEach((letter, col) => letter !== "." && tiles.set(squareAt(row, col), letter)),
+  );
   return tiles;
 }
 
@@ -52,8 +62,18 @@ describe("the kumimoji tile mix", () => {
   });
 
   it("sizes short, medium and full games for one or two tile sets", () => {
-    expect([kumimojiTileCount(7, "short"), kumimojiTileCount(11, "short"), kumimojiTileCount(7, "medium"), kumimojiTileCount(7, "full")]).toEqual([40, 50, 72, 144]);
-    expect([kumimojiTileCount(7, "short", TILE_MIX_TOTAL, true), kumimojiTileCount(11, "short", TILE_MIX_TOTAL, true), kumimojiTileCount(7, "medium", TILE_MIX_TOTAL, true), kumimojiTileCount(7, "full", TILE_MIX_TOTAL, true)]).toEqual([80, 100, 144, 288]);
+    expect([
+      kumimojiTileCount(7, "short"),
+      kumimojiTileCount(11, "short"),
+      kumimojiTileCount(7, "medium"),
+      kumimojiTileCount(7, "full"),
+    ]).toEqual([40, 50, 72, 144]);
+    expect([
+      kumimojiTileCount(7, "short", TILE_MIX_TOTAL, true),
+      kumimojiTileCount(11, "short", TILE_MIX_TOTAL, true),
+      kumimojiTileCount(7, "medium", TILE_MIX_TOTAL, true),
+      kumimojiTileCount(7, "full", TILE_MIX_TOTAL, true),
+    ]).toEqual([80, 100, 144, 288]);
     expect(kumimojiTileCount(7, "medium", 200)).toBe(100);
   });
 });
@@ -66,7 +86,8 @@ describe("the kumimoji word list", () => {
   it("holds every length from two to fifteen, everyday words, and no letter-plurals", () => {
     const words = tileWords();
     for (let length = 2; length <= 15; length += 1) expect(words.byLength.get(length)?.length ?? 0).toBeGreaterThan(0);
-    for (const word of ["at", "qi", "cat", "quiz", "crossword", "extraordinary"]) expect(words.allowed.has(word), word).toBe(true);
+    for (const word of ["at", "qi", "cat", "quiz", "crossword", "extraordinary"])
+      expect(words.allowed.has(word), word).toBe(true);
     for (const word of ["ks", "lm", "mb", "zzq", "catz"]) expect(words.allowed.has(word), word).toBe(false);
     expect(words.allowed.size).toBeGreaterThan(100_000);
   });
@@ -147,7 +168,11 @@ describe("a kumimoji grid", () => {
 
   it("finds every run across and down, and marks what is not a word or not joined", () => {
     const sound = gridOf("cat", "o..", "w..");
-    expect(runsOf(sound).map((run) => run.word).sort()).toEqual(["cat", "cow"]);
+    expect(
+      runsOf(sound)
+        .map((run) => run.word)
+        .sort(),
+    ).toEqual(["cat", "cow"]);
     expect(judgeGrid(sound, isWord).sound).toBe(true);
 
     const misspelt = judgeGrid(gridOf("cat", "oz.", "w.."), isWord);
@@ -164,19 +189,22 @@ describe("a kumimoji grid", () => {
 });
 
 describe("making a kumimoji", () => {
-  it.each(Object.values(KUMIMOJI_HANDS))("deals a bag of the right size at hand %i, laid out once as a sound crossword", (size) => {
-    for (const seed of [1, 2, 3, 77, 20260926]) {
-      const puzzle = generateKumimoji(size, "medium", seed);
-      expect(puzzle.givens).toHaveLength(KUMIMOJI_BAG[size]!);
-      expect(checkKumimoji(size, puzzle.givens, puzzle.solution, { level: "medium" })).toEqual({ ok: true });
-      expect(generateKumimoji(size, "medium", seed)).toEqual(puzzle);
+  it.each(Object.values(KUMIMOJI_HANDS))(
+    "deals a bag of the right size at hand %i, laid out once as a sound crossword",
+    (size) => {
+      for (const seed of [1, 2, 3, 77, 20260926]) {
+        const puzzle = generateKumimoji(size, "medium", seed);
+        expect(puzzle.givens).toHaveLength(KUMIMOJI_BAG[size]!);
+        expect(checkKumimoji(size, puzzle.givens, puzzle.solution, { level: "medium" })).toEqual({ ok: true });
+        expect(generateKumimoji(size, "medium", seed)).toEqual(puzzle);
         expect([...puzzle.givens].filter(tileWords().isWild)).toHaveLength(KUMIMOJI_WILDS[size]!.medium);
         for (const [letter, count] of lettersOf(puzzle.givens).entries()) {
           if (tileWords().isWild(letter)) continue;
           expect(count).toBeLessThanOrEqual(TILE_MIX[letter]!);
         }
-    }
-  });
+      }
+    },
+  );
 
   it("deals different bags from different seeds", () => {
     expect(generateKumimoji(11, "medium", 1).givens).not.toBe(generateKumimoji(11, "medium", 2).givens);
@@ -187,14 +215,18 @@ describe("making a kumimoji", () => {
       const started = performance.now();
       const puzzle = generateKumimoji(7, "medium", seed, { gameLength: "full" });
       expect(performance.now() - started, `seed ${seed}`).toBeLessThan(8_000);
-      expect(checkKumimoji(7, puzzle.givens, puzzle.solution, { level: "medium", gameLength: "full" })).toEqual({ ok: true });
+      expect(checkKumimoji(7, puzzle.givens, puzzle.solution, { level: "medium", gameLength: "full" })).toEqual({
+        ok: true,
+      });
     }
   });
 
   it("lays and independently checks a full Double inventory", () => {
     const puzzle = generateKumimoji(7, "medium", 20260928, { gameLength: "full", doubleSet: true });
     expect(puzzle.givens).toHaveLength(288);
-    expect(checkKumimoji(7, puzzle.givens, puzzle.solution, { level: "medium", gameLength: "full", doubleSet: true })).toEqual({ ok: true });
+    expect(
+      checkKumimoji(7, puzzle.givens, puzzle.solution, { level: "medium", gameLength: "full", doubleSet: true }),
+    ).toEqual({ ok: true });
   });
 
   it("lays a Japanese bag and independently checks its words and wilds", async () => {
@@ -204,7 +236,9 @@ describe("making a kumimoji", () => {
       const puzzle = generateKumimoji(7, "medium", seed, { language: "japanese" });
       expect(puzzle.givens).toHaveLength(40);
       expect([...puzzle.givens].filter(words.isWild)).toHaveLength(3);
-      expect(checkKumimoji(7, puzzle.givens, puzzle.solution, { level: "medium", language: "japanese" })).toEqual({ ok: true });
+      expect(checkKumimoji(7, puzzle.givens, puzzle.solution, { level: "medium", language: "japanese" })).toEqual({
+        ok: true,
+      });
     }
   });
 });

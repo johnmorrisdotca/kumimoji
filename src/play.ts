@@ -97,7 +97,11 @@ function withTiles(play: TilePlay, change: (tiles: Map<string, string>) => void)
 export function placeFromHand(play: TilePlay, handAt: number, square: string): TilePlay {
   const letter = play.hand[handAt];
   if (letter === undefined || play.tiles.has(square)) return play;
-  return { ...play, tiles: withTiles(play, (tiles) => tiles.set(square, letter)), hand: play.hand.filter((_, at) => at !== handAt) };
+  return {
+    ...play,
+    tiles: withTiles(play, (tiles) => tiles.set(square, letter)),
+    hand: play.hand.filter((_, at) => at !== handAt),
+  };
 }
 
 /** Give a hand tile its chosen reading, without changing which physical tile it is.
@@ -242,7 +246,10 @@ export function liftAll(play: TilePlay): TilePlay {
  * ```
  */
 export function sortHand(play: TilePlay): TilePlay {
-  const hand = [...play.hand].sort((a, b) => Number(tileFace(a).wild) - Number(tileFace(b).wild) || (tileFace(a).wild ? 0 : a < b ? -1 : a > b ? 1 : 0));
+  const hand = [...play.hand].sort(
+    (a, b) =>
+      Number(tileFace(a).wild) - Number(tileFace(b).wild) || (tileFace(a).wild ? 0 : a < b ? -1 : a > b ? 1 : 0),
+  );
   return { ...play, hand };
 }
 
@@ -319,7 +326,12 @@ export function trade(play: TilePlay, handAt: number): TilePlay {
   if (letter === undefined || !mayTrade(play)) return play;
   const returned = play.returned + letter;
   const coming = (play.bag + returned).slice(play.taken, play.taken + KUMIMOJI_TRADE.take);
-  return { ...play, returned, taken: play.taken + coming.length, hand: [...play.hand.filter((_, at) => at !== handAt), ...coming] };
+  return {
+    ...play,
+    returned,
+    taken: play.taken + coming.length,
+    hand: [...play.hand.filter((_, at) => at !== handAt), ...coming],
+  };
 }
 
 /** Whether the game is over: the bag empty, the hand used, and the grid sound.
@@ -375,11 +387,18 @@ export function encodeTileProgress(play: TilePlay): string {
  * console.log(readTileProgress(encodeTileProgress(play)));
  * ```
  */
-export function readTileProgress(code: string): { taken: number; returned: string; hand: string[]; tiles: Map<string, string> } | null {
+export function readTileProgress(
+  code: string,
+): { taken: number; returned: string; hand: string[]; tiles: Map<string, string> } | null {
   const parts = code.split(":");
   if (parts.length !== 4) return null;
   const [takenText, returned, hand, grid] = parts as [string, string, string, string];
-  if (!/^\d{1,3}$/.test(takenText) || !/^[a-zA-Z*\uE000-\uF8FF]*$/.test(returned) || !/^[a-zA-Z*\uE000-\uF8FF]*$/.test(hand)) return null;
+  if (
+    !/^\d{1,3}$/.test(takenText) ||
+    !/^[a-zA-Z*\uE000-\uF8FF]*$/.test(returned) ||
+    !/^[a-zA-Z*\uE000-\uF8FF]*$/.test(hand)
+  )
+    return null;
   const tiles = decodeGrid(grid);
   if (tiles === null) return null;
   return { taken: Number(takenText), returned, hand: [...hand], tiles };
@@ -406,13 +425,19 @@ export function readTileProgress(code: string): { taken: number; returned: strin
  * console.log(decodeTileProgress(encodeTileProgress(play),play.bag));
  * ```
  */
-export function decodeTileProgress(code: string, bag: string, language: "english" | "japanese" = "english"): TilePlay | null {
+export function decodeTileProgress(
+  code: string,
+  bag: string,
+  language: "english" | "japanese" = "english",
+): TilePlay | null {
   const read = readTileProgress(code);
   if (read === null) return null;
   const words = tileWords(language);
   const line = bag + read.returned;
   if (read.taken > line.length) return null;
-  const held = lettersOf([...line.slice(0, read.taken)].map(words.familyKey).filter((tile): tile is string => tile !== null));
+  const held = lettersOf(
+    [...line.slice(0, read.taken)].map(words.familyKey).filter((tile): tile is string => tile !== null),
+  );
   for (const tile of read.returned) {
     const identity = words.familyKey(tile);
     if (identity === null) return null;

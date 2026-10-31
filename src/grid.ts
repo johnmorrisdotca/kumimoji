@@ -88,7 +88,12 @@ export function boundsOf(tiles: Tiles): Bounds | null {
     bounds =
       bounds === null
         ? { top: row, left: col, bottom: row, right: col }
-        : { top: Math.min(bounds.top, row), left: Math.min(bounds.left, col), bottom: Math.max(bounds.bottom, row), right: Math.max(bounds.right, col) };
+        : {
+            top: Math.min(bounds.top, row),
+            left: Math.min(bounds.left, col),
+            bottom: Math.max(bounds.bottom, row),
+            right: Math.max(bounds.right, col),
+          };
   }
   return bounds;
 }
@@ -231,7 +236,12 @@ export function sameLetters(a: Map<string, number>, b: Map<string, number>): boo
 export type RunLine = "across" | "down" | "downRight" | "downLeft";
 
 /** One step along each line, as rows and columns. */
-const STEP: Record<RunLine, readonly [number, number]> = { across: [0, 1], down: [1, 0], downRight: [1, 1], downLeft: [1, -1] };
+const STEP: Record<RunLine, readonly [number, number]> = {
+  across: [0, 1],
+  down: [1, 0],
+  downRight: [1, 1],
+  downLeft: [1, -1],
+};
 
 /**
  * The fewest tiles a diagonal run needs before it is read. Two tiles touching
@@ -307,7 +317,11 @@ function runsAlong(tiles: Tiles, line: RunLine, least: number): Run[] {
  */
 export function runsOf(tiles: Tiles, rules: GridRules = {}): Run[] {
   const runs = [...runsAlong(tiles, "across", 2), ...runsAlong(tiles, "down", 2)];
-  if (rules.diagonals === true) runs.push(...runsAlong(tiles, "downRight", DIAGONAL_RUN_LEAST), ...runsAlong(tiles, "downLeft", DIAGONAL_RUN_LEAST));
+  if (rules.diagonals === true)
+    runs.push(
+      ...runsAlong(tiles, "downRight", DIAGONAL_RUN_LEAST),
+      ...runsAlong(tiles, "downLeft", DIAGONAL_RUN_LEAST),
+    );
   return runs;
 }
 
@@ -349,7 +363,13 @@ export function groupsOf(tiles: Tiles, links: readonly Run[] = []): string[][] {
       const at = queue.pop()!;
       group.push(at);
       const { row, col } = placeOf(at);
-      for (const near of [squareAt(row - 1, col), squareAt(row + 1, col), squareAt(row, col - 1), squareAt(row, col + 1), ...(joined.get(at) ?? [])]) {
+      for (const near of [
+        squareAt(row - 1, col),
+        squareAt(row + 1, col),
+        squareAt(row, col - 1),
+        squareAt(row, col + 1),
+        ...(joined.get(at) ?? []),
+      ]) {
         if (tiles.has(near) && !seen.has(near)) {
           seen.add(near);
           queue.push(near);
@@ -407,7 +427,12 @@ export type GridVerdict = {
  * console.log(judgeGrid(tiles,word=>word==="cat"));
  * ```
  */
-export function judgeGrid(tiles: Tiles, isWord: (word: string) => boolean, readable: (word: string) => string = (word) => word, rules: GridRules = {}): GridVerdict {
+export function judgeGrid(
+  tiles: Tiles,
+  isWord: (word: string) => boolean,
+  readable: (word: string) => string = (word) => word,
+  rules: GridRules = {},
+): GridVerdict {
   const misspelt = new Set<string>();
   const notWords: string[] = [];
   const runs = runsOf(tiles, rules);
@@ -416,7 +441,16 @@ export function judgeGrid(tiles: Tiles, isWord: (word: string) => boolean, reada
     notWords.push(readable(run.word));
     for (const at of run.squares) misspelt.add(at);
   }
-  const groups = groupsOf(tiles, runs.filter((run) => run.line === "downRight" || run.line === "downLeft"));
+  const groups = groupsOf(
+    tiles,
+    runs.filter((run) => run.line === "downRight" || run.line === "downLeft"),
+  );
   const apart = new Set(groups.slice(1).flat());
-  return { sound: tiles.size >= 2 && groups.length === 1 && notWords.length === 0, tiles: tiles.size, misspelt, apart, notWords };
+  return {
+    sound: tiles.size >= 2 && groups.length === 1 && notWords.length === 0,
+    tiles: tiles.size,
+    misspelt,
+    apart,
+    notWords,
+  };
 }

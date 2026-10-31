@@ -10,7 +10,17 @@
 //
 // Run it before a release that names a framework. It needs the network and a few minutes.
 import { execFileSync } from "node:child_process";
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { extname, join, resolve } from "node:path";
@@ -19,7 +29,13 @@ import process from "node:process";
 const root = resolve(process.argv[2] ?? mkdtempSync(join(tmpdir(), "kumimoji-frameworks-")));
 rmSync(root, { recursive: true, force: true });
 mkdirSync(root, { recursive: true });
-const run = (cwd, command, args) => execFileSync(command, args, { cwd, stdio: "pipe", shell: process.platform === "win32", env: { ...process.env, NG_CLI_ANALYTICS: "false" } }).toString();
+const run = (cwd, command, args) =>
+  execFileSync(command, args, {
+    cwd,
+    stdio: "pipe",
+    shell: process.platform === "win32",
+    env: { ...process.env, NG_CLI_ANALYTICS: "false" },
+  }).toString();
 const write = (dir, files) => {
   for (const [name, text] of Object.entries(files)) {
     mkdirSync(join(dir, name, ".."), { recursive: true });
@@ -28,9 +44,13 @@ const write = (dir, files) => {
 };
 
 run(process.cwd(), "npm", ["pack", "--ignore-scripts", "--pack-destination", root]);
-const tarball = join(root, readdirSync(root).find((name) => name.endsWith(".tgz")));
+const tarball = join(
+  root,
+  readdirSync(root).find((name) => name.endsWith(".tgz")),
+);
 const kumimoji = `file:${tarball}`;
-const page = (script) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>kumimoji</title></head><body><div id="app"></div>${script}</body></html>`;
+const page = (script) =>
+  `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>kumimoji</title></head><body><div id="app"></div>${script}</body></html>`;
 // The README's examples, by the heading each stands under.
 const readme = readFileSync(join(process.cwd(), "README.md"), "utf8");
 function example(heading, lang) {
@@ -44,14 +64,23 @@ const unbundled = (code) =>
   code
     .replaceAll('"@johnmorrisdotca/kumimoji/ui"', '"./kumimoji/dist/ui.js"')
     .replaceAll('"@johnmorrisdotca/kumimoji"', '"./kumimoji/dist/index.js"')
-    .replaceAll("https://cdn.jsdelivr.net/npm/@johnmorrisdotca/kumimoji@1/dist/element-define.js", "./kumimoji/dist/element-define.js");
+    .replaceAll(
+      "https://cdn.jsdelivr.net/npm/@johnmorrisdotca/kumimoji@1/dist/element-define.js",
+      "./kumimoji/dist/element-define.js",
+    );
 
 const projects = {
   // The table in a component's mount hook, which is all any framework needs.
   vue: {
     out: "dist",
     files: {
-      "package.json": { name: "check-vue", private: true, type: "module", dependencies: { "@johnmorrisdotca/kumimoji": kumimoji, vue: "^3.5.0" }, devDependencies: { vite: "^7.0.0", "@vitejs/plugin-vue": "^6.0.0" } },
+      "package.json": {
+        name: "check-vue",
+        private: true,
+        type: "module",
+        dependencies: { "@johnmorrisdotca/kumimoji": kumimoji, vue: "^3.5.0" },
+        devDependencies: { vite: "^7.0.0", "@vitejs/plugin-vue": "^6.0.0" },
+      },
       "vite.config.js": `import vue from "@vitejs/plugin-vue";\nexport default { base: "./", plugins: [vue()] };\n`,
       "index.html": page(`<script type="module" src="/src/main.js"></script>`),
       "src/main.js": `import { createApp } from "vue";\nimport App from "./App.vue";\ncreateApp(App).mount("#app");\n`,
@@ -61,7 +90,13 @@ const projects = {
   svelte: {
     out: "dist",
     files: {
-      "package.json": { name: "check-svelte", private: true, type: "module", dependencies: { "@johnmorrisdotca/kumimoji": kumimoji, svelte: "^5.0.0" }, devDependencies: { vite: "^7.0.0", "@sveltejs/vite-plugin-svelte": "^6.0.0" } },
+      "package.json": {
+        name: "check-svelte",
+        private: true,
+        type: "module",
+        dependencies: { "@johnmorrisdotca/kumimoji": kumimoji, svelte: "^5.0.0" },
+        devDependencies: { vite: "^7.0.0", "@sveltejs/vite-plugin-svelte": "^6.0.0" },
+      },
       "vite.config.js": `import { svelte } from "@sveltejs/vite-plugin-svelte";\nexport default { base: "./", plugins: [svelte()] };\n`,
       "index.html": page(`<script type="module" src="/src/main.js"></script>`),
       "src/main.js": `import { mount } from "svelte";\nimport App from "./App.svelte";\nmount(App, { target: document.getElementById("app") });\n`,
@@ -74,8 +109,21 @@ const projects = {
       "package.json": {
         name: "check-angular",
         private: true,
-        dependencies: { "@johnmorrisdotca/kumimoji": kumimoji, "@angular/common": "^20.0.0", "@angular/compiler": "^20.0.0", "@angular/core": "^20.0.0", "@angular/platform-browser": "^20.0.0", rxjs: "^7.8.0", tslib: "^2.8.0" },
-        devDependencies: { "@angular/build": "^20.0.0", "@angular/cli": "^20.0.0", "@angular/compiler-cli": "^20.0.0", typescript: "~5.8.0" },
+        dependencies: {
+          "@johnmorrisdotca/kumimoji": kumimoji,
+          "@angular/common": "^20.0.0",
+          "@angular/compiler": "^20.0.0",
+          "@angular/core": "^20.0.0",
+          "@angular/platform-browser": "^20.0.0",
+          rxjs: "^7.8.0",
+          tslib: "^2.8.0",
+        },
+        devDependencies: {
+          "@angular/build": "^20.0.0",
+          "@angular/cli": "^20.0.0",
+          "@angular/compiler-cli": "^20.0.0",
+          typescript: "~5.8.0",
+        },
       },
       "angular.json": {
         version: 1,
@@ -84,11 +132,35 @@ const projects = {
             projectType: "application",
             root: "",
             sourceRoot: "src",
-            architect: { build: { builder: "@angular/build:application", options: { outputPath: "dist/check-angular", index: "src/index.html", browser: "src/main.ts", tsConfig: "tsconfig.json", baseHref: "./" }, configurations: { production: {} }, defaultConfiguration: "production" } },
+            architect: {
+              build: {
+                builder: "@angular/build:application",
+                options: {
+                  outputPath: "dist/check-angular",
+                  index: "src/index.html",
+                  browser: "src/main.ts",
+                  tsConfig: "tsconfig.json",
+                  baseHref: "./",
+                },
+                configurations: { production: {} },
+                defaultConfiguration: "production",
+              },
+            },
           },
         },
       },
-      "tsconfig.json": { compilerOptions: { target: "ES2022", module: "ES2022", moduleResolution: "bundler", strict: true, experimentalDecorators: true, skipLibCheck: true, lib: ["ES2022", "dom"] }, files: ["src/main.ts"] },
+      "tsconfig.json": {
+        compilerOptions: {
+          target: "ES2022",
+          module: "ES2022",
+          moduleResolution: "bundler",
+          strict: true,
+          experimentalDecorators: true,
+          skipLibCheck: true,
+          lib: ["ES2022", "dom"],
+        },
+        files: ["src/main.ts"],
+      },
       "src/index.html": page(`<app-root></app-root>`),
       "src/main.ts": example("### 7. Angular", "ts no-check"),
     },
@@ -98,7 +170,13 @@ const projects = {
     out: "dist",
     board: true,
     files: {
-      "package.json": { name: "check-react", private: true, type: "module", dependencies: { "@johnmorrisdotca/kumimoji": kumimoji, react: "^19.0.0", "react-dom": "^19.0.0" }, devDependencies: { vite: "^7.0.0", "@vitejs/plugin-react": "^5.0.0" } },
+      "package.json": {
+        name: "check-react",
+        private: true,
+        type: "module",
+        dependencies: { "@johnmorrisdotca/kumimoji": kumimoji, react: "^19.0.0", "react-dom": "^19.0.0" },
+        devDependencies: { vite: "^7.0.0", "@vitejs/plugin-react": "^5.0.0" },
+      },
       "vite.config.js": `import react from "@vitejs/plugin-react";\nexport default { base: "./", plugins: [react()] };\n`,
       "index.html": page(`<script type="module" src="/src/main.jsx"></script>`),
       "src/App.jsx": example("### 4. React", "jsx"),
@@ -121,7 +199,10 @@ createRoot(document.getElementById("app")).render(
     out: ".",
     build: (dir) => {
       run(dir, "npm", ["install", "--no-audit", "--no-fund", "--ignore-scripts"]);
-      cpSync(join(dir, "node_modules/@johnmorrisdotca/kumimoji"), join(dir, "kumimoji"), { recursive: true, dereference: true });
+      cpSync(join(dir, "node_modules/@johnmorrisdotca/kumimoji"), join(dir, "kumimoji"), {
+        recursive: true,
+        dereference: true,
+      });
       rmSync(join(dir, "node_modules"), { recursive: true, force: true });
     },
     also: ["quick.html", "themed.html", "tag.html"],
@@ -129,8 +210,12 @@ createRoot(document.getElementById("app")).render(
       "package.json": { name: "check-plain", private: true, dependencies: { "@johnmorrisdotca/kumimoji": kumimoji } },
       "index.html": page(unbundled(example("### 2. The table, in plain HTML", "html"))),
       // The two other examples that mount a table: the one in "Play in 30 seconds", and the themed one.
-      "quick.html": page(`<div id="table"></div><script type="module">${unbundled(example("## Play in 30 seconds", "js no-run"))}</script>`),
-      "themed.html": page(`<div id="table"></div><script type="module">${unbundled(example("## Theming", "js no-run"))}</script>`),
+      "quick.html": page(
+        `<div id="table"></div><script type="module">${unbundled(example("## Play in 30 seconds", "js no-run"))}</script>`,
+      ),
+      "themed.html": page(
+        `<div id="table"></div><script type="module">${unbundled(example("## Theming", "js no-run"))}</script>`,
+      ),
       // The tag, as the README writes it: two tables on one page, with no script of the page's own.
       "tag.html": page(unbundled(example("### 3. As a tag", "html"))),
     },
@@ -154,7 +239,12 @@ for (const [name, project] of Object.entries(projects)) {
     built.push([name, join(dir, project.out), project]);
     console.log(`built   ${name.padEnd(8)} in ${Math.round((Date.now() - started) / 1000)} s`);
   } catch (error) {
-    console.log(`FAILED  ${name}: ${String(error.stderr ?? error.stdout ?? error.message).split("\n").slice(-12).join("\n")}`);
+    console.log(
+      `FAILED  ${name}: ${String(error.stderr ?? error.stdout ?? error.message)
+        .split("\n")
+        .slice(-12)
+        .join("\n")}`,
+    );
     process.exitCode = 1;
   }
 }
@@ -162,10 +252,21 @@ for (const [name, project] of Object.entries(projects)) {
 // Open each built page in a browser and play: the table has to mount, fetch its word list as a file
 // of its own, deal a hand, and a tap on a tile and then on a square has to lay it and hand the game back.
 if (process.env.KUMIMOJI_BROWSER !== undefined) {
-  const { chromium, webkit } = createRequire(import.meta.url)(process.env.KUMIMOJI_BROWSER === "1" ? "@playwright/test" : process.env.KUMIMOJI_BROWSER);
-  const types = { ".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript", ".css": "text/css", ".json": "application/json" };
+  const { chromium, webkit } = createRequire(import.meta.url)(
+    process.env.KUMIMOJI_BROWSER === "1" ? "@playwright/test" : process.env.KUMIMOJI_BROWSER,
+  );
+  const types = {
+    ".html": "text/html",
+    ".js": "text/javascript",
+    ".mjs": "text/javascript",
+    ".css": "text/css",
+    ".json": "application/json",
+  };
   const ROOT = '[data-testid="km-root"]';
-  for (const [engine, launcher] of [["chromium", chromium], ["webkit", webkit]]) {
+  for (const [engine, launcher] of [
+    ["chromium", chromium],
+    ["webkit", webkit],
+  ]) {
     const browser = await launcher.launch();
     for (const [name, out, project] of built) {
       const context = await browser.newContext({ viewport: { width: 390, height: 800 } });
@@ -178,7 +279,10 @@ if (process.env.KUMIMOJI_BROWSER !== undefined) {
         if (existsSync(file) && statSync(file).isDirectory()) file = join(file, "index.html");
         if (!existsSync(file)) return route.fulfill({ status: 404, body: "" });
         fetched.push(statSync(file).size);
-        return route.fulfill({ body: readFileSync(file), contentType: types[extname(file)] ?? "application/octet-stream" });
+        return route.fulfill({
+          body: readFileSync(file),
+          contentType: types[extname(file)] ?? "application/octet-stream",
+        });
       });
       await tab.goto("http://check.test/");
       await tab.waitForSelector(`${ROOT}[data-state="playing"]`, { timeout: 60000 });
@@ -195,7 +299,9 @@ if (process.env.KUMIMOJI_BROWSER !== undefined) {
       if (project.board === true) {
         await tab.waitForSelector("#board [data-square]");
         await tab.locator("#board [data-square]").first().click();
-        const drawn = await tab.locator("#board [data-square]").evaluateAll((squares) => squares.filter((square) => square.textContent !== "").length);
+        const drawn = await tab
+          .locator("#board [data-square]")
+          .evaluateAll((squares) => squares.filter((square) => square.textContent !== "").length);
         notes.push(`KumimojiBoard drew ${drawn} tile after a press`);
         if (drawn !== 1) errors.push("the board did not lay a tile");
       }
@@ -203,17 +309,27 @@ if (process.env.KUMIMOJI_BROWSER !== undefined) {
       for (const other of project.also ?? []) {
         await tab.goto(`http://check.test/${other}`);
         await tab.waitForSelector(`${ROOT}[data-state="playing"]`, { timeout: 60000 });
-        const felt = await tab.locator(ROOT).first().evaluate((el) => el.style.getPropertyValue("--km-felt"));
+        const felt = await tab
+          .locator(ROOT)
+          .first()
+          .evaluate((el) => el.style.getPropertyValue("--km-felt"));
         notes.push(`${other} dealt${felt === "" ? "" : ` on a table of ${felt}`}`);
         if (other === "themed.html" && felt !== "#23405a") errors.push("the theme was not set on the table");
         if (other === "tag.html") {
-          await tab.waitForFunction(() => document.querySelectorAll('kumimoji-table [data-testid="km-root"][data-state="playing"]').length === 2, null, { timeout: 60000 });
+          await tab.waitForFunction(
+            () =>
+              document.querySelectorAll('kumimoji-table [data-testid="km-root"][data-state="playing"]').length === 2,
+            null,
+            { timeout: 60000 },
+          );
           const kana = await tab.locator("kumimoji-table.km-japanese, kumimoji-table .km-japanese").count();
           if (kana !== 1) errors.push(`the tags dealt ${kana} tables of kana, not one`);
         }
       }
       const ok = errors.length === 0 && laid === 1 && largest > 500_000 && fetched.length >= 2;
-      console.log(`${ok ? "played " : "FAILED "} ${name.padEnd(8)} in ${engine}: a hand of 7 dealt, a tap laid ${laid} tile and the game was handed back; the word list came as a file of its own (${Math.round(largest / 1000)} kB of ${fetched.length} files)${notes.map((note) => `; ${note}`).join("")}${errors.length > 0 ? ` ${errors.join("; ")}` : ""}`);
+      console.log(
+        `${ok ? "played " : "FAILED "} ${name.padEnd(8)} in ${engine}: a hand of 7 dealt, a tap laid ${laid} tile and the game was handed back; the word list came as a file of its own (${Math.round(largest / 1000)} kB of ${fetched.length} files)${notes.map((note) => `; ${note}`).join("")}${errors.length > 0 ? ` ${errors.join("; ")}` : ""}`,
+      );
       if (!ok) process.exitCode = 1;
       await context.close();
     }

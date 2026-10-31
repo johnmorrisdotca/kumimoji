@@ -4,7 +4,9 @@ import { expect, test } from "@playwright/test";
 
 import { PLAYING, SMALL, open, sound, state, tap } from "./table.mjs";
 
-test("the chooser turns the page and the table's words to Japanese, and the tiles stay as they were", async ({ page }) => {
+test("the chooser turns the page and the table's words to Japanese, and the tiles stay as they were", async ({
+  page,
+}) => {
   const errors = await open(page);
   let s = await state(page);
   expect(s.lang).toBe("en");

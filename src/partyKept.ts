@@ -74,12 +74,18 @@ export function encodeParty(game: PartyGame): string {
     traded: game.traded,
     passedBy: game.passedBy,
     ...(game.dealt === game.players.length ? {} : { dealt: game.dealt }),
-    players: game.players.map((player) => ({ name: player.name, hand: player.hand.join(""), grid: encodeGrid(player.tiles), ...(player.computer === true ? { computer: true as const } : {}) })),
+    players: game.players.map((player) => ({
+      name: player.name,
+      hand: player.hand.join(""),
+      grid: encodeGrid(player.tiles),
+      ...(player.computer === true ? { computer: true as const } : {}),
+    })),
   };
   return JSON.stringify(kept);
 }
 
-const isCount = (value: unknown, most: number): value is number => Number.isInteger(value) && (value as number) >= 0 && (value as number) <= most;
+const isCount = (value: unknown, most: number): value is number =>
+  Number.isInteger(value) && (value as number) >= 0 && (value as number) <= most;
 const isTiles = (value: unknown): value is string => typeof value === "string" && /^[a-zA-Z*-]*$/.test(value);
 
 /** A game's settings as something outside this browser sent them — a table on several devices, a kept game — checked, or null.
@@ -106,7 +112,16 @@ export function readSettings(value: unknown): PartySettings | null {
   if (typeof s.doubleSet !== "boolean" || typeof s.hints !== "boolean") return null;
   // A game kept before Diagonals existed has no word for it, and was played without.
   if (s.diagonals !== undefined && typeof s.diagonals !== "boolean") return null;
-  return { size: s.size as number, level: s.level, seed: s.seed as number, gameLength: s.gameLength, language: s.language, doubleSet: s.doubleSet, diagonals: s.diagonals === true, hints: s.hints };
+  return {
+    size: s.size as number,
+    level: s.level,
+    seed: s.seed as number,
+    gameLength: s.gameLength,
+    language: s.language,
+    doubleSet: s.doubleSet,
+    diagonals: s.diagonals === true,
+    hints: s.hints,
+  };
 }
 
 /**
@@ -150,18 +165,61 @@ export function decodeParty(code: string | null, familyKey?: (tile: string) => s
   if (count < 1 || count > KUMIMOJI_PARTY.most) return null;
   const dealt = kept.dealt ?? count;
   if (!Number.isInteger(dealt) || dealt < KUMIMOJI_PARTY.least || dealt > KUMIMOJI_PARTY.most) return null;
-  if (!isCount(kept.turn, count - 1) || !isCount(kept.turns, 1_000_000) || (kept.ending !== null && kept.ending !== "out" && kept.ending !== "standing" && kept.ending !== "tied") || typeof kept.traded !== "boolean" || !isTiles(kept.startTable) || (kept.passedBy !== null && !isCount(kept.passedBy, count - 1))) return null;
-  const seats = (list: unknown): list is number[] => Array.isArray(list) && list.every((at) => isCount(at, count - 1)) && new Set(list).size === list.length;
-  if (!seats(kept.out) || (kept.lastTurns !== null && !seats(kept.lastTurns)) || !seats(kept.resigned) || !seats(kept.resignRun)) return null;
+  if (
+    !isCount(kept.turn, count - 1) ||
+    !isCount(kept.turns, 1_000_000) ||
+    (kept.ending !== null && kept.ending !== "out" && kept.ending !== "standing" && kept.ending !== "tied") ||
+    typeof kept.traded !== "boolean" ||
+    !isTiles(kept.startTable) ||
+    (kept.passedBy !== null && !isCount(kept.passedBy, count - 1))
+  )
+    return null;
+  const seats = (list: unknown): list is number[] =>
+    Array.isArray(list) && list.every((at) => isCount(at, count - 1)) && new Set(list).size === list.length;
+  if (
+    !seats(kept.out) ||
+    (kept.lastTurns !== null && !seats(kept.lastTurns)) ||
+    !seats(kept.resigned) ||
+    !seats(kept.resignRun)
+  )
+    return null;
   const players: PartyGame["players"][number][] = [];
   for (const player of kept.players) {
-    if (typeof player !== "object" || player === null || typeof player.name !== "string" || player.name.length > KUMIMOJI_PARTY.nameMost || !isTiles(player.hand)) return null;
+    if (
+      typeof player !== "object" ||
+      player === null ||
+      typeof player.name !== "string" ||
+      player.name.length > KUMIMOJI_PARTY.nameMost ||
+      !isTiles(player.hand)
+    )
+      return null;
     if (player.computer !== undefined && player.computer !== true) return null;
     const tiles = decodeGrid(player.grid);
     if (tiles === null) return null;
-    players.push(player.computer === true ? { name: player.name, hand: [...player.hand], tiles, computer: true } : { name: player.name, hand: [...player.hand], tiles });
+    players.push(
+      player.computer === true
+        ? { name: player.name, hand: [...player.hand], tiles, computer: true }
+        : { name: player.name, hand: [...player.hand], tiles },
+    );
   }
-  const game: PartyGame = { settings, bag: kept.bag, returned: kept.returned, taken: kept.taken, players, dealt, turn: kept.turn, turns: kept.turns, out: kept.out, lastTurns: kept.lastTurns, resigned: kept.resigned, resignRun: kept.resignRun, ending: kept.ending, startTable: kept.startTable, traded: kept.traded, passedBy: kept.passedBy };
+  const game: PartyGame = {
+    settings,
+    bag: kept.bag,
+    returned: kept.returned,
+    taken: kept.taken,
+    players,
+    dealt,
+    turn: kept.turn,
+    turns: kept.turns,
+    out: kept.out,
+    lastTurns: kept.lastTurns,
+    resigned: kept.resigned,
+    resignRun: kept.resignRun,
+    ending: kept.ending,
+    startTable: kept.startTable,
+    traded: kept.traded,
+    passedBy: kept.passedBy,
+  };
   if (familyKey !== undefined && !holdsItsBag(game, familyKey)) return null;
   return game;
 }

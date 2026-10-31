@@ -4,10 +4,19 @@
 import { cpSync, readFileSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 
 import { API_CSS, apiPage } from "./api.mjs";
-import { FAMILY_SCRIPT, FAMILY_EMBED_BUILDER_WORDS, familyEmbedBuilder, familyFooter, familyHead, familyHeader, familyUnreviewed } from "./family-template.mjs";
+import {
+  FAMILY_SCRIPT,
+  FAMILY_EMBED_BUILDER_WORDS,
+  familyEmbedBuilder,
+  familyFooter,
+  familyHead,
+  familyHeader,
+  familyUnreviewed,
+} from "./family-template.mjs";
 
 const id = "kumimoji";
-const ICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%232f5d4a'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='%23f3efe4'%3E組%3C/text%3E%3C/svg%3E";
+const ICON =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%232f5d4a'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='%23f3efe4'%3E組%3C/text%3E%3C/svg%3E";
 
 /** One segmented choice of the set-up row: its label, each button's setting and words, and a line for the Help switch in both languages. */
 const choice = (say, buttons, [en, ja]) => `<div class="fam-row" data-help-en="${en}" data-help-ja="${ja}">
@@ -31,7 +40,8 @@ const page = `<!doctype html>
     ${familyHead({
       id,
       title: "Kumimoji 組み文字 — Crossword tile game in English and Japanese",
-      description: "Build one crossword from every tile in the bag, in English or in Japanese kana: lay tiles as words that cross, draw when every run is a word, and race the clock. Free and open source.",
+      description:
+        "Build one crossword from every tile in the bag, in English or in Japanese kana: lay tiles as words that cross, draw when every run is a word, and race the clock. Free and open source.",
       ogTitle: "Kumimoji 組み文字 — Crossword tile game in English and Japanese",
       ogDescription: "Build one crossword from every tile in the bag, in English or Japanese.",
     })}
@@ -41,11 +51,48 @@ const page = `<!doctype html>
   </head>
   <body>
     <main>
-      ${familyHeader({ id, links: [{ href: "docs/index.html", say: "pageDocs" }, { href: "api.html", say: "pageApi" }] })}
+      ${familyHeader({
+        id,
+        links: [
+          { href: "docs/index.html", say: "pageDocs" },
+          { href: "api.html", say: "pageApi" },
+        ],
+      })}
       <div class="setup fam-row">
-        ${choice("words", [["language=english", { say: "english" }], ["language=japanese", { say: "japanese" }]], ["Choose the tiles in the bag: English letters, or Japanese kana. It takes effect when you press New game.", "袋に入れるタイルを選びます（英語の文字か、日本語のかな）。「新しいゲーム」を押すと反映されます。"])}
-        ${choice("hand", [["hand=7", { text: "7" }], ["hand=11", { text: "11" }]], ["How many tiles you hold at a time: 7 or 11. It takes effect when you press New game.", "手元に持つタイルの枚数です（7枚か11枚）。「新しいゲーム」を押すと反映されます。"])}
-        ${choice("wilds", [["level=easy", { say: "easy" }], ["level=medium", { say: "medium" }], ["level=hard", { say: "hard" }]], ["How many wild tiles are in the bag: most, some or none. A wild stands for any letter. It takes effect when you press New game.", "袋に入れるワイルドタイル（どの文字にもなるタイル）の量です（多め・少し・なし）。「新しいゲーム」を押すと反映されます。"])}
+        ${choice(
+          "words",
+          [
+            ["language=english", { say: "english" }],
+            ["language=japanese", { say: "japanese" }],
+          ],
+          [
+            "Choose the tiles in the bag: English letters, or Japanese kana. It takes effect when you press New game.",
+            "袋に入れるタイルを選びます（英語の文字か、日本語のかな）。「新しいゲーム」を押すと反映されます。",
+          ],
+        )}
+        ${choice(
+          "hand",
+          [
+            ["hand=7", { text: "7" }],
+            ["hand=11", { text: "11" }],
+          ],
+          [
+            "How many tiles you hold at a time: 7 or 11. It takes effect when you press New game.",
+            "手元に持つタイルの枚数です（7枚か11枚）。「新しいゲーム」を押すと反映されます。",
+          ],
+        )}
+        ${choice(
+          "wilds",
+          [
+            ["level=easy", { say: "easy" }],
+            ["level=medium", { say: "medium" }],
+            ["level=hard", { say: "hard" }],
+          ],
+          [
+            "How many wild tiles are in the bag: most, some or none. A wild stands for any letter. It takes effect when you press New game.",
+            "袋に入れるワイルドタイル（どの文字にもなるタイル）の量です（多め・少し・なし）。「新しいゲーム」を押すと反映されます。",
+          ],
+        )}
         <button type="button" class="fam-button" data-set="diagonals=true" data-say="diagonals" data-tip-en="Also read words that run on a diagonal, not only across and down. A switch: it takes effect when you press New game." data-tip-ja="縦と横に加えて、斜めに並んだ言葉も読みます。オンとオフの切り替えで、「新しいゲーム」を押すと反映されます。"></button>
         <button type="button" class="fam-button" data-accent="true" id="new" data-say="newGame"></button>
         <button type="button" class="fam-button" id="daily" data-say="daily" data-help-after data-help-en="Deal a game from today's seed, the same bag for everybody in the world today, with the tiles, hand, wilds and diagonals chosen above." data-help-ja="今日のシードでゲームを配ります。今日は世界中の誰でも同じ袋です。タイル、手札、ワイルド、斜めは上で選んだものになります。"></button>
@@ -88,8 +135,31 @@ writeFileSync("site/api.css", API_CSS);
 writeFileSync("site/api.html", apiPage({ id, name: "Kumimoji", icon: ICON }));
 console.log("site/ is ready: serve it, or let the Pages workflow publish it.");
 
-writeFileSync("site/family-embed-builder.js", `export const FAMILY_EMBED_BUILDER_WORDS = ${JSON.stringify(FAMILY_EMBED_BUILDER_WORDS)};\nexport ${familyEmbedBuilder.toString()};\n`);
-const builderParts = { builderHead: familyHead({ id, title: "Kumimoji · build a crossword embed", description: "Choose tiles and a seed, preview a crossword table and copy the embed code." }), builderHeader: familyHeader({ id, links: [{ href: "./", say: "toGallery" }, { href: "docs/index.html", say: "pageDocs" }, { href: "api.html", say: "pageApi" }] }), unreviewed: familyUnreviewed({ id }), footer: familyFooter({ id }), script: `<script>${FAMILY_SCRIPT}</script>` };
-writeFileSync("site/builder.html", readFileSync("demo/builder.html", "utf8").replace(/<!-- family:([A-Za-z]+) -->/g, (_match, key) => builderParts[key]));
+writeFileSync(
+  "site/family-embed-builder.js",
+  `export const FAMILY_EMBED_BUILDER_WORDS = ${JSON.stringify(FAMILY_EMBED_BUILDER_WORDS)};\nexport ${familyEmbedBuilder.toString()};\n`,
+);
+const builderParts = {
+  builderHead: familyHead({
+    id,
+    title: "Kumimoji · build a crossword embed",
+    description: "Choose tiles and a seed, preview a crossword table and copy the embed code.",
+  }),
+  builderHeader: familyHeader({
+    id,
+    links: [
+      { href: "./", say: "toGallery" },
+      { href: "docs/index.html", say: "pageDocs" },
+      { href: "api.html", say: "pageApi" },
+    ],
+  }),
+  unreviewed: familyUnreviewed({ id }),
+  footer: familyFooter({ id }),
+  script: `<script>${FAMILY_SCRIPT}</script>`,
+};
+writeFileSync(
+  "site/builder.html",
+  readFileSync("demo/builder.html", "utf8").replace(/<!-- family:([A-Za-z]+) -->/g, (_match, key) => builderParts[key]),
+);
 cpSync("demo/embed", "site/embed", { recursive: true });
 for (const file of ["builder.js", "builder.css"]) cpSync(`demo/${file}`, `site/${file}`);

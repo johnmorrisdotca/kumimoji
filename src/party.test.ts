@@ -2,16 +2,59 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { generateKumimoji } from "./generate.ts";
 import { judgeGrid, squareAt } from "./grid.ts";
-import { drawAll, mayDrawAll, mayTradeThisTurn, nameOf, passViewStart, stepView, partyFits, partyLength, partyPlayersAsked, partyTilesLeft, partyTilesNeeded, seatPlay, startParty, stillIn, tidyName, withSeatPlay } from "./party.ts";
-import { doneRefused, endTurn, goesOut, handCanSpell, isLastTurn, lastStanding, mayResign, mustTradeFirst, resign, winnersOf } from "./partyTurns.ts";
+import {
+  drawAll,
+  mayDrawAll,
+  mayTradeThisTurn,
+  nameOf,
+  passViewStart,
+  stepView,
+  partyFits,
+  partyLength,
+  partyPlayersAsked,
+  partyTilesLeft,
+  partyTilesNeeded,
+  seatPlay,
+  startParty,
+  stillIn,
+  tidyName,
+  withSeatPlay,
+} from "./party.ts";
+import {
+  doneRefused,
+  endTurn,
+  goesOut,
+  handCanSpell,
+  isLastTurn,
+  lastStanding,
+  mayResign,
+  mustTradeFirst,
+  resign,
+  winnersOf,
+} from "./partyTurns.ts";
 import type { PartyGame, PartySettings } from "./party.types.ts";
 import { decodeParty, encodeParty, holdsItsBag, isPartyFor } from "./partyKept.ts";
 import { placeFromHand, trade } from "./play.ts";
-import { JAPANESE_TILE_MIX, KUMIMOJI_HANDS, KUMIMOJI_PARTY, kumimojiTileCount, TILE_MIX_TOTAL } from "./tiles.constants.ts";
+import {
+  JAPANESE_TILE_MIX,
+  KUMIMOJI_HANDS,
+  KUMIMOJI_PARTY,
+  kumimojiTileCount,
+  TILE_MIX_TOTAL,
+} from "./tiles.constants.ts";
 import { familyKeyOf } from "./tileFamily.ts";
 import { loadTileWords } from "./tileWords.ts";
 
-const SETTINGS: PartySettings = { size: 3, level: "medium", seed: 7, gameLength: "short", language: "english", doubleSet: false, diagonals: false, hints: false };
+const SETTINGS: PartySettings = {
+  size: 3,
+  level: "medium",
+  seed: 7,
+  gameLength: "short",
+  language: "english",
+  doubleSet: false,
+  diagonals: false,
+  hints: false,
+};
 const WORDS = new Set(["cat", "cats", "dog", "sun", "at", "go", "us", "to", "ox"]);
 const judge = (tiles: PartyGame["players"][number]["tiles"]) => judgeGrid(tiles, (word) => WORDS.has(word));
 const family = (tile: string) => (/^[a-z*]$/.test(tile) ? tile : null);
@@ -45,7 +88,8 @@ describe("how many a bag can play", () => {
     // One player asks nothing of the size, since every puzzle's set-up asks: a Number Place is nine.
     expect(partyLength(1, 9, "medium", false)).toBe("medium");
     for (let players = 1; players <= KUMIMOJI_PARTY.most; players += 1) {
-      for (const hand of [KUMIMOJI_HANDS.quick, KUMIMOJI_HANDS.classic]) expect(partyFits(players, hand, kumimojiTileCount(hand, "full"))).toBe(true);
+      for (const hand of [KUMIMOJI_HANDS.quick, KUMIMOJI_HANDS.classic])
+        expect(partyFits(players, hand, kumimojiTileCount(hand, "full"))).toBe(true);
     }
   });
 
@@ -177,7 +221,11 @@ describe("going out, the last round and the winners", () => {
   });
 
   it("shares the win with anybody who also goes out on their last turn", () => {
-    let game = { ...layHand(startParty(SETTINGS, "catdogsunx" + "yzabcdefghijkl", ["Aiko", "Ben", "Cho"])), taken: 23, turn: 1 };
+    let game = {
+      ...layHand(startParty(SETTINGS, "catdogsunx" + "yzabcdefghijkl", ["Aiko", "Ben", "Cho"])),
+      taken: 23,
+      turn: 1,
+    };
     game = layHand(game);
     game = endTurn(game, verdictOf(game), spells);
     expect(game.out).toEqual([1]);
@@ -363,7 +411,9 @@ describe("keeping the game in the browser", () => {
     const kept = JSON.parse(encodeParty(startParty(SETTINGS, "catdogsunsox", ["Aiko", "", "Cho"])));
     delete kept.settings.diagonals;
     expect(decodeParty(JSON.stringify(kept), family)!.settings.diagonals).toBe(false);
-    expect(decodeParty(JSON.stringify({ ...kept, settings: { ...kept.settings, diagonals: "yes" } }), family)).toBeNull();
+    expect(
+      decodeParty(JSON.stringify({ ...kept, settings: { ...kept.settings, diagonals: "yes" } }), family),
+    ).toBeNull();
   });
 
   it("refuses what is not a kept game, or one whose tiles did not come out of its bag", () => {
@@ -390,7 +440,11 @@ describe("with a real bag", () => {
     const words = await loadTileWords();
     const length = partyLength(8, KUMIMOJI_HANDS.quick, "short", false);
     const bag = generateKumimoji(KUMIMOJI_HANDS.quick, "medium", 11, { gameLength: length }).givens;
-    const game = startParty({ ...SETTINGS, size: KUMIMOJI_HANDS.quick, gameLength: length }, bag, Array.from({ length: 8 }, () => ""));
+    const game = startParty(
+      { ...SETTINGS, size: KUMIMOJI_HANDS.quick, gameLength: length },
+      bag,
+      Array.from({ length: 8 }, () => ""),
+    );
     expect(game.players.every((player) => player.hand.length === KUMIMOJI_HANDS.quick)).toBe(true);
     expect(holdsItsBag(drawAll(game), words.familyKey)).toBe(true);
     expect(drawAll(game).players.every((player) => player.hand.length === KUMIMOJI_HANDS.quick + 1)).toBe(true);
@@ -399,8 +453,16 @@ describe("with a real bag", () => {
   it("keeps a Japanese game, whose tiles are not letters, and reads it back on its own bag", async () => {
     const words = await loadTileWords("japanese");
     const length = partyLength(3, KUMIMOJI_HANDS.quick, "short", false);
-    const settings: PartySettings = { ...SETTINGS, size: KUMIMOJI_HANDS.quick, gameLength: length, language: "japanese" };
-    const bag = generateKumimoji(KUMIMOJI_HANDS.quick, "medium", 11, { gameLength: length, language: "japanese" }).givens;
+    const settings: PartySettings = {
+      ...SETTINGS,
+      size: KUMIMOJI_HANDS.quick,
+      gameLength: length,
+      language: "japanese",
+    };
+    const bag = generateKumimoji(KUMIMOJI_HANDS.quick, "medium", 11, {
+      gameLength: length,
+      language: "japanese",
+    }).givens;
     const game = drawAll(startParty(settings, bag, ["Aiko", "", "Cho"]));
     const laid = withSeatPlay(game, placeFromHand(seatPlay(game), 0, squareAt(0, 0)));
     const back = decodeParty(encodeParty(laid), words.familyKey);

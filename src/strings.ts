@@ -31,7 +31,8 @@ const EN = {
   left: "{n} tiles left in the bag · {time}",
   finished: "Finished in {time}. Every tile laid, every run a word.",
   tableLabel: "The table",
-  tableKeys: "Arrow keys move between squares, Enter or Space taps one, and Escape lets go of a tile you have picked up.",
+  tableKeys:
+    "Arrow keys move between squares, Enter or Space taps one, and Escape lets go of a tile you have picked up.",
   handLabel: "Your hand",
   emptySquare: "Empty square",
   wildTile: "{tile}, wild",
@@ -83,7 +84,8 @@ const JA: KumimojiStrings = {
   left: "袋の残り{n}枚 · {time}",
   finished: "{time}で完成しました。すべてのタイルを置き、どの並びも単語になっています。",
   tableLabel: "テーブル",
-  tableKeys: "矢印キーでマスを移動し、Enterキーかスペースキーでタップします。Escapeキーで、選んだタイルの選択を解除します。",
+  tableKeys:
+    "矢印キーでマスを移動し、Enterキーかスペースキーでタップします。Escapeキーで、選んだタイルの選択を解除します。",
   handLabel: "手札",
   emptySquare: "空きマス",
   wildTile: "{tile}（ワイルド）",
@@ -153,7 +155,10 @@ export function kumimojiSay(line: string, values: Readonly<Record<string, string
  * console.log(Object.keys(kumimojiStrings("ja")).length);
  * ```
  */
-export function kumimojiStrings(locale: KumimojiLocale | string | undefined, own: Partial<KumimojiStrings> = {}): KumimojiStrings {
+export function kumimojiStrings(
+  locale: KumimojiLocale | string | undefined,
+  own: Partial<KumimojiStrings> = {},
+): KumimojiStrings {
   const base = typeof locale === "string" && locale.toLowerCase().startsWith("ja") ? JA : EN;
   return { ...base, ...own };
 }

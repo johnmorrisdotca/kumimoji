@@ -46,7 +46,12 @@ import { tileWords, type TileWords } from "./tileWords.ts";
  * console.log(generateKumimoji(3,"hard",44).givens);
  * ```
  */
-export function generateKumimoji(size: number, level: KumimojiLevel, seed: number, options: KumimojiOptions = {}): KumimojiDeal {
+export function generateKumimoji(
+  size: number,
+  level: KumimojiLevel,
+  seed: number,
+  options: KumimojiOptions = {},
+): KumimojiDeal {
   const gameLength = options.gameLength ?? "short";
   const language = options.language ?? "english";
   const doubleSet = language === "english" && (options.doubleSet ?? false);
@@ -60,9 +65,23 @@ export function generateKumimoji(size: number, level: KumimojiLevel, seed: numbe
   const side = layingSideFor(tiles);
   let bestProgress = 0;
   for (let attempt = 0; attempt < 50; attempt += 1) {
-    const squares = layCrossword(tiles, random, words, side, multiplier, words.mix, (laid) => { bestProgress = Math.max(bestProgress, laid); }, diagonals);
+    const squares = layCrossword(
+      tiles,
+      random,
+      words,
+      side,
+      multiplier,
+      words.mix,
+      (laid) => {
+        bestProgress = Math.max(bestProgress, laid);
+      },
+      diagonals,
+    );
     if (squares === null) continue;
-    const positions = shuffled(squares.flatMap((tile, at) => tile === "" ? [] : [at]), random);
+    const positions = shuffled(
+      squares.flatMap((tile, at) => (tile === "" ? [] : [at])),
+      random,
+    );
     const wildAt = new Set(positions.slice(0, wilds));
     const bag = squares.flatMap((tile, at) => {
       if (tile === "") return [];
@@ -72,9 +91,22 @@ export function generateKumimoji(size: number, level: KumimojiLevel, seed: numbe
       squares[at] = assigned;
       return ["*"];
     });
-    return { kind: "kumimoji", size, level, seed, givens: shuffled(bag, random).join(""), solution: encodeGrid(tilesOf(squares, side)), gameLength, doubleSet, language, ...(diagonals ? { diagonals } : {}) };
+    return {
+      kind: "kumimoji",
+      size,
+      level,
+      seed,
+      givens: shuffled(bag, random).join(""),
+      solution: encodeGrid(tilesOf(squares, side)),
+      gameLength,
+      doubleSet,
+      language,
+      ...(diagonals ? { diagonals } : {}),
+    };
   }
-  throw new Error(`Could not lay a Kumimoji of ${tiles} tiles from seed ${seed}; furthest attempt laid ${bestProgress}.`);
+  throw new Error(
+    `Could not lay a Kumimoji of ${tiles} tiles from seed ${seed}; furthest attempt laid ${bestProgress}.`,
+  );
 }
 
 /**
@@ -129,7 +161,16 @@ const WIDE_FINISH_FROM = 100;
 type Placement = { word: string; start: number; across: boolean; fresh: number[]; score: number };
 
 /** A crossword of exactly `tiles` tiles, or null where this try got stuck (the caller tries again). */
-function layCrossword(tiles: number, random: Random, words: TileWords, side: number, multiplier: number, mix: ReadonlyMap<string, number>, progress: (laid: number) => void, diagonals: boolean): string[] | null {
+function layCrossword(
+  tiles: number,
+  random: Random,
+  words: TileWords,
+  side: number,
+  multiplier: number,
+  mix: ReadonlyMap<string, number>,
+  progress: (laid: number) => void,
+  diagonals: boolean,
+): string[] | null {
   const squares = new Array<string>(side * side).fill("");
   const wide = diagonals || tiles > WIDE_FINISH_FROM;
   // What the set still holds of each letter, and the handful drawn from it that the words are chosen to use.
@@ -165,7 +206,17 @@ function layCrossword(tiles: number, random: Random, words: TileWords, side: num
   const first = bestOf(
     sample(words.byLength.get(firstLength) ?? [], WORDS_READ * 4, random).map((word) => {
       const start = Math.floor(side / 2) * side + Math.floor((side - firstLength) / 2);
-      return scored(word, start, true, Array.from({ length: word.length }, (_, at) => start + at), left, wanted, random, undefined, side);
+      return scored(
+        word,
+        start,
+        true,
+        Array.from({ length: word.length }, (_, at) => start + at),
+        left,
+        wanted,
+        random,
+        undefined,
+        side,
+      );
     }),
   );
   if (first === null) return null;
@@ -193,7 +244,19 @@ function layCrossword(tiles: number, random: Random, words: TileWords, side: num
           for (const word of sample(candidates, exhaustive ? candidates.length : WORDS_READ, random, letter)) {
             for (let at = 0; at < word.length; at += 1) {
               if (word[at] !== letter) continue;
-              const placement = fit(squares, word, anchor, at, across, room, left, wanted, random, side, diagonals ? words : null);
+              const placement = fit(
+                squares,
+                word,
+                anchor,
+                at,
+                across,
+                room,
+                left,
+                wanted,
+                random,
+                side,
+                diagonals ? words : null,
+              );
               if (placement !== null) found.push(placement);
             }
           }
@@ -319,6 +382,7 @@ function scored(
 
 function bestOf(placements: readonly (Placement | null)[]): Placement | null {
   let best: Placement | null = null;
-  for (const placement of placements) if (placement !== null && (best === null || placement.score > best.score)) best = placement;
+  for (const placement of placements)
+    if (placement !== null && (best === null || placement.score > best.score)) best = placement;
   return best;
 }

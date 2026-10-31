@@ -1,6 +1,12 @@
 import { BASE_KANA, CORNER_FORMS, tileKana } from "./kana.ts";
 import { kanaTileCode } from "./tileFace.ts";
-import { JAPANESE_TILE_MIX, KUMIMOJI_HANDS, TILE_MIX, kumimojiTileCount, kumimojiWildCount } from "./tiles.constants.ts";
+import {
+  JAPANESE_TILE_MIX,
+  KUMIMOJI_HANDS,
+  TILE_MIX,
+  kumimojiTileCount,
+  kumimojiWildCount,
+} from "./tiles.constants.ts";
 import type { KumimojiLanguage, KumimojiLength } from "./kumimoji.types.ts";
 
 /**
@@ -65,7 +71,12 @@ export function mixShown(language: KumimojiLanguage): MixShown {
   const tiles: MixTile[] =
     language === "english"
       ? Object.entries(TILE_MIX).map(([letter, count]) => ({ code: letter, glyph: letter, forms: "", count }))
-      : [...BASE_KANA].map((kana) => ({ code: kanaTileCode(kana)!, glyph: kana, forms: CORNER_FORMS[kana] ?? "", count: JAPANESE_TILE_MIX[kana] ?? 0 }));
+      : [...BASE_KANA].map((kana) => ({
+          code: kanaTileCode(kana)!,
+          glyph: kana,
+          forms: CORNER_FORMS[kana] ?? "",
+          count: JAPANESE_TILE_MIX[kana] ?? 0,
+        }));
   const counts = tiles.map((tile) => tile.count);
   const most = Math.max(...counts);
   const fewest = Math.min(...counts);
@@ -156,7 +167,11 @@ export function lengthRows(hand: number = KUMIMOJI_HANDS.classic): LengthRow[] {
       length,
       tiles,
       doubleTiles: kumimojiTileCount(hand, length, undefined, true),
-      wilds: { easy: kumimojiWildCount(hand, "easy", tiles), medium: kumimojiWildCount(hand, "medium", tiles), hard: kumimojiWildCount(hand, "hard", tiles) },
+      wilds: {
+        easy: kumimojiWildCount(hand, "easy", tiles),
+        medium: kumimojiWildCount(hand, "medium", tiles),
+        hard: kumimojiWildCount(hand, "hard", tiles),
+      },
     };
   });
 }

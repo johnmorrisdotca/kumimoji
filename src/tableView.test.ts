@@ -1,7 +1,18 @@
 import { describe, expect, it } from "vitest";
 
 import { squareAt } from "./grid.ts";
-import { TABLE, edgePan, fitView, fittedMost, keepInReach, overflows, panView, squareUnder, tableArea, zoomView } from "./tableView.ts";
+import {
+  TABLE,
+  edgePan,
+  fitView,
+  fittedMost,
+  keepInReach,
+  overflows,
+  panView,
+  squareUnder,
+  tableArea,
+  zoomView,
+} from "./tableView.ts";
 
 /** A kumimoji table with tiles on these squares. */
 const tilesOn = (...squares: [number, number][]) => new Map(squares.map(([row, col]) => [squareAt(row, col), "a"]));

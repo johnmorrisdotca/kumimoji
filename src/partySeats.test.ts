@@ -8,9 +8,19 @@ import { joinParty, joinRefused, leaveParty, leaveRefused, tilesHeldBy } from ".
 import { endTurn, lastStanding, resign, winnersOf } from "./partyTurns.ts";
 import { assignHandTile, placeFromHand } from "./play.ts";
 
-const SETTINGS: PartySettings = { size: 3, level: "medium", seed: 7, gameLength: "short", language: "english", doubleSet: false, diagonals: false, hints: false };
+const SETTINGS: PartySettings = {
+  size: 3,
+  level: "medium",
+  seed: 7,
+  gameLength: "short",
+  language: "english",
+  doubleSet: false,
+  diagonals: false,
+  hints: false,
+};
 const WORDS = new Set(["cat", "dog", "sun", "at", "go"]);
-const verdictOf = (game: PartyGame) => judgeGrid(game.players[game.turn]!.tiles, (word) => WORDS.has(word.toLowerCase()));
+const verdictOf = (game: PartyGame) =>
+  judgeGrid(game.players[game.turn]!.tiles, (word) => WORDS.has(word.toLowerCase()));
 const spells = () => true;
 const family = (tile: string) => (/^[a-z]$/.test(tile) ? tile : /^[A-Z*]$/.test(tile) ? "*" : null);
 const BAG = "catdogsunxyzabcdefghijklmnopq";
@@ -25,7 +35,13 @@ function layHand(game: PartyGame): PartyGame {
 
 /** Every tile of the bag, wherever it is: held by somebody, or still to come. */
 const everyTile = (game: PartyGame) =>
-  [...game.players.flatMap((player) => [...player.hand, ...player.tiles.values()]), ...(game.bag + game.returned).slice(game.taken)].map((tile) => family(tile)).sort().join("");
+  [
+    ...game.players.flatMap((player) => [...player.hand, ...player.tiles.values()]),
+    ...(game.bag + game.returned).slice(game.taken),
+  ]
+    .map((tile) => family(tile))
+    .sort()
+    .join("");
 
 describe("joining", () => {
   it("seats a new player after the last with the next hand from the bag, to play when the turn comes round", () => {
@@ -60,7 +76,10 @@ describe("joining", () => {
   it("is refused at eight, in the last round, once the game is over, and when the bag cannot give a whole hand", () => {
     const game = startParty(SETTINGS, BAG, ["a", "b"]);
     expect(joinRefused(game)).toBeNull();
-    const eight = Array.from({ length: 6 }).reduce<PartyGame>((now) => joinParty(now, { name: "" }), startParty(SETTINGS, BAG + BAG, ["a", "b"]));
+    const eight = Array.from({ length: 6 }).reduce<PartyGame>(
+      (now) => joinParty(now, { name: "" }),
+      startParty(SETTINGS, BAG + BAG, ["a", "b"]),
+    );
     expect(eight.players).toHaveLength(8);
     expect(joinRefused(eight)).toBe("full");
     expect(joinParty(eight, { name: "" })).toBe(eight);

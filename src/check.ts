@@ -31,7 +31,12 @@ import { tileWords } from "./tileWords.ts";
  * console.log(checkKumimoji(3,"cat","cat",{level:"hard"}));
  * ```
  */
-export function checkKumimoji(size: number, givens: string, answer: string, options: KumimojiOptions & { level?: KumimojiLevel } = {}): KumimojiCheck {
+export function checkKumimoji(
+  size: number,
+  givens: string,
+  answer: string,
+  options: KumimojiOptions & { level?: KumimojiLevel } = {},
+): KumimojiCheck {
   const gameLength = options.gameLength ?? "short";
   const language = options.language ?? "english";
   const doubleSet = language === "english" && (options.doubleSet ?? false);
@@ -47,19 +52,26 @@ export function checkKumimoji(size: number, givens: string, answer: string, opti
     return { ok: false, reason: `no Kumimoji with a hand of ${size}` };
   }
   const bag = [...givens];
-  if (typeof givens !== "string" || bag.length !== inBag) return { ok: false, reason: "the givens are not a bag of tiles" };
+  if (typeof givens !== "string" || bag.length !== inBag)
+    return { ok: false, reason: "the givens are not a bag of tiles" };
   const expectedWilds = kumimojiWildCount(size, level, inBag);
-  if (bag.filter(words.isWild).length !== expectedWilds) return { ok: false, reason: "the bag has the wrong number of wild tiles" };
+  if (bag.filter(words.isWild).length !== expectedWilds)
+    return { ok: false, reason: "the bag has the wrong number of wild tiles" };
   for (const [tile, count] of lettersOf(bag.filter((each) => !words.isWild(each)))) {
     const face = words.inventoryKey(tile);
     const code = face === null ? null : words.codeOf(face);
-    if (code === null || count > (words.mix.get(code) ?? 0) * multiplier) return { ok: false, reason: "the bag exceeds the tile set" };
+    if (code === null || count > (words.mix.get(code) ?? 0) * multiplier)
+      return { ok: false, reason: "the bag exceeds the tile set" };
   }
   const tiles = decodeGrid(answer);
   if (tiles === null) return { ok: false, reason: "the answer is not a grid" };
   const bagIdentities = bag.map(words.familyKey);
   const tileIdentities = [...tiles.values()].map(words.familyKey);
-  if (bagIdentities.some((tile) => tile === null) || tileIdentities.some((tile) => tile === null) || !sameLetters(lettersOf(tileIdentities as string[]), lettersOf(bagIdentities as string[]))) {
+  if (
+    bagIdentities.some((tile) => tile === null) ||
+    tileIdentities.some((tile) => tile === null) ||
+    !sameLetters(lettersOf(tileIdentities as string[]), lettersOf(bagIdentities as string[]))
+  ) {
     return { ok: false, reason: "the grid does not use exactly the tiles of the bag" };
   }
   const verdict = judgeWithWords(tiles, words, { diagonals: options.diagonals === true });

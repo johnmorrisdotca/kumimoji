@@ -192,8 +192,10 @@ export async function kumimojiFromJSON(text: string): Promise<KumimojiSaved | nu
     return null;
   }
   if (typeof data !== "object" || data === null || Array.isArray(data)) return null;
-  const { format, game, size, level, seed, language, gameLength, doubleSet, diagonals, progress, elapsedMs } = data as Record<string, unknown>;
-  if (typeof format !== "number" || !Number.isInteger(format) || format < 1 || format > KUMIMOJI_EXPORT_FORMAT) return null;
+  const { format, game, size, level, seed, language, gameLength, doubleSet, diagonals, progress, elapsedMs } =
+    data as Record<string, unknown>;
+  if (typeof format !== "number" || !Number.isInteger(format) || format < 1 || format > KUMIMOJI_EXPORT_FORMAT)
+    return null;
   if (game !== "kumimoji") return null;
   if (typeof size !== "number" || KUMIMOJI_BAG[size] === undefined) return null;
   if (typeof level !== "string" || !LEVELS.includes(level)) return null;
@@ -208,7 +210,12 @@ export async function kumimojiFromJSON(text: string): Promise<KumimojiSaved | nu
   await loadTileWords(language);
   let deal: KumimojiDeal;
   try {
-    deal = generateKumimoji(size, level as KumimojiLevel, seed, { language, gameLength: gameLength as KumimojiLength, doubleSet, diagonals });
+    deal = generateKumimoji(size, level as KumimojiLevel, seed, {
+      language,
+      gameLength: gameLength as KumimojiLength,
+      doubleSet,
+      diagonals,
+    });
   } catch {
     return null;
   }
@@ -294,12 +301,24 @@ export function gridToText(tiles: Tiles, language: KumimojiLanguage = "english")
 export function kumimojiToText(saved: KumimojiSaved, strings: KumimojiStrings = KUMIMOJI_STRINGS.en): string {
   const { deal, play } = saved;
   const words = tileWords(deal.language);
-  const face = (tile: string) => (tileFace(tile).blank ? "*" : deal.language === "japanese" ? words.glyphOf(tile) : words.glyphOf(tile).toUpperCase());
-  const lines = [kumimojiSay(strings.textTitle, { language: deal.language === "japanese" ? strings.japanese : strings.english, hand: deal.size, seed: deal.seed })];
+  const face = (tile: string) =>
+    tileFace(tile).blank ? "*" : deal.language === "japanese" ? words.glyphOf(tile) : words.glyphOf(tile).toUpperCase();
+  const lines = [
+    kumimojiSay(strings.textTitle, {
+      language: deal.language === "japanese" ? strings.japanese : strings.english,
+      hand: deal.size,
+      seed: deal.seed,
+    }),
+  ];
   lines.push(play.tiles.size === 0 ? strings.textEmpty : gridToText(play.tiles, deal.language));
-  if (isFinished(play, judgeWithWords(play.tiles, words, { diagonals: deal.diagonals === true }))) lines.push(strings.textFinished);
+  if (isFinished(play, judgeWithWords(play.tiles, words, { diagonals: deal.diagonals === true })))
+    lines.push(strings.textFinished);
   else {
-    lines.push(play.hand.length === 0 ? strings.textHandEmpty : kumimojiSay(strings.textHand, { tiles: play.hand.map(face).join(" ") }));
+    lines.push(
+      play.hand.length === 0
+        ? strings.textHandEmpty
+        : kumimojiSay(strings.textHand, { tiles: play.hand.map(face).join(" ") }),
+    );
     lines.push(kumimojiSay(strings.textLeft, { n: tilesLeft(play) }));
   }
   lines.push(kumimojiSay(strings.textTime, { time: kumimojiClock(saved.elapsedMs) }));

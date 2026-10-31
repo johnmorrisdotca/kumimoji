@@ -24,8 +24,32 @@ import type { KumimojiLength } from "./kumimoji.types.ts";
  * ```
  */
 export const TILE_MIX: Readonly<Record<string, number>> = {
-  a: 13, b: 3, c: 3, d: 6, e: 18, f: 3, g: 4, h: 3, i: 12, j: 2, k: 2, l: 5, m: 3,
-  n: 8, o: 11, p: 3, q: 2, r: 9, s: 6, t: 9, u: 6, v: 3, w: 3, x: 2, y: 3, z: 2,
+  a: 13,
+  b: 3,
+  c: 3,
+  d: 6,
+  e: 18,
+  f: 3,
+  g: 4,
+  h: 3,
+  i: 12,
+  j: 2,
+  k: 2,
+  l: 5,
+  m: 3,
+  n: 8,
+  o: 11,
+  p: 3,
+  q: 2,
+  r: 9,
+  s: 6,
+  t: 9,
+  u: 6,
+  v: 3,
+  w: 3,
+  x: 2,
+  y: 3,
+  z: 2,
 };
 
 /**
@@ -49,11 +73,51 @@ export const TILE_MIX: Readonly<Record<string, number>> = {
  * ```
  */
 export const JAPANESE_TILE_MIX: Readonly<Record<string, number>> = {
-  あ: 2, い: 11, う: 12, え: 1, お: 2, か: 7, き: 6, く: 6, け: 3, こ: 4,
-  さ: 3, し: 10, す: 2, せ: 3, そ: 2, た: 4, ち: 3, つ: 6, て: 2, と: 3,
-  な: 1, に: 1, ぬ: 1, ね: 1, の: 1, は: 2, ひ: 2, ふ: 2, へ: 1, ほ: 1,
-  ま: 2, み: 1, む: 1, め: 1, も: 1, や: 2, ゆ: 4, よ: 6, ら: 1, り: 3,
-  る: 3, れ: 1, ろ: 1, わ: 1, ん: 11,
+  あ: 2,
+  い: 11,
+  う: 12,
+  え: 1,
+  お: 2,
+  か: 7,
+  き: 6,
+  く: 6,
+  け: 3,
+  こ: 4,
+  さ: 3,
+  し: 10,
+  す: 2,
+  せ: 3,
+  そ: 2,
+  た: 4,
+  ち: 3,
+  つ: 6,
+  て: 2,
+  と: 3,
+  な: 1,
+  に: 1,
+  ぬ: 1,
+  ね: 1,
+  の: 1,
+  は: 2,
+  ひ: 2,
+  ふ: 2,
+  へ: 1,
+  ほ: 1,
+  ま: 2,
+  み: 1,
+  む: 1,
+  め: 1,
+  も: 1,
+  や: 2,
+  ゆ: 4,
+  よ: 6,
+  ら: 1,
+  り: 3,
+  る: 3,
+  れ: 1,
+  ろ: 1,
+  わ: 1,
+  ん: 11,
 };
 
 /** The whole set, counted from the table.
@@ -140,13 +204,19 @@ export const KUMIMOJI_WILDS: Readonly<Record<number, Readonly<Record<"easy" | "m
  * console.log(kumimojiTileCount(7,"short"));
  * ```
  */
-export function kumimojiTileCount(hand: number, length: KumimojiLength, setSize = TILE_MIX_TOTAL, doubleSet = false): number {
+export function kumimojiTileCount(
+  hand: number,
+  length: KumimojiLength,
+  setSize = TILE_MIX_TOTAL,
+  doubleSet = false,
+): number {
   const short = KUMIMOJI_BAG[hand];
   if (short === undefined) throw new Error(`No Kumimoji with a hand of ${hand}.`);
   if (!Number.isInteger(setSize) || setSize < 1) throw new Error(`Invalid Kumimoji set size: ${setSize}.`);
   const multiplier = doubleSet ? 2 : 1;
   const available = setSize * multiplier;
-  if (short * multiplier > available) throw new Error(`A short game needs more tiles than the ${available}-tile set holds.`);
+  if (short * multiplier > available)
+    throw new Error(`A short game needs more tiles than the ${available}-tile set holds.`);
   if (length === "short") return short * multiplier;
   if (length === "medium") return Math.floor(available / 2);
   return available;
@@ -169,7 +239,8 @@ export function kumimojiWildCount(hand: number, level: "easy" | "medium" | "hard
   const short = KUMIMOJI_BAG[hand];
   const wilds = KUMIMOJI_WILDS[hand];
   if (short === undefined || wilds === undefined) throw new Error(`No Kumimoji with a hand of ${hand}.`);
-  if (!Number.isInteger(totalTiles) || totalTiles < short) throw new Error(`Invalid Kumimoji tile count: ${totalTiles}.`);
+  if (!Number.isInteger(totalTiles) || totalTiles < short)
+    throw new Error(`Invalid Kumimoji tile count: ${totalTiles}.`);
   return Math.round((wilds[level] * totalTiles) / short);
 }
 

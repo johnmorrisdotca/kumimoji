@@ -20,7 +20,9 @@ beforeAll(async () => {
 /** A grid from rows of text, "." for an empty square, its first row and column at 0. */
 function gridOf(...rows: string[]): Map<string, string> {
   const tiles = new Map<string, string>();
-  rows.forEach((line, row) => [...line].forEach((letter, col) => letter !== "." && tiles.set(squareAt(row, col), letter)));
+  rows.forEach((line, row) =>
+    [...line].forEach((letter, col) => letter !== "." && tiles.set(squareAt(row, col), letter)),
+  );
   return tiles;
 }
 
@@ -75,8 +77,15 @@ describe("a wild with no letter", () => {
 
   it("reads a blank as a kana in a Japanese grid", () => {
     const words = tileWords("japanese");
-    const [first, second] = [...[...words.allowed].find((word) => [...word].length === 2 && [...word].every((kana) => kanaTileCode(kana) !== null))!];
-    const tiles = new Map([[squareAt(0, 0), kanaTileCode(first!)!], [squareAt(0, 1), "*"]]);
+    const [first, second] = [
+      ...[...words.allowed].find(
+        (word) => [...word].length === 2 && [...word].every((kana) => kanaTileCode(kana) !== null),
+      )!,
+    ];
+    const tiles = new Map([
+      [squareAt(0, 0), kanaTileCode(first!)!],
+      [squareAt(0, 1), "*"],
+    ]);
     const verdict = judgeWithWords(tiles, words);
     expect(verdict.sound).toBe(true);
     expect(second).toBeDefined();

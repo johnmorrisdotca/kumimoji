@@ -100,7 +100,12 @@ export function unturnPlace(row: number, col: number, turn: Turn): { row: number
 export function turnArea(area: Area, turn: Turn): Area {
   const a = turnPlace(area.top, area.left, turn);
   const b = turnPlace(area.top + area.rows - 1, area.left + area.cols - 1, turn);
-  return { top: Math.min(a.row, b.row), left: Math.min(a.col, b.col), rows: Math.abs(a.row - b.row) + 1, cols: Math.abs(a.col - b.col) + 1 };
+  return {
+    top: Math.min(a.row, b.row),
+    left: Math.min(a.col, b.col),
+    rows: Math.abs(a.row - b.row) + 1,
+    cols: Math.abs(a.col - b.col) + 1,
+  };
 }
 
 /**

@@ -53,7 +53,12 @@ export function isOver(game: PartyGame): boolean {
  * ```
  */
 export function goesOut(game: PartyGame, verdict: GridVerdict): boolean {
-  return !isOver(game) && game.players[game.turn]!.hand.length === 0 && verdict.sound && partyTilesLeft(game) < stillIn(game).length;
+  return (
+    !isOver(game) &&
+    game.players[game.turn]!.hand.length === 0 &&
+    verdict.sound &&
+    partyTilesLeft(game) < stillIn(game).length
+  );
 }
 
 /** Whether the player whose turn it is has laid a tile on their table this turn: more tiles there than when it began.
@@ -162,7 +167,11 @@ export function handCanSpell(hand: readonly string[], words: TileWords): boolean
  * console.log(doneRefused(game,judgeWithWords(seatPlay(game).tiles,words),hand=>handCanSpell(hand,words)));
  * ```
  */
-export function doneRefused(game: PartyGame, verdict: GridVerdict, handSpells: (hand: readonly string[]) => boolean): "trade" | "standing" | null {
+export function doneRefused(
+  game: PartyGame,
+  verdict: GridVerdict,
+  handSpells: (hand: readonly string[]) => boolean,
+): "trade" | "standing" | null {
   if (mustTradeFirst(game, handSpells)) return "trade";
   const used = game.players[game.turn]!.hand.length === 0;
   if (lastStanding(game) && !(verdict.sound && (laidThisTurn(game) || used))) return "standing";
@@ -171,7 +180,15 @@ export function doneRefused(game: PartyGame, verdict: GridVerdict, handSpells: (
 
 /** The game passed to `turn`, a new turn with nothing traded and its table as it stands. */
 function passTo(game: PartyGame, turn: number, rest: Partial<PartyGame>): PartyGame {
-  return { ...game, ...rest, turns: game.turns + 1, turn, traded: false, startTable: tableTally(game.players[turn]!.tiles), passedBy: game.turn };
+  return {
+    ...game,
+    ...rest,
+    turns: game.turns + 1,
+    turn,
+    traded: false,
+    startTable: tableTally(game.players[turn]!.tiles),
+    passedBy: game.turn,
+  };
 }
 
 /**
@@ -202,13 +219,19 @@ function passTo(game: PartyGame, turn: number, rest: Partial<PartyGame>): PartyG
  * console.log(endTurn(game,judgeWithWords(seatPlay(game).tiles,words),hand=>handCanSpell(hand,words)).turn);
  * ```
  */
-export function endTurn(game: PartyGame, verdict: GridVerdict, handSpells: (hand: readonly string[]) => boolean): PartyGame {
+export function endTurn(
+  game: PartyGame,
+  verdict: GridVerdict,
+  handSpells: (hand: readonly string[]) => boolean,
+): PartyGame {
   if (isOver(game) || doneRefused(game, verdict, handSpells) !== null) return game;
   if (lastStanding(game)) return passTo(game, game.turn, { ending: "standing", resignRun: [] });
   const out = goesOut(game, verdict) ? [...game.out, game.turn] : game.out;
   if (game.lastTurns === null) {
     if (out.length === 0) return passTo(game, nextIn(game, game.turn), { resignRun: [] });
-    const lastTurns = stillIn(game).filter((at) => at !== game.turn).sort((a, b) => fromTurn(game, a) - fromTurn(game, b));
+    const lastTurns = stillIn(game)
+      .filter((at) => at !== game.turn)
+      .sort((a, b) => fromTurn(game, a) - fromTurn(game, b));
     if (lastTurns.length === 0) return passTo(game, game.turn, { out, lastTurns, ending: "out" });
     return passTo(game, lastTurns[0]!, { out, lastTurns, resignRun: [] });
   }

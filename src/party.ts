@@ -93,7 +93,8 @@ const LENGTHS: readonly KumimojiLength[] = ["short", "medium", "full"];
 export function partyLength(players: number, hand: number, chosen: KumimojiLength, doubleSet: boolean): KumimojiLength {
   // One player plays any length, and asks nothing of the size: the set-up screen asks this of every puzzle's.
   if (players < KUMIMOJI_PARTY.least) return chosen;
-  const fits = (length: KumimojiLength) => partyFits(players, hand, kumimojiTileCount(hand, length, undefined, doubleSet));
+  const fits = (length: KumimojiLength) =>
+    partyFits(players, hand, kumimojiTileCount(hand, length, undefined, doubleSet));
   if (fits(chosen)) return chosen;
   return LENGTHS.find(fits) ?? "full";
 }
@@ -119,15 +120,37 @@ export function partyLength(players: number, hand: number, chosen: KumimojiLengt
 export function startParty(settings: PartySettings, bag: string, seats: readonly (string | PartySeat)[]): PartyGame {
   const count = Math.min(Math.max(seats.length, KUMIMOJI_PARTY.least), KUMIMOJI_PARTY.most);
   const hand = settings.size;
-  if (bag.length < partyTilesNeeded(count, hand)) throw new Error(`A bag of ${bag.length} cannot be dealt to ${count} players.`);
+  if (bag.length < partyTilesNeeded(count, hand))
+    throw new Error(`A bag of ${bag.length} cannot be dealt to ${count} players.`);
   const players: PartyPlayer[] = [];
   for (let at = 0; at < count; at += 1) {
     const seat = seats[at] ?? "";
     const asked = typeof seat === "string" ? { name: seat } : seat;
     const dealt = { hand: [...bag.slice(at * hand, (at + 1) * hand)], tiles: new Map<string, string>() };
-    players.push(asked.computer === true ? { name: computerName(players), computer: true, ...dealt } : { name: tidyName(asked.name), ...dealt });
+    players.push(
+      asked.computer === true
+        ? { name: computerName(players), computer: true, ...dealt }
+        : { name: tidyName(asked.name), ...dealt },
+    );
   }
-  return { settings, bag, returned: "", taken: count * hand, players, dealt: count, turn: 0, turns: 0, out: [], lastTurns: null, resigned: [], resignRun: [], ending: null, startTable: "", traded: false, passedBy: null };
+  return {
+    settings,
+    bag,
+    returned: "",
+    taken: count * hand,
+    players,
+    dealt: count,
+    turn: 0,
+    turns: 0,
+    out: [],
+    lastTurns: null,
+    resigned: [],
+    resignRun: [],
+    ending: null,
+    startTable: "",
+    traded: false,
+    passedBy: null,
+  };
 }
 
 /** The name a new computer takes: "Computer" and the lowest number no player at the table already goes by.
@@ -280,7 +303,9 @@ export function mayTradeThisTurn(game: PartyGame): boolean {
 export function withSeatPlay(game: PartyGame, play: TilePlay): PartyGame {
   if (game.ending !== null) return game;
   if (game.traded && play.returned.length > game.returned.length) return game;
-  const players = game.players.map((player, at) => (at === game.turn ? { ...player, hand: play.hand, tiles: play.tiles } : player));
+  const players = game.players.map((player, at) =>
+    at === game.turn ? { ...player, hand: play.hand, tiles: play.tiles } : player,
+  );
   const traded = game.traded || play.returned.length > game.returned.length;
   return { ...game, returned: play.returned, taken: play.taken, players, traded };
 }
@@ -367,7 +392,13 @@ export function nextIn(game: PartyGame, from: number): number {
  * ```
  */
 export function mayDrawAll(game: PartyGame, verdict: GridVerdict): boolean {
-  return game.ending === null && game.lastTurns === null && game.players[game.turn]!.hand.length === 0 && verdict.sound && partyTilesLeft(game) >= stillIn(game).length;
+  return (
+    game.ending === null &&
+    game.lastTurns === null &&
+    game.players[game.turn]!.hand.length === 0 &&
+    verdict.sound &&
+    partyTilesLeft(game) >= stillIn(game).length
+  );
 }
 
 /**
@@ -392,7 +423,9 @@ export function drawAll(game: PartyGame): PartyGame {
   const order = stillIn(game).sort((a, b) => ((a - game.turn + count) % count) - ((b - game.turn + count) % count));
   if (partyTilesLeft(game) < order.length) return game;
   const coming = (game.bag + game.returned).slice(game.taken, game.taken + order.length);
-  const players = game.players.map((player, at) => (order.includes(at) ? { ...player, hand: [...player.hand, coming[order.indexOf(at)]!] } : player));
+  const players = game.players.map((player, at) =>
+    order.includes(at) ? { ...player, hand: [...player.hand, coming[order.indexOf(at)]!] } : player,
+  );
   return { ...game, taken: game.taken + order.length, players };
 }
 

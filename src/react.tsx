@@ -60,16 +60,44 @@ export type KumimojiBoardProps = {
  * console.log(createElement(KumimojiBoard,{tiles:new Map([["0,0","c"]])}));
  * ```
  */
-export function KumimojiBoard({ tiles, verdict = null, glyphOf, onSquare, held = null, square = 36, style, ...element }: KumimojiBoardProps) {
+export function KumimojiBoard({
+  tiles,
+  verdict = null,
+  glyphOf,
+  onSquare,
+  held = null,
+  square = 36,
+  style,
+  ...element
+}: KumimojiBoardProps) {
   const model = boardModel(tiles, verdict, glyphOf);
   return (
-    <div role="grid" style={{ display: "grid", gap: 2, gridTemplateColumns: `repeat(${model.cols}, ${square}px)`, width: "max-content", ...style }} {...element}>
+    <div
+      role="grid"
+      style={{
+        display: "grid",
+        gap: 2,
+        gridTemplateColumns: `repeat(${model.cols}, ${square}px)`,
+        width: "max-content",
+        ...style,
+      }}
+      {...element}
+    >
       {model.squares.map((cell) => {
-        const ring = cell.square === held ? "0 0 0 3px #ffcf3f" : cell.mark === "misspelt" ? "0 0 0 3px #d9534f inset" : undefined;
+        const ring =
+          cell.square === held ? "0 0 0 3px #ffcf3f" : cell.mark === "misspelt" ? "0 0 0 3px #d9534f inset" : undefined;
         const look: CSSProperties =
           cell.tile === null
             ? { width: square, height: square, borderRadius: 5, background: "rgba(127,127,127,.18)", boxShadow: ring }
-            : { ...TILE, width: square, height: square, fontSize: square * 0.55, background: cell.wild ? "#f6d27a" : TILE.background, opacity: cell.mark === "apart" ? 0.6 : 1, boxShadow: ring ?? TILE.boxShadow };
+            : {
+                ...TILE,
+                width: square,
+                height: square,
+                fontSize: square * 0.55,
+                background: cell.wild ? "#f6d27a" : TILE.background,
+                opacity: cell.mark === "apart" ? 0.6 : 1,
+                boxShadow: ring ?? TILE.boxShadow,
+              };
         return (
           <button
             key={cell.square}
@@ -96,7 +124,8 @@ export function KumimojiBoard({ tiles, verdict = null, glyphOf, onSquare, held =
  * console.log(props.controls);
  * ```
  */
-export type KumimojiTableProps = KumimojiTableOptions & Omit<HTMLAttributes<HTMLDivElement>, keyof KumimojiTableOptions>;
+export type KumimojiTableProps = KumimojiTableOptions &
+  Omit<HTMLAttributes<HTMLDivElement>, keyof KumimojiTableOptions>;
 
 /**
  * A whole game alone, as a React component: the plain-DOM table
@@ -112,7 +141,24 @@ export type KumimojiTableProps = KumimojiTableOptions & Omit<HTMLAttributes<HTML
  * ```
  */
 export function KumimojiTable(props: KumimojiTableProps) {
-  const { language, hand, level, gameLength, diagonals, seed, onFinish, onChange, locale, strings, theme, keep, controls, saved, onError, ...element } = props;
+  const {
+    language,
+    hand,
+    level,
+    gameLength,
+    diagonals,
+    seed,
+    onFinish,
+    onChange,
+    locale,
+    strings,
+    theme,
+    keep,
+    controls,
+    saved,
+    onError,
+    ...element
+  } = props;
   const host = useRef<HTMLDivElement>(null);
   const latest = useRef({ onFinish, onChange, onError });
   useEffect(() => {
@@ -121,7 +167,23 @@ export function KumimojiTable(props: KumimojiTableProps) {
   useEffect(() => {
     const target = host.current;
     if (target === null) return;
-    const table = mountKumimoji(target, { language, hand, level, gameLength, diagonals, seed, locale, strings, theme, keep, controls, saved, onError: error => latest.current.onError?.(error), onFinish: (result) => latest.current.onFinish?.(result), onChange: (saved) => latest.current.onChange?.(saved) });
+    const table = mountKumimoji(target, {
+      language,
+      hand,
+      level,
+      gameLength,
+      diagonals,
+      seed,
+      locale,
+      strings,
+      theme,
+      keep,
+      controls,
+      saved,
+      onError: (error) => latest.current.onError?.(error),
+      onFinish: (result) => latest.current.onFinish?.(result),
+      onChange: (saved) => latest.current.onChange?.(saved),
+    });
     return () => table.destroy();
     // Mounted once per key, as documented above.
     // eslint-disable-next-line react-hooks/exhaustive-deps

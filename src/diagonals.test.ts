@@ -26,7 +26,9 @@ const DIAGONALS = { diagonals: true } as const;
 /** A grid from rows of text, "." for an empty square, its first row and column at 0. */
 function gridOf(...rows: string[]): Map<string, string> {
   const tiles = new Map<string, string>();
-  rows.forEach((line, row) => [...line].forEach((letter, col) => letter !== "." && tiles.set(squareAt(row, col), letter)));
+  rows.forEach((line, row) =>
+    [...line].forEach((letter, col) => letter !== "." && tiles.set(squareAt(row, col), letter)),
+  );
   return tiles;
 }
 
@@ -34,13 +36,19 @@ describe("reading the diagonals", () => {
   it("reads runs of three or more both ways, top to bottom, only when asked", () => {
     const right = gridOf("c..", ".a.", "..t");
     expect(runsOf(right)).toEqual([]);
-    expect(runsOf(right, DIAGONALS)).toEqual([{ word: "cat", squares: [squareAt(0, 0), squareAt(1, 1), squareAt(2, 2)], line: "downRight" }]);
+    expect(runsOf(right, DIAGONALS)).toEqual([
+      { word: "cat", squares: [squareAt(0, 0), squareAt(1, 1), squareAt(2, 2)], line: "downRight" },
+    ]);
     const left = gridOf("..d", ".o.", "g..");
-    expect(runsOf(left, DIAGONALS)).toEqual([{ word: "dog", squares: [squareAt(0, 2), squareAt(1, 1), squareAt(2, 0)], line: "downLeft" }]);
+    expect(runsOf(left, DIAGONALS)).toEqual([
+      { word: "dog", squares: [squareAt(0, 2), squareAt(1, 1), squareAt(2, 0)], line: "downLeft" },
+    ]);
   });
 
   it("leaves a pair touching at a corner unread", () => {
-    expect(runsOf(gridOf("ca.", ".at"), DIAGONALS).filter((run) => run.line === "downRight" || run.line === "downLeft")).toEqual([]);
+    expect(
+      runsOf(gridOf("ca.", ".at"), DIAGONALS).filter((run) => run.line === "downRight" || run.line === "downLeft"),
+    ).toEqual([]);
   });
 
   it("judges a diagonal word sound, and joins its tiles, with Diagonals on", () => {
@@ -88,7 +96,10 @@ describe("the server's check with Diagonals", () => {
   it("refuses a crossword whose diagonal is not a word, which is sound without Diagonals", () => {
     // AT, TO, OR and RE, a staircase whose diagonal reads A·O·E.
     expect(checkKumimoji(3, "atore", "at/1or/2e")).toEqual({ ok: true });
-    expect(checkKumimoji(3, "atore", "at/1or/2e", DIAGONALS)).toEqual({ ok: false, reason: "aoe is not in the word list" });
+    expect(checkKumimoji(3, "atore", "at/1or/2e", DIAGONALS)).toEqual({
+      ok: false,
+      reason: "aoe is not in the word list",
+    });
   });
 
   it("takes an ordinary crossword with no diagonal of three either way", () => {
@@ -99,17 +110,23 @@ describe("the server's check with Diagonals", () => {
 describe("making a kumimoji with Diagonals", () => {
   const languages: KumimojiLanguage[] = ["english", "japanese"];
   for (const language of languages) {
-    it.each(Object.values(KUMIMOJI_HANDS))(`lays every ${language} bag at hand %i as a crossword sound along its diagonals too, in a browser's time`, (size) => {
-      for (const seed of [1, 2, 3, 77, 20260928]) {
-        const started = performance.now();
-        const puzzle = generateKumimoji(size, "medium", seed, { language, diagonals: true });
-        const took = performance.now() - started;
-        expect(puzzle.diagonals).toBe(true);
-        expect(puzzle.givens).toHaveLength(language === "english" ? KUMIMOJI_BAG[size]! : puzzle.givens.length);
-        expect(checkKumimoji(size, puzzle.givens, puzzle.solution, { level: "medium", language, diagonals: true }), `seed ${seed}`).toEqual({ ok: true });
-        expect(took, `seed ${seed} took ${Math.round(took)} ms`).toBeLessThan(3000);
-      }
-    });
+    it.each(Object.values(KUMIMOJI_HANDS))(
+      `lays every ${language} bag at hand %i as a crossword sound along its diagonals too, in a browser's time`,
+      (size) => {
+        for (const seed of [1, 2, 3, 77, 20260928]) {
+          const started = performance.now();
+          const puzzle = generateKumimoji(size, "medium", seed, { language, diagonals: true });
+          const took = performance.now() - started;
+          expect(puzzle.diagonals).toBe(true);
+          expect(puzzle.givens).toHaveLength(language === "english" ? KUMIMOJI_BAG[size]! : puzzle.givens.length);
+          expect(
+            checkKumimoji(size, puzzle.givens, puzzle.solution, { level: "medium", language, diagonals: true }),
+            `seed ${seed}`,
+          ).toEqual({ ok: true });
+          expect(took, `seed ${seed} took ${Math.round(took)} ms`).toBeLessThan(3000);
+        }
+      },
+    );
   }
 
   it.each([
@@ -118,7 +135,9 @@ describe("making a kumimoji with Diagonals", () => {
   ] as const)("lays and independently checks %s with Diagonals", (_, options) => {
     const started = performance.now();
     const puzzle = generateKumimoji(7, "medium", 20260928, { ...options, diagonals: true });
-    expect(checkKumimoji(7, puzzle.givens, puzzle.solution, { level: "medium", ...options, diagonals: true })).toEqual({ ok: true });
+    expect(checkKumimoji(7, puzzle.givens, puzzle.solution, { level: "medium", ...options, diagonals: true })).toEqual({
+      ok: true,
+    });
     /*
      * Measured at two seconds or under alone. The gate runs the unit suite beside
      * the lint and the build, where the Double set once took 8.5 s; the bound is

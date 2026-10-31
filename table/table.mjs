@@ -7,7 +7,13 @@ import { fileURLToPath } from "node:url";
 import { expect, test } from "@playwright/test";
 
 const site = join(dirname(fileURLToPath(import.meta.url)), "..", "site");
-const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".md": "text/markdown" };
+const TYPES = {
+  ".html": "text/html",
+  ".js": "text/javascript",
+  ".css": "text/css",
+  ".json": "application/json",
+  ".md": "text/markdown",
+};
 
 export const ROOT = '#table [data-testid="km-root"]';
 /** The table once a game is dealt. */
@@ -17,7 +23,8 @@ export const SMALL = "?seed=44&hand=3&level=hard&words=english&lang=en";
 
 /** Open the demo with a query, wait for the game to be dealt, and collect anything the page complains of. */
 export async function open(page, query = SMALL) {
-  if (!existsSync(join(site, "index.html"))) throw new Error("site/ is not built: run `pnpm site` first (`pnpm test:table` does)");
+  if (!existsSync(join(site, "index.html")))
+    throw new Error("site/ is not built: run `pnpm site` first (`pnpm test:table` does)");
   const errors = [];
   page.on("pageerror", (error) => errors.push(String(error)));
   page.on("console", (message) => message.type() === "error" && errors.push(message.text()));
@@ -25,7 +32,10 @@ export async function open(page, query = SMALL) {
     const { pathname } = new URL(route.request().url());
     const file = join(site, pathname === "/" ? "index.html" : pathname);
     if (!existsSync(file)) return route.fulfill({ status: 404, body: "" });
-    return route.fulfill({ body: readFileSync(file), contentType: TYPES[file.slice(file.lastIndexOf("."))] ?? "application/octet-stream" });
+    return route.fulfill({
+      body: readFileSync(file),
+      contentType: TYPES[file.slice(file.lastIndexOf("."))] ?? "application/octet-stream",
+    });
   });
   await page.goto(`http://kumimoji.test/${query}`);
   await expect(page.locator(PLAYING)).toBeVisible({ timeout: 30000 });
@@ -63,12 +73,16 @@ export function state(page) {
       notes: q('#table [data-testid="km-notes"]').textContent,
       hand: all('#table [data-testid="km-hand"] [data-hand]').map((tile) => tile.dataset.tile),
       handWords: q('#table [data-testid="km-hand"]').textContent,
-      table: Object.fromEntries(all("#table .km-board .km-tile").map((tile) => [tile.dataset.square, tile.dataset.tile])),
+      table: Object.fromEntries(
+        all("#table .km-board .km-tile").map((tile) => [tile.dataset.square, tile.dataset.tile]),
+      ),
       wrong: all("#table .km-board .km-misspelt").map((tile) => tile.dataset.square),
       wilds: all("#table .km-board .km-wild").map((tile) => tile.dataset.square),
       squares: all("#table .km-board .km-square, .km-board .km-tile").length,
       picker: all('#table [data-testid="km-picker"] button').map((b) => b.textContent),
-      controls: all('#table [data-testid="km-controls"] button').map((b) => `${b.textContent}${b.disabled ? " (off)" : ""}`),
+      controls: all('#table [data-testid="km-controls"] button').map(
+        (b) => `${b.textContent}${b.disabled ? " (off)" : ""}`,
+      ),
       keep: all('#table [data-testid="km-keep"] button').map((b) => b.textContent),
       note: q('#table [data-testid="km-note"]')?.textContent ?? "",
       unreviewed: !q("#unreviewed").hidden,
@@ -79,7 +93,10 @@ export function state(page) {
       // Anything to be tapped that is smaller than a fingertip. Links in running text are words, not targets.
       small: all("button, input, select, textarea, summary, nav a, footer .family a")
         .filter((e) => box(e).width > 0 && !e.hidden && (box(e).height < 43.5 || box(e).width < 43.5))
-        .map((e) => `${e.dataset.testid ?? e.className ?? e.tagName} “${e.textContent.trim().slice(0, 20)}”: ${Math.round(box(e).width)}×${Math.round(box(e).height)}`),
+        .map(
+          (e) =>
+            `${e.dataset.testid ?? e.className ?? e.tagName} “${e.textContent.trim().slice(0, 20)}”: ${Math.round(box(e).width)}×${Math.round(box(e).height)}`,
+        ),
     };
   });
 }

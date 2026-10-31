@@ -39,7 +39,9 @@ test("Today's game deals the day's seed, whatever the set-up", async ({ page }) 
 test("Copy link copies a link that deals the same game, and the address is read back", async ({ page }) => {
   // The page is served over http, where a browser keeps no clipboard; this one is a stand-in that remembers what was written.
   await page.addInitScript(() => {
-    Object.defineProperty(navigator, "clipboard", { value: { writeText: async (text) => void (window.__copied = text) } });
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText: async (text) => void (window.__copied = text) },
+    });
   });
   const errors = await open(page, "?seed=2026&hand=11&level=easy&words=japanese&diagonals=1&length=medium&lang=en");
   await expect(page.locator("#table [data-hand]")).toHaveCount(11);
@@ -48,7 +50,15 @@ test("Copy link copies a link that deals the same game, and the address is read 
   await expect(page.locator("#share")).toHaveText("Copied");
   const copied = new URL(await page.evaluate(() => window.__copied));
   expect(copied.origin).toBe("http://kumimoji.test");
-  expect(Object.fromEntries(copied.searchParams)).toEqual({ seed: "2026", words: "japanese", hand: "11", level: "easy", length: "medium", lang: "en", diagonals: "1" });
+  expect(Object.fromEntries(copied.searchParams)).toEqual({
+    seed: "2026",
+    words: "japanese",
+    hand: "11",
+    level: "easy",
+    length: "medium",
+    lang: "en",
+    diagonals: "1",
+  });
   await expect(page.locator("#share")).toHaveText("Copy link");
   await sound(page, errors);
 });
