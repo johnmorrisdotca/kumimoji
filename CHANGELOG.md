@@ -6,6 +6,10 @@ All notable changes to this project are written down here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- A table can be laid in the family's five cloths: `<kumimoji-table cloth="blue">`, `mountKumimoji(el, { cloth })` and `set({ cloth })`, the `cloth` embed parameter and Builder option, and `KUMIMOJI_CLOTHS`, `isCloth` and `clothVars` from `/ui`. The demo's header patches lay it through the page's theme.
+
 ## [1.3.1] - 2026-10-31
 
 ### Changed

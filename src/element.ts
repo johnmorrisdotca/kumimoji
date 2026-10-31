@@ -3,6 +3,7 @@ import { embedDay } from "./embed-day.ts";
 import type { KumimojiSaved } from "./export.ts";
 import type { KumimojiLanguage, KumimojiLength, KumimojiLevel } from "./kumimoji.types.ts";
 import { KUMIMOJI_HANDS } from "./tiles.constants.ts";
+import { type Cloth, isCloth } from "./ui/cloth.ts";
 import { type KumimojiTableHandle, type KumimojiTableOptions, mountKumimoji } from "./ui/mount.ts";
 import { KUMIMOJI_STYLE } from "./ui/style.ts";
 
@@ -60,6 +61,7 @@ export const KUMIMOJI_EMBED_OPTION_KEYS = Object.keys({
   locale: true,
   strings: true,
   theme: true,
+  cloth: true,
   keep: true,
   controls: true,
   saved: true,
@@ -99,6 +101,7 @@ export class KumimojiTable extends ElementBase {
     "size",
     "width",
     "label",
+    "cloth",
   ];
 
   #table: KumimojiTableHandle | null = null;
@@ -226,6 +229,13 @@ export class KumimojiTable extends ElementBase {
   set controls(value: string | number | boolean | null | undefined) {
     this.#write("controls", value);
   }
+  /** The `cloth` attribute, reflected: green, blue, red, black or wood. */
+  get cloth(): string | null {
+    return this.getAttribute("cloth");
+  }
+  set cloth(value: string | number | boolean | null | undefined) {
+    this.#write("cloth", value);
+  }
   /** The `theme` attribute, reflected. */
   get theme(): string | null {
     return this.getAttribute("theme");
@@ -340,11 +350,19 @@ export class KumimojiTable extends ElementBase {
           ? lang
           : (this.#options.locale ??
             (this.ownerDocument.documentElement.lang.toLowerCase().startsWith("ja") ? "ja" : "en"));
+      const cloth = isCloth(this.getAttribute("cloth")) ? (this.getAttribute("cloth") as Cloth) : this.#options.cloth;
       const keep = isOn(this.getAttribute("keep"), this.#options.keep ?? true);
       const controls = isOn(this.getAttribute("controls"), this.#options.controls ?? true);
       const key = JSON.stringify([language, hand, level, gameLength, diagonals, seed, day, this.#options.saved]);
       if (key === this.#key && this.#table !== null) {
-        this.#table.set({ locale, strings: this.#options.strings, theme: this.#options.theme ?? {}, keep, controls });
+        this.#table.set({
+          locale,
+          strings: this.#options.strings,
+          cloth,
+          theme: this.#options.theme ?? {},
+          keep,
+          controls,
+        });
         return;
       }
       if (hand !== undefined && !HANDS.includes(hand)) throw new RangeError("Choose a hand of 3, 7 or 11 tiles.");
@@ -362,6 +380,7 @@ export class KumimojiTable extends ElementBase {
         diagonals,
         seed,
         locale,
+        cloth,
         keep,
         controls,
         onChange: (saved) => {

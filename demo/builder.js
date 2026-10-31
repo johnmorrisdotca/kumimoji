@@ -45,6 +45,7 @@ const row = (id, kind, en, ja, extra = {}) => ({
     table: id,
     ...({
       language: "language",
+      cloth: "cloth",
       hand: "hand",
       level: "level",
       length: "gameLength",
@@ -57,6 +58,7 @@ const row = (id, kind, en, ja, extra = {}) => ({
       ? {
           mount: {
             language: "language",
+            cloth: "cloth",
             hand: "hand",
             level: "level",
             length: "gameLength",
@@ -151,6 +153,14 @@ const options = [
     ["幅", "ピクセルで指定します。狭い表示枠にも収まります。"],
     { range: { min: 200, max: 1000, step: 10 } },
   ),
+  row("cloth", "choice", ["Cloth", "The colour of the felt."], ["テーブルの色", "フェルトの色です。"], {
+    default: "green",
+    choices: ["green", "blue", "red", "black", "wood"],
+    choiceLabels: {
+      en: { green: "Green", blue: "Blue", red: "Red", black: "Black", wood: "Wood" },
+      ja: { green: "緑", blue: "青", red: "赤", black: "黒", wood: "木目" },
+    },
+  }),
   row(
     "theme",
     "choice",

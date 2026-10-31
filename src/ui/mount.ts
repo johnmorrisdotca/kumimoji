@@ -6,6 +6,7 @@ import { deal, isFinished, liftToHand, moveOnTable, placeFromHand, swapWithHand,
 import { type KumimojiLocale, type KumimojiStrings, kumimojiStrings } from "../strings.ts";
 import { KUMIMOJI_HANDS } from "../tiles.constants.ts";
 import { loadTileWords } from "../tileWords.ts";
+import { type Cloth, clothVars, isCloth } from "./cloth.ts";
 import { button, type Held, node, type TableSession, tableDrawing } from "./draw.ts";
 import { KUMIMOJI_STYLE } from "./style.ts";
 
@@ -42,6 +43,8 @@ export type KumimojiTableOptions = {
   strings?: Partial<KumimojiStrings>;
   /** CSS variables set on the table itself, which win in light and dark alike: `{ "--km-felt": "#23405a" }`. */
   theme?: Readonly<Record<string, string>>;
+  /** The cloth the table is laid in: "green", "blue", "red", "black" or "wood", the family's five. `theme` is laid over it. */
+  cloth?: Cloth;
   /** Whether the table offers saving and loading. True by default. */
   keep?: boolean;
   /** Show native play-action buttons; a host hiding them supplies its own actions. */
@@ -68,7 +71,7 @@ export type KumimojiTableHandle = {
   /** Settles once the initial deal or restored game is ready. */
   readonly ready: Promise<void>;
   /** Change presentation and controls without redealing. */
-  set: (options: Pick<KumimojiTableOptions, "locale" | "strings" | "theme" | "keep" | "controls">) => void;
+  set: (options: Pick<KumimojiTableOptions, "locale" | "strings" | "cloth" | "theme" | "keep" | "controls">) => void;
   /** The game as it stands, or null while it is being dealt. */
   play: () => TilePlay | null;
   /** The game as it would be saved (`kumimojiToJSON`), or null while it is being dealt. */
@@ -159,7 +162,14 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
   const root = node("div", "km-root");
   root.dataset.testid = "km-root";
   root.dataset.state = "dealing";
-  for (const [name, value] of Object.entries(current.theme ?? {})) root.style.setProperty(name, value);
+  const wear = (cloth: string | undefined, theme: Readonly<Record<string, string>>) => {
+    for (const name of Object.keys(clothVars("green"))) root.style.removeProperty(name);
+    for (const [name, value] of Object.entries<string>({ ...clothVars(cloth), ...theme }))
+      root.style.setProperty(name, value);
+    if (isCloth(cloth)) root.dataset.cloth = cloth;
+    else delete root.dataset.cloth;
+  };
+  wear(current.cloth, current.theme ?? {});
   const style = node("style");
   style.textContent = KUMIMOJI_STYLE;
   const status = node("p", "km-status");
@@ -392,8 +402,8 @@ export function mountKumimoji(target: HTMLElement, options: KumimojiTableOptions
     set: (changes) => {
       for (const name of Object.keys(current.theme ?? {}))
         if (changes.theme !== undefined && !(name in changes.theme)) root.style.removeProperty(name);
-      if (changes.theme !== undefined)
-        for (const [name, value] of Object.entries(changes.theme)) root.style.setProperty(name, value);
+      if (changes.theme !== undefined || "cloth" in changes)
+        wear("cloth" in changes ? changes.cloth : current.cloth, changes.theme ?? current.theme ?? {});
       current = { ...current, ...changes };
       if (changes.locale !== undefined) session.locale = changes.locale;
       if (changes.strings !== undefined) own = changes.strings;

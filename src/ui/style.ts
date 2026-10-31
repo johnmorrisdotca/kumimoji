@@ -22,6 +22,7 @@ export const KUMIMOJI_STYLE = `
 }
 .km-root > * { min-width: 0; }
 .km-status { margin: 0; min-height: 1.4em; font-variant-numeric: tabular-nums; }
+.km-root, .km-root * { line-height: 1.35; }
 .km-board { background: var(--km-felt); border-radius: var(--km-radius); padding: 10px; overflow: auto; max-height: 70vh; }
 .km-grid { display: grid; gap: 2px; width: max-content; margin: 0 auto; }
 .km-square { width: var(--km-square); height: var(--km-square); border: 0; border-radius: 5px; background: var(--km-grid-line); padding: 0; cursor: pointer; touch-action: manipulation; }

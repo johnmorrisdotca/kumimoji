@@ -152,3 +152,32 @@ test("copied iframe forwards native JSON detail, fits a phone and ignores bad fi
   for (const name of ["hand", "seed", "daily", "language", "width"])
     await expect(page.locator("kumimoji-table")).not.toHaveAttribute(name, /.*/);
 });
+
+test("the cloth attribute lays the felt in each of the five and keeps the game; taking it off gives the green back", async ({
+  page,
+}) => {
+  await serve(page);
+  await page.goto("http://kumimoji.test/embed/?seed=42&cloth=blue");
+  const table = page.locator("kumimoji-table");
+  await expect(table).toHaveAttribute("cloth", "blue");
+  await expect(table.locator(".km-board")).toBeVisible();
+  const felt = () =>
+    table.evaluate((el) => getComputedStyle(el.querySelector(".km-root")).getPropertyValue("--km-felt").trim());
+  expect(await felt()).toBe("#2865a6");
+  const hand = () => table.locator(".km-hand").textContent();
+  const held = await hand();
+  for (const [name, colour] of [
+    ["green", "#2f5d4a"],
+    ["red", "#a3342e"],
+    ["black", "#2f3236"],
+    ["wood", "#e2ba7a"],
+  ]) {
+    await table.evaluate((el, value) => el.setAttribute("cloth", value), name);
+    await expect.poll(felt).toBe(colour);
+  }
+  expect(await hand()).toBe(held);
+  await table.evaluate((el) => el.removeAttribute("cloth"));
+  await expect.poll(felt).not.toBe("#e2ba7a");
+  await page.goto("http://kumimoji.test/embed/?cloth=plaid");
+  await expect(page.locator("kumimoji-table")).not.toHaveAttribute("cloth", /./);
+});

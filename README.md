@@ -566,6 +566,8 @@ table.destroy();
 
 ### A look of your own
 
+`<kumimoji-table cloth="blue">`, or `cloth: "blue"` when you mount, lays the table in one of the family's five cloths, `green`, `blue`, `red`, `black` or `wood`, the same set as the boards on itsutsu.com; `set({ cloth })` changes it in place, keeping the game, and `theme` is laid over it. `KUMIMOJI_CLOTHS` and `clothVars` hold the colours.
+
 Every colour is a CSS variable on `.km-root`, so a stylesheet or the `theme` option can restyle the table:
 
 ```ts no-run

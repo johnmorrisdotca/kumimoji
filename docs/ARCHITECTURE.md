@@ -53,6 +53,7 @@ src/
 ├── words.ts            the "/words" entry: the word lists, for a place with no browser, such as a server or a test
 └── ui/  the table that draws and plays a game
     ├── board.ts  how a tile on the table is drawn: sound, in a run that is not a word, or apart
+    ├── cloth.ts   the five cloths a table may be laid in
     ├── draw.ts   how the table is drawn: status, board, hand, picker, buttons, and focus put back
     ├── mount.ts  the table itself: mounting it on a page, the options it takes, and playing it from a keyboard
     └── style.ts  the table's own styles, every colour and size a CSS variable so a page can restyle it

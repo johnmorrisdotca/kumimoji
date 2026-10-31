@@ -100,6 +100,7 @@ and plays a whole game alone in the element, and returns a handle.
 | `locale` | the page's `lang` | The language of the table's words: `"en"` or `"ja"` |
 | `strings` | | Words of your own, laid over the locale's |
 | `theme` | | CSS variables set on the table itself |
+| `cloth` | green | The felt's cloth: `green`, `blue`, `red`, `black` or `wood`, the family's five. `theme` is laid over it |
 | `keep` | `true` | Whether the table offers saving and loading |
 | `controls` | true | Show native play-action buttons; a host can supply its own |
 | `saved` | none | Restore a validated saved game initially |
@@ -145,6 +146,7 @@ attribute is read again when it changes. Game inputs redeal; display, locale, ke
 | `size` | unset | small/medium/large display width (320/480/640px) |
 | `width` | unset | Pixel display width, capped to the parent |
 | `label` | unset | Spoken group name |
+| `cloth` | green | The felt's cloth: `green`, `blue`, `red`, `black` or `wood`, the family's five; changed in place, keeping the game |
 
 It fires `kumimoji-change` after every change to the game, with the game as it
 would be saved as `event.detail.saved`, and `kumimoji-finish` when the last
