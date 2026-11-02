@@ -770,7 +770,7 @@ The JSON, as `kumimojiToJSON` writes it:
 {
   "format": 1,
   "game": "kumimoji",
-  "generator": "kumimoji 1.3.1",
+  "generator": "kumimoji 1.4.0",
   "size": 3,
   "level": "hard",
   "seed": 44,
@@ -895,16 +895,7 @@ as you type. The entries:
 
 ### The long tables
 
-The tables of every export for dealing and judging, tiles and grids, playing and keeping a game, a table of players and looking at the table are in [docs/API.md](docs/API.md), and every export of every entry point, with its signature and doc comment, is in the [API reference](https://johnmorrisdotca.github.io/kumimoji/api.html). The types the package exports are listed there too.
-
-The types are `TilePlay`, `Tiles`, `GridVerdict`, `GridRules`, `Run`,
-`RunLine`, `Bounds`, `Square`, `CrossingFit`, `KumimojiDeal`,
-`KumimojiOptions`, `KumimojiCheck`, `KumimojiLevel`, `KumimojiLength`,
-`KumimojiLanguage`, `TileWords`, `TileFaceOf`, `PartyGame`, `PartySettings`,
-`PartyPlayer`, `PartySeat`, `PartyEnding`, `JoinRefusal`, `LeaveRefusal`,
-`ComputerStep`, `ComputerSaid`, `KumimojiSaved`, `KumimojiExported`, `KumimojiStrings`,
-`KumimojiLocale`, `Random`, `Turn`, `Area`, `View`, `MixTile`, `MixShown` and
-`LengthRow`.
+The types, and the tables of every export for dealing and judging, tiles and grids, playing and keeping a game, a table of players and looking at the table are in [docs/API.md](docs/API.md), and every export of every entry point, with its signature and doc comment, is in the [API reference](https://johnmorrisdotca.github.io/kumimoji/api.html). The types the package exports are listed there too.
 
 ### The table
 
@@ -1203,7 +1194,7 @@ Please follow the [code of conduct](./CODE_OF_CONDUCT.md). A way to make a check
 
 See [CHANGELOG.md](./CHANGELOG.md).
 
-The latest release, 1.3.1, changes nothing a player sees.
+The latest release, 1.4.0, gives a check's reason as a code beside the English, and lets a table be laid in the family's five cloths.
 
 ## Licence
 

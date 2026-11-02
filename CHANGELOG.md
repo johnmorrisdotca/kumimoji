@@ -6,6 +6,8 @@ All notable changes to this project are written down here. The format follows
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-11-02
+
 ### Added
 
 - A table can be laid in the family's five cloths: `<kumimoji-table cloth="blue">`, `mountKumimoji(el, { cloth })` and `set({ cloth })`, the `cloth` embed parameter and Builder option, and `KUMIMOJI_CLOTHS`, `isCloth` and `clothVars` from `/ui`. The demo's header patches lay it through the page's theme.
@@ -194,7 +196,8 @@ The first release.
   `@johnmorrisdotca/kumimoji/react`.
 - A static demo for GitHub Pages.
 
-[Unreleased]: https://github.com/johnmorrisdotca/kumimoji/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/johnmorrisdotca/kumimoji/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/johnmorrisdotca/kumimoji/compare/v1.3.1...v1.4.0
 [1.3.0]: https://github.com/johnmorrisdotca/kumimoji/compare/v1.2.2...v1.3.0
 [1.2.1]: https://github.com/johnmorrisdotca/kumimoji/compare/v1.2.0...v1.2.1
 [1.1.1]: https://github.com/johnmorrisdotca/kumimoji/compare/v1.1.0...v1.1.1

@@ -158,3 +158,14 @@ saved), `table` (the handle `mountKumimoji` returns), `newGame(options?)` and
 
 
 The element also exports defineTable(tagName?, registry?) for a custom tag (safe on a server), full native options through options, and reflected properties for every attribute. Native saved/table getters and newGame/setGame remain. Kumimoji-load gives the deal seed/day, and kumimoji-error gives a plain message. See [the embed guide](embeds.md) for all host formats and the validated frame route.
+
+## The types
+
+The types are `TilePlay`, `Tiles`, `GridVerdict`, `GridRules`, `Run`,
+`RunLine`, `Bounds`, `Square`, `CrossingFit`, `KumimojiDeal`,
+`KumimojiOptions`, `KumimojiCheck`, `KumimojiLevel`, `KumimojiLength`,
+`KumimojiLanguage`, `TileWords`, `TileFaceOf`, `PartyGame`, `PartySettings`,
+`PartyPlayer`, `PartySeat`, `PartyEnding`, `JoinRefusal`, `LeaveRefusal`,
+`ComputerStep`, `ComputerSaid`, `KumimojiSaved`, `KumimojiExported`, `KumimojiStrings`,
+`KumimojiLocale`, `Random`, `Turn`, `Area`, `View`, `MixTile`, `MixShown` and
+`LengthRow`.
