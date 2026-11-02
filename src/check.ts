@@ -1,3 +1,4 @@
+import { kumimojiRefusal } from "./check-reasons.ts";
 import { decodeGrid, lettersOf, sameLetters } from "./grid.ts";
 import { judgeWithWords } from "./judge.ts";
 import type { KumimojiCheck, KumimojiLevel, KumimojiOptions } from "./kumimoji.types.ts";
@@ -49,22 +50,19 @@ export function checkKumimoji(
     const setSize = [...words.mix.values()].reduce((sum, count) => sum + count, 0);
     inBag = kumimojiTileCount(size, gameLength, language === "english" ? TILE_MIX_TOTAL : setSize, doubleSet);
   } catch {
-    return { ok: false, reason: `no Kumimoji with a hand of ${size}` };
+    return kumimojiRefusal("no-hand", { size });
   }
   const bag = [...givens];
-  if (typeof givens !== "string" || bag.length !== inBag)
-    return { ok: false, reason: "the givens are not a bag of tiles" };
+  if (typeof givens !== "string" || bag.length !== inBag) return kumimojiRefusal("givens-not-bag");
   const expectedWilds = kumimojiWildCount(size, level, inBag);
-  if (bag.filter(words.isWild).length !== expectedWilds)
-    return { ok: false, reason: "the bag has the wrong number of wild tiles" };
+  if (bag.filter(words.isWild).length !== expectedWilds) return kumimojiRefusal("wild-count-wrong");
   for (const [tile, count] of lettersOf(bag.filter((each) => !words.isWild(each)))) {
     const face = words.inventoryKey(tile);
     const code = face === null ? null : words.codeOf(face);
-    if (code === null || count > (words.mix.get(code) ?? 0) * multiplier)
-      return { ok: false, reason: "the bag exceeds the tile set" };
+    if (code === null || count > (words.mix.get(code) ?? 0) * multiplier) return kumimojiRefusal("bag-exceeds-set");
   }
   const tiles = decodeGrid(answer);
-  if (tiles === null) return { ok: false, reason: "the answer is not a grid" };
+  if (tiles === null) return kumimojiRefusal("answer-not-grid");
   const bagIdentities = bag.map(words.familyKey);
   const tileIdentities = [...tiles.values()].map(words.familyKey);
   if (
@@ -72,12 +70,12 @@ export function checkKumimoji(
     tileIdentities.some((tile) => tile === null) ||
     !sameLetters(lettersOf(tileIdentities as string[]), lettersOf(bagIdentities as string[]))
   ) {
-    return { ok: false, reason: "the grid does not use exactly the tiles of the bag" };
+    return kumimojiRefusal("grid-not-the-bag");
   }
   const verdict = judgeWithWords(tiles, words, { diagonals: options.diagonals === true });
-  if (verdict.apart.size > 0) return { ok: false, reason: "the tiles are not all joined" };
-  if (verdict.notWords.length > 0) return { ok: false, reason: `${verdict.notWords[0]} is not in the word list` };
-  if (!verdict.sound) return { ok: false, reason: "the grid is not finished" };
+  if (verdict.apart.size > 0) return kumimojiRefusal("tiles-apart");
+  if (verdict.notWords.length > 0) return kumimojiRefusal("not-a-word", { word: verdict.notWords[0]! });
+  if (!verdict.sound) return kumimojiRefusal("grid-not-finished");
   return { ok: true };
 }
 

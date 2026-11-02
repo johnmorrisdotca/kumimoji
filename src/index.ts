@@ -18,6 +18,7 @@
  */
 
 export * from "./check.ts";
+export * from "./check-reasons.ts";
 export * from "./computer.types.ts";
 export * from "./computerPlay.ts";
 export * from "./computerTurn.ts";

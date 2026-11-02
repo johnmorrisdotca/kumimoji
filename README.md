@@ -10,7 +10,7 @@ In English and in Japanese kana. The rules as pure, seeded TypeScript, two word 
   <a href="./NOTICE.md"><img alt="Japanese word list: CC BY-SA 4.0" src="https://img.shields.io/badge/Japanese%20words-CC%20BY--SA%204.0-b5452c"></a>
   <img alt="No dependencies" src="https://img.shields.io/badge/dependencies-0-2f5d4a">
   <img alt="TypeScript" src="https://img.shields.io/badge/types-TypeScript-3178c6">
-  <a href="https://johnmorrisdotca.github.io/kumimoji/docs/api/main/index.html"><img alt="679.1 kB minified and gzipped" src="https://img.shields.io/badge/min%2Bgzip-679.1%20kB-2f5d4a"></a>
+  <a href="https://johnmorrisdotca.github.io/kumimoji/docs/api/main/index.html"><img alt="679.3 kB minified and gzipped" src="https://img.shields.io/badge/min%2Bgzip-679.3%20kB-2f5d4a"></a>
   <a href="https://www.npmjs.com/package/@johnmorrisdotca/kumimoji#provenance"><img alt="Published with npm provenance" src="https://img.shields.io/badge/npm-provenance-2f5d4a"></a>
 </p>
 
@@ -242,7 +242,7 @@ const wrong = decodeGrid("cat/2x")!;
 judgeWithWords(wrong, words).notWords; // → ["tx"]
 
 checkKumimoji(3, "nwosy", "snowy", { level: "hard" }); // → { ok: true }
-checkKumimoji(3, "nwosy", "snows", { level: "hard" }); // → { ok: false, reason: "the grid does not use exactly the tiles of the bag" }
+checkKumimoji(3, "nwosy", "snows", { level: "hard" }); // → { ok: false, reason: "the grid does not use exactly the tiles of the bag", code: "grid-not-the-bag" }
 encodeGrid(tiles); // → "cat/2o/2w"
 ```
 
@@ -541,7 +541,7 @@ import { checkKumimoji, generateKumimoji, loadTileWords } from "@johnmorrisdotca
 await loadTileWords("english");
 const dealt = generateKumimoji(3, "hard", 44);
 checkKumimoji(3, dealt.givens, "snowy", { level: "hard" }); // → { ok: true }
-checkKumimoji(3, dealt.givens, "snows", { level: "hard" }); // → { ok: false, reason: "the grid does not use exactly the tiles of the bag" }
+checkKumimoji(3, dealt.givens, "snows", { level: "hard" }); // → { ok: false, reason: "the grid does not use exactly the tiles of the bag", code: "grid-not-the-bag" }
 ```
 
 ### Mount the table with options
@@ -888,7 +888,7 @@ as you type. The entries:
 | `deal(bag, handSize)` and `placeFromHand`, `moveOnTable`, `liftToHand`, `draw`, `trade` | The opening hand, and each move, every one returning a new game |
 | `judgeWithWords(tiles, words)` | What is wrong with a grid, or that it is sound |
 | `isFinished(play, verdict)` | Whether the bag is empty, the hand used and every run a word in one piece |
-| `checkKumimoji(size, givens, answer, options?)` | The one check a server runs on a finished grid |
+| `checkKumimoji(size, givens, answer, options?)` | The one check a server runs on a finished grid; a refusal has `reason`, `code`, `values` (`KUMIMOJI_CHECK_REASONS`, `kumimojiRefusal`) |
 | `loadTileWords(language)` | A word list, fetched when first needed |
 | `mountKumimoji(element, options?)` and `<kumimoji-table>` | The table, in one call or one tag |
 | `kumimojiToJSON`, `kumimojiFromJSON` | A game kept, and read back without trusting it |

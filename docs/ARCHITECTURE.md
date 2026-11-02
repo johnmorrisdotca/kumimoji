@@ -13,6 +13,7 @@ exactly after a reload.
 src/
 ├── embed-day.ts                 shared UTC embed-date validation
 ├── check.ts            whether a finished grid completes a game: the one check a server also runs
+├── check-reasons.ts    why it does not: a stable code and values beside the English reason
 ├── computer.types.ts   what a computer did in one step of its turn
 ├── computerPlay.ts     the word a computer player lays: from its own hand, with no randomness
 ├── computerTurn.ts     a computer's whole turn, planned as steps the page can show one at a time
