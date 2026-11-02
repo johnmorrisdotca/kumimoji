@@ -6,6 +6,10 @@ All notable changes to this project are written down here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **`checkKumimoji` gives its reason as a code and values as well as in English.** A refusal is now `{ ok: false, reason, code, values }`: `reason` is the sentence it has always been, word for word, and `code` (`"no-hand"`, `"givens-not-bag"`, `"wild-count-wrong"`, `"bag-exceeds-set"`, `"answer-not-grid"`, `"grid-not-the-bag"`, `"tiles-apart"`, `"not-a-word"` and `"grid-not-finished"`) and `values` (`{ size }` for `no-hand`, `{ word }` for `not-a-word`) let a site say it in its own language. `KUMIMOJI_CHECK_REASONS` lists every code with its English clause, `kumimojiRefusal(code, values)` makes a refusal, and the types are `KumimojiCheckCode` and `KumimojiCheckValues`. A test holds every refusal's `reason` to its code's clause filled with its values.
+
 ## [1.3.1] - 2026-10-31
 
 ### Changed

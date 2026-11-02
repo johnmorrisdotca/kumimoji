@@ -1,3 +1,5 @@
+import type { KumimojiCheckCode, KumimojiCheckValues } from "./check-reasons.ts";
+
 /** How much of the set a game's bag holds: a short game, half the set, or all of it.
  *
  * @example
@@ -71,17 +73,19 @@ export type KumimojiOptions = {
   diagonals?: boolean;
 };
 
-/** The answer to "does this grid finish the game?": yes, or no and why.
+/** The answer to "does this grid finish the game?": yes, or no and why, in English (`reason`) and as a stable `code` with `values` a site can say in its own language (`KUMIMOJI_CHECK_REASONS`).
  *
  * @example
  * ```ts
  * import type { KumimojiCheck } from "@johnmorrisdotca/kumimoji";
  *
- * const value: KumimojiCheck = {ok:false,reason:"Not a finished grid"};
+ * const value: KumimojiCheck = {ok:false,reason:"the grid is not finished",code:"grid-not-finished"};
  * console.log(value);
  * ```
  */
-export type KumimojiCheck = { ok: true } | { ok: false; reason: string };
+export type KumimojiCheck =
+  | { ok: true }
+  | { ok: false; reason: string; code: KumimojiCheckCode; values?: KumimojiCheckValues };
 
 /**
  * A GAME DEALT (`generateKumimoji`): the bag, in the order its tiles come out,

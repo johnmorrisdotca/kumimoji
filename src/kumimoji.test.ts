@@ -264,8 +264,8 @@ describe("checking a finished kumimoji", () => {
     const bag = "tacwo";
     expect(checkKumimoji(3, bag, "cat/o/w")).toEqual({ ok: true });
     expect(checkKumimoji(3, bag, "cat/2o/2w")).toEqual({ ok: true });
-    expect(checkKumimoji(3, bag, "cat/1o/1w")).toEqual({ ok: false, reason: "aow is not in the word list" });
-    expect(checkKumimoji(3, bag, "cat/5o/5w")).toEqual({ ok: false, reason: "the tiles are not all joined" });
+    expect(checkKumimoji(3, bag, "cat/1o/1w")).toMatchObject({ ok: false, reason: "aow is not in the word list" });
+    expect(checkKumimoji(3, bag, "cat/5o/5w")).toMatchObject({ ok: false, reason: "the tiles are not all joined" });
   });
 
   it("scores ten a tile and as much again for speed, falling to nothing at half a minute a tile", () => {

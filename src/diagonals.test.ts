@@ -92,15 +92,17 @@ describe("the server's check with Diagonals", () => {
   it("takes a crossword joined only along a diagonal word, and refuses it without Diagonals", () => {
     // CAT down to the right, and TOW across from its T.
     expect(checkKumimoji(3, "tacwo", "c/1a/2tow", DIAGONALS)).toEqual({ ok: true });
-    expect(checkKumimoji(3, "tacwo", "c/1a/2tow")).toEqual({ ok: false, reason: "the tiles are not all joined" });
+    expect(checkKumimoji(3, "tacwo", "c/1a/2tow")).toMatchObject({ ok: false, reason: "the tiles are not all joined" });
   });
 
   it("refuses a crossword whose diagonal is not a word, which is sound without Diagonals", () => {
     // AT, TO, OR and RE, a staircase whose diagonal reads A·O·E.
     expect(checkKumimoji(3, "atore", "at/1or/2e")).toEqual({ ok: true });
-    expect(checkKumimoji(3, "atore", "at/1or/2e", DIAGONALS)).toEqual({
+    expect(checkKumimoji(3, "atore", "at/1or/2e", DIAGONALS)).toMatchObject({
       ok: false,
       reason: "aoe is not in the word list",
+      code: "not-a-word",
+      values: { word: "aoe" },
     });
   });
 
