@@ -1,3 +1,5 @@
+<p align="center"><a href="https://johnmorrisdotca.github.io/kumimoji/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/johnmorrisdotca/kumimoji/main/docs/images/thumbnail-dark.png"><img src="https://raw.githubusercontent.com/johnmorrisdotca/kumimoji/main/docs/images/thumbnail.png" alt="Kumimoji: letter tiles laid in a crossword by the package's own computer player." width="1200"></picture></a></p>
+
 <h1 align="center">Kumimoji <sub>組み文字</sub> — Crossword tile game in English and Japanese</h1>
 
 <p align="center"><strong>The crossword tile race: a word game where you build one crossword from a bag of letter tiles.</strong><br>
@@ -1062,8 +1064,6 @@ kept as text made to be sent, and Itsutsu sends it; the sending is yours); a
 command line; CSV; and any name, art or wording of a published game. Kumimoji
 runs from a static page and costs nothing to host.
 
-Ideas and pull requests are welcome.
-
 ## Architecture
 
 The rules are plain functions over plain data with no DOM: a game is a value,
@@ -1173,16 +1173,16 @@ Kumimoji is one of thirty-two packages, each made for the same site, each at
 
 ```sh
 pnpm install --frozen-lockfile
-pnpm check             # lint, types and tests, including the checks on the README's tables and examples
+pnpm check             # lint, types and tests, the README's own checks among them
 pnpm test:table        # the demo in real browsers, by taps
 pnpm test:package      # pack it as npm does, install it and import every entry
 pnpm test:frameworks   # the six framework examples, built from the packed tarball and played
 pnpm test:readme       # every TypeScript and JavaScript example in this README, type-checked and run
 pnpm site              # build the demo into ./site
-pnpm screenshots:readme  # retake the README's pictures into docs/images (builds the demo first)
+pnpm screenshots:readme  # retake the README's pictures (builds the demo first)
 ```
 
-The pictures are taken on the maintainer's Mac and are retaken only when the look changes; they are in `docs/images` and are not in the package that npm installs.
+The README's pictures are in `docs/images`, which the npm package leaves out.
 
 ## Contributing
 

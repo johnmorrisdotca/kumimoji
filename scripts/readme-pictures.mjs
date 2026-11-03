@@ -115,4 +115,34 @@ await takePictures({
     ),
     table("hand-of-eleven", { seed: 33, hand: 11 }, { language: "english", seed: 33, words: 5 }),
   ],
+  // The family's thumbnail, dark thumbnail and icon (scripts/family-thumbnail.mjs): an English crossword the computer
+  // player builds, its tiles alone without the table; the icon is
+  // its busiest corner.
+  thumbnail: {
+    url: address({ seed: 77 }),
+    ready: `${TABLE}[data-state="playing"]`,
+    target: `${TABLE} .km-grid`,
+    label: "Kumimoji 組み文字",
+    async prepare(page) {
+      await laid({ language: "english", seed: 77, words: 14 })(page);
+      // The crossword alone: the empty squares keep their room and are not drawn.
+      await page.addStyleTag({ content: `${TABLE} .km-square:empty { visibility: hidden !important; }` });
+    },
+    // The icon: the busiest three squares by three of the same crossword, so its tiles read at 40 px.
+    icon: {
+      async prepare(page) {
+        await page.locator(`${TABLE} .km-grid`).evaluate((grid) => {
+          const filled = [...grid.querySelectorAll(".km-square")].filter((square) =>
+            square.classList.contains("km-tile"),
+          );
+          const at = (square) => square.dataset.square.split(",").map(Number);
+          const near = (a, b) => Math.abs(at(a)[0] - at(b)[0]) <= 1 && Math.abs(at(a)[1] - at(b)[1]) <= 1;
+          const count = (square) => filled.filter((other) => near(square, other)).length;
+          const centre = filled.reduce((best, square) => (count(square) > count(best) ? square : best));
+          for (const square of filled)
+            if (!near(square, centre)) square.style.setProperty("visibility", "hidden", "important");
+        });
+      },
+    },
+  },
 });

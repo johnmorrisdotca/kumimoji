@@ -13,6 +13,7 @@ import {
   familyHeader,
   familyUnreviewed,
 } from "./family-template.mjs";
+import { publishThumbnails, thumbnailHead } from "./family-thumbnail.mjs";
 
 const id = "kumimoji";
 const ICON =
@@ -34,6 +35,9 @@ const tries = [
   ["diagonals", `diagonals: true`],
 ];
 
+/** What the family's card shows, for a reader who cannot see it (the README's top picture says the same). */
+const ALT = "Kumimoji: letter tiles laid in a crossword by the package's own computer player.";
+
 const page = `<!doctype html>
 <html lang="en">
   <head>
@@ -45,6 +49,7 @@ const page = `<!doctype html>
       ogTitle: "Kumimoji 組み文字 — Crossword tile game in English and Japanese",
       ogDescription: "Build one crossword from every tile in the bag, in English or Japanese.",
     })}
+    ${thumbnailHead(JSON.parse(readFileSync("package.json", "utf8")), { alt: ALT })}
     <link rel="icon" href="${ICON}" />
     <link rel="stylesheet" href="family.css" />
     <link rel="stylesheet" href="kumimoji.css" />
@@ -130,6 +135,8 @@ cpSync("dist", "site/dist", { recursive: true });
 cpSync("NOTICE.md", "site/NOTICE.md");
 cpSync("LICENSE", "site/LICENSE");
 writeFileSync("site/index.html", page);
+// The family's card, dark card and icon, at <site>/thumbnail.png, thumbnail-dark.png and icon.png.
+publishThumbnails(".", "site");
 // The API reference, made from the source: every export of every entry point.
 writeFileSync("site/api.css", API_CSS);
 writeFileSync("site/api.html", apiPage({ id, name: "Kumimoji", icon: ICON }));
