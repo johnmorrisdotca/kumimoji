@@ -121,17 +121,17 @@ test("in kana: the hand is kana, and a word is judged in Japanese", async ({ pag
   let s = await sound(page, errors);
   expect(s.japanese).toBe(true);
   expect(s.hand).toEqual([...givens.slice(0, 7)].map(words.glyphOf));
-  expect(s.hand.join("")).toBe("つかてしんきし");
-  // つか, a hilt: two kana side by side are a word.
+  expect(s.hand.join("")).toBe("はしんゆほしも");
+  // はし, chopsticks: two kana side by side are a word.
   await lay(page, 0, 0, 0);
   await lay(page, 0, 0, 1);
   s = await sound(page, errors);
-  expect(s.table).toEqual({ "0,0": "つ", "0,1": "か" });
+  expect(s.table).toEqual({ "0,0": "は", "0,1": "し" });
   expect(s.notes).toBe("");
-  // て after it is not one.
-  await lay(page, 0, 0, 2);
+  // ほ after it is not one.
+  await lay(page, 2, 0, 2);
   s = await sound(page, errors);
-  expect(s.notes).toBe("Not words: つかて");
+  expect(s.notes).toBe("Not words: はしほ");
   expect(s.pressed).toContain("language=japanese");
 });
 

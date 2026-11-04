@@ -6,6 +6,16 @@ All notable changes to this project are written down here. The format follows
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-11-04
+
+A minor version: nothing that 1.5.0 gave is taken away except five lines that are obscene in themselves. The English list, the rules and the saved-game format are unchanged.
+
+### Changed
+
+- **The Japanese word list no longer leaves out ordinary words** (MODULES-392; John, 2026-11-04: "we can't filter out regular good words"). Kotoba's children bar, which writes the list, is narrowed: a line is out only when every entry that spells it is marked vulgar, X-rated, sensitive or derogatory by JMdict, or has a first sense that names a sex act, a sex organ or the sex trade, or it is a reading on Kotoba's short list of obscene ones. A sense that only mentions sex is no longer enough. 86 lines are back, among them せいべつ (性別), いせい (異性), どうせい (同性), きょうがく (共学), こんりゅう (建立), まぜもの (混ぜ物), そうにゅう (挿入), ふじゅん (不純), なのはな (菜の花), あいじん (愛人).
+- **Five lines are held out by name**: まんこ and うんこ and おっぱい and ちんこ, which JMdict marks nothing or shares with an ordinary word (万古 is also まんこ), and れいふ, the line that れいぷ plays on the tiles (it is also 霊符, a charm, which goes out with it). The list is 162,243 readings, 86 more and 5 fewer: 162,324.
+- **A seeded Japanese game is dealt differently**, as the list has other words to choose among; English games and the saved-game format are unchanged.
+
 ## [1.5.0] - 2026-11-04
 
 A minor version: nothing that 1.4.0 gave is taken away except what children should not have been handed. The English list, the rules and the saved-game format are unchanged.

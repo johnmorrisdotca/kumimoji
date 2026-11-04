@@ -96,7 +96,7 @@ test("a saved game loads back, and a file that is not a game is refused", async 
   await expect(page.locator(`${PLAYING}.km-japanese`)).toBeVisible();
   s = await sound(page, errors);
   expect(s.table).toEqual({});
-  expect(s.hand.join("")).toBe("つかてしんきし");
+  expect(s.hand.join("")).toBe("はしんゆほしも");
 });
 
 test("a game left half way is on the table again on return", async ({ page }) => {
