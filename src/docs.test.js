@@ -260,7 +260,7 @@ describe("the README's tables", () => {
     expect(readme).toContain(`${japanese.allowed.size.toLocaleString("en-US")} hiragana readings of 2 to 15 kana`);
     const notice = readFileSync("NOTICE.md", "utf8");
     expect(notice).toContain("110,316 words");
-    expect(notice).toContain("162,243 hiragana readings");
+    expect(notice).toContain("162,324 hiragana readings");
     expect(notice).toContain("Copyright 2000-2018 by Kevin Atkinson");
     expect(notice).toContain("Creative Commons Attribution-ShareAlike 4.0");
     // The share-alike terms are said before the first heading a reader scrolls to, not only at the foot.
