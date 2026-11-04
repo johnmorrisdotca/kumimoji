@@ -100,7 +100,7 @@ const game = `
 const { loadTileWords, generateKumimoji, deal, draw, placeFromHand, squareAt, judgeWithWords, isFinished, checkKumimoji, encodeGrid, kumimojiToJSON, kumimojiFromJSON, KUMIMOJI_VERSION } = kumimoji;
 const english = await loadTileWords("english");
 const japanese = await loadTileWords("japanese");
-if (english.allowed.size !== 110316 || japanese.allowed.size !== 163461) throw new Error("the lists hold " + english.allowed.size + " and " + japanese.allowed.size + " words");
+if (english.allowed.size !== 110316 || japanese.allowed.size !== 162243) throw new Error("the lists hold " + english.allowed.size + " and " + japanese.allowed.size + " words");
 const dealt = generateKumimoji(3, "hard", 44);
 if (dealt.givens !== "nwosy") throw new Error("seed 44 dealt " + dealt.givens);
 if (generateKumimoji(7, "medium", 2026).givens !== "xbsnnnymrqao*et*cuutxmopsmdewie*aapirpfe") throw new Error("seed 2026 dealt another bag");

@@ -31,7 +31,7 @@ SCOWL's own distribution.
 
 `src/words.ja.data.ts` is derived from JMdict, the Japanese-Multilingual
 Dictionary of the Electronic Dictionary Research and Development Group
-(https://www.edrdg.org/), release 2026-09-28: 163,461 hiragana readings of 2 to
+(https://www.edrdg.org/), release 2026-11-04: 162,243 hiragana readings of 2 to
 15 kana, each spelt in the 45 base kana the tiles show. JMdict is the property of
 the EDRDG and is used under the Creative Commons Attribution-ShareAlike 4.0
 licence, with the group's conditions: https://www.edrdg.org/edrdg/licence.html.

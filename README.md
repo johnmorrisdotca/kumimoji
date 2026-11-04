@@ -12,7 +12,7 @@ In English and in Japanese kana. The rules as pure, seeded TypeScript, two word 
   <a href="./NOTICE.md"><img alt="Japanese word list: CC BY-SA 4.0" src="https://img.shields.io/badge/Japanese%20words-CC%20BY--SA%204.0-b5452c"></a>
   <img alt="No dependencies" src="https://img.shields.io/badge/dependencies-0-2f5d4a">
   <img alt="TypeScript" src="https://img.shields.io/badge/types-TypeScript-3178c6">
-  <a href="https://johnmorrisdotca.github.io/kumimoji/docs/api/main/index.html"><img alt="679.3 kB minified and gzipped" src="https://img.shields.io/badge/min%2Bgzip-679.3%20kB-2f5d4a"></a>
+  <a href="https://johnmorrisdotca.github.io/kumimoji/docs/api/main/index.html"><img alt="677.1 kB minified and gzipped" src="https://img.shields.io/badge/min%2Bgzip-677.1%20kB-2f5d4a"></a>
   <a href="https://www.npmjs.com/package/@johnmorrisdotca/kumimoji#provenance"><img alt="Published with npm provenance" src="https://img.shields.io/badge/npm-provenance-2f5d4a"></a>
 </p>
 
@@ -105,7 +105,7 @@ Or with nothing to install, [play a game in the demo](https://johnmorrisdotca.gi
 - **Races and daily puzzles.** A seed deals one bag, the same for everybody,
   and `checkKumimoji` checks a finished grid against it without searching.
 - **Japanese.** A word game that plays in kana, with が on the か tile and ゃ
-  on the や tile, and a list of 163,461 readings.
+  on the や tile, and a list of 162,243 readings.
 - **Learners and teachers** of English or Japanese spelling.
 
 ## Features
@@ -114,7 +114,7 @@ Or with nothing to install, [play a game in the demo](https://johnmorrisdotca.gi
   its tiles, so every bag can be finished.
 - **English and Japanese.** 144 tiles in each: the English letters, or 45 base
   kana where が plays as か, ゃ as や and を as お. 110,316 English words and
-  163,461 Japanese readings, of 2 to 15 tiles.
+  162,243 Japanese readings, of 2 to 15 tiles.
 - **Wild tiles** that take any letter or kana, and are read as that in every
   word they are part of.
 - **Trades.** A tile you cannot use goes back into the bag for three.
@@ -157,7 +157,7 @@ Each picture is the table the package draws, taken from [the demo](https://johnm
 <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/johnmorrisdotca/kumimoji/main/docs/images/kana-desk-dark.webp">
 <img src="https://raw.githubusercontent.com/johnmorrisdotca/kumimoji/main/docs/images/kana-desk-light.webp" alt="A Japanese board of kana tiles on the green table, a crossword of hiragana laid across and down on the grid of empty squares." width="400">
 </picture>
-<br><em><strong>Japanese kana.</strong> 45 base kana tiles, 163,461 readings.</em>
+<br><em><strong>Japanese kana.</strong> 45 base kana tiles, 162,243 readings.</em>
 </td>
 </tr>
 <tr>
@@ -392,8 +392,8 @@ fetches when a game is first dealt.
   names only the files that define the tag and register the word lists.
 - **Sizes.** The rules, the computer player and the table of players are
   about 44 kB minified (16 kB gzipped); the table for a page is 34 kB (13 kB).
-  The English list is 606 kB (277 kB gzipped) and the Japanese 718 kB
-  (396 kB), each a file of its own that is fetched only when a game in that
+  The English list is 606 kB (277 kB gzipped) and the Japanese 715 kB
+  (394 kB), each a file of its own that is fetched only when a game in that
   language is first dealt.
 - **Where it runs.** Current Chrome, Edge, Firefox and Safari, on a desk or a
   phone. The rules have no DOM in them and run in Node 22 and later, Deno,
@@ -674,11 +674,11 @@ import { BASE_KANA, deal, generateKumimoji, loadTileWords, tileKana } from "@joh
 const words = await loadTileWords("japanese");
 [...BASE_KANA].length; // → 45
 [tileKana("が"), tileKana("ゃ"), tileKana("を"), tileKana("っ")]; // → ["か", "や", "お", "つ"]
-words.allowed.size; // → 163461
+words.allowed.size; // → 162243
 words.allowed.has("ことは"); // → true
 
 const dealt = generateKumimoji(7, "medium", 2026, { language: "japanese" });
-deal(dealt.givens, 7).hand.map(words.glyphOf).join(""); // → "よきめたんえら"
+deal(dealt.givens, 7).hand.map(words.glyphOf).join(""); // → "つかてしんきし"
 ```
 
 The tiles are the 45 base hiragana. A word is spelt with the base of each of
@@ -772,7 +772,7 @@ The JSON, as `kumimojiToJSON` writes it:
 {
   "format": 1,
   "game": "kumimoji",
-  "generator": "kumimoji 1.4.0",
+  "generator": "kumimoji 1.5.0",
   "size": 3,
   "level": "hard",
   "seed": 44,
@@ -817,7 +817,7 @@ with its notice too.
 | List | What it is | Where it comes from | Terms |
 | --- | --- | --- | --- |
 | English, `dist/words.en.data.js` | 110,316 words of 2 to 15 letters, English and American spellings | [SCOWL](http://wordlist.aspell.net/) 2020.12.07, sizes 10 to 70 | © 2000–2018 Kevin Atkinson and the authors of the lists SCOWL is built from. Permission to use, copy, modify, distribute and sell for any purpose, **provided the copyright notice appears in all copies, and both it and the permission notice in supporting documentation**. No share-alike. |
-| Japanese, `dist/words.ja.data.js` | 163,461 hiragana readings of 2 to 15 kana, each spelt in the 45 base kana of the tiles | [JMdict](https://www.edrdg.org/jmdict/j_jmdict.html), release 2026-09-28, of the Electronic Dictionary Research and Development Group | **[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)**, with the [EDRDG's conditions](https://www.edrdg.org/edrdg/licence.html). **Attribution is required, and the list, or anything made from it, may be passed on only under the same licence.** |
+| Japanese, `dist/words.ja.data.js` | 162,243 hiragana readings of 2 to 15 kana, each spelt in the 45 base kana of the tiles | [JMdict](https://www.edrdg.org/jmdict/j_jmdict.html), release 2026-11-04, of the Electronic Dictionary Research and Development Group | **[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)**, with the [EDRDG's conditions](https://www.edrdg.org/edrdg/licence.html). **Attribution is required, and the list, or anything made from it, may be passed on only under the same licence.** |
 
 What that means for a project that uses this package:
 
@@ -1194,7 +1194,7 @@ Please follow the [code of conduct](./CODE_OF_CONDUCT.md). A way to make a check
 
 See [CHANGELOG.md](./CHANGELOG.md).
 
-The latest release, 1.4.0, gives a check's reason as a code beside the English, and lets a table be laid in the family's five cloths.
+The latest release, 1.5.0, leaves words that are not for children out of the Japanese list.
 
 ## Licence
 

@@ -24,3 +24,7 @@ TileWords has allowed words, encoded words by length, physical mix, glyph/readin
 ## Preserve the data notices
 
 The English and Japanese data have their own notices, distinct from MIT code. [NOTICE.md](../../NOTICE.md) and [the existing licence table](../../README.md#the-word-lists-and-their-licences) preserve the terms and attribution. Generated dictionaries are changed through their source workflow, not edited by hand.
+
+## What the Japanese list leaves out
+
+Children play this game, so the Japanese list leaves out readings that are not for them. A reading is out when every JMdict entry that spells it has a vulgar, X-rated, sensitive or derogatory mark on its first meaning, or a first meaning that names sex or the sex trade. JMdict's release of 2026-11-04 gives 1,347 such readings, and the list holds 162,243. A reading that an ordinary word is also spelt like stays, because the tiles play ば and ぱ as は. The list is written by Kotoba's `scripts/word-lists-ja.mjs` with the rule in its `scripts/children-bar.mjs`; it is not edited by hand here, and a test holds the known bad readings out.

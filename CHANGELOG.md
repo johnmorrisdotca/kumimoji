@@ -6,6 +6,19 @@ All notable changes to this project are written down here. The format follows
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-11-04
+
+A minor version: nothing that 1.4.0 gave is taken away except what children should not have been handed. The English list, the rules and the saved-game format are unchanged.
+
+### Changed
+
+- **The Japanese word list leaves out what is not for children** (MODULES-390). Children play this game, and the list was every kana reading of every JMdict entry. It now has the bar of Kotoba's kana lists (`scripts/children-bar.mjs` in Kotoba, which writes the list with `scripts/word-lists-ja.mjs`): a reading is out when every JMdict entry that spells it has a vulgar, X-rated, sensitive or derogatory mark on its first sense, or a first sense whose gloss names sex or the sex trade. A reading that an ordinary entry is also spelt like stays, and so does a line that another word plays: the tiles play ば and ぱ as は, so れいぷ is the line れいふ, which is also 霊符 (a charm). Of the 163,585 lines JMdict's release of 2026-11-04 gives, 1,347 are barred (110 of 3 kana, 347 of 4, 264 of 5, 626 longer), among them せっくす, ばいしゅん, ぽるの, えろい, おなに, ちくび, ふぇらちお, せいどれい, いんらん, ちんぽ and らぶほてる; the 5 words earlier lists held that JMdict no longer lists are kept, so a game kept half way still checks. The list holds **162,243** readings (163,461 in 1.4.0). A test (`src/childrenBar.test.ts`) holds the known bad readings out. The guide "Load and judge with word lists" says what is left out, in English and in Japanese.
+- **A seeded Japanese game is dealt differently**, as the list has fewer words to choose among: the same seed gives another bag. English games are unchanged, and so is the saved-game format; a kept Japanese game checks as before unless it spells one of the barred lines.
+- The Japanese list is made again from JMdict's release of 2026-11-04 (it was 2026-09-28): 129 readings join, 5 are kept that JMdict dropped.
+- The package is a little smaller: the Japanese list is 715 kB (394 kB gzipped), and the sizes in `docs/bundle-size.json` are measured again.
+
+### Added
+
 - The README opens with the package's thumbnail, and the demo carries it as its link preview (og:image) and publishes the card, a dark card and an icon on Pages at `thumbnail.png`, `thumbnail-dark.png` and `icon.png`.
 
 ## [1.4.0] - 2026-11-02
@@ -198,7 +211,8 @@ The first release.
   `@johnmorrisdotca/kumimoji/react`.
 - A static demo for GitHub Pages.
 
-[Unreleased]: https://github.com/johnmorrisdotca/kumimoji/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/johnmorrisdotca/kumimoji/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/johnmorrisdotca/kumimoji/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/johnmorrisdotca/kumimoji/compare/v1.3.1...v1.4.0
 [1.3.0]: https://github.com/johnmorrisdotca/kumimoji/compare/v1.2.2...v1.3.0
 [1.2.1]: https://github.com/johnmorrisdotca/kumimoji/compare/v1.2.0...v1.2.1
